@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.egg-info/
+
+# Virtualenv
+.venv/
+venv/
+ENV/
+
+# Django
+staticfiles/
+media/
+!media/.gitkeep
+!media/avatars/.gitkeep
+!static/images/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Env files
+.env
+.env.local
+
+# Migrations
+*/migrations/__pycache__/

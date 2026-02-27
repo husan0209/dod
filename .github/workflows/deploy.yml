@@ -1,0 +1,64 @@
+# .github/workflows/deploy.yml
+
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ['CI Pipeline']
+    types: [completed]
+    branches: [main, staging]
+
+jobs:
+  deploy-staging:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'staging'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to staging
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /opt/dod
+            git pull origin staging
+            docker compose -f docker-compose.staging.yml \
+              pull && \
+            docker compose -f docker-compose.staging.yml \
+              up -d --build && \
+            docker compose -f docker-compose.staging.yml \
+              exec web python manage.py migrate --noinput
+            echo "Staging deployed: $(date)"
+
+  deploy-production:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to production
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /opt/dod
+            # Бэкап перед деплоем
+            ./deploy/backups/backup.sh pre-deploy
+            # Деплой
+            git pull origin main
+            docker compose -f docker-compose.prod.yml \
+              up -d --build
+            docker compose -f docker-compose.prod.yml \
+              exec web python manage.py migrate --noinput
+            # Health check
+            ./deploy/scripts/health-check.sh || \
+              ./deploy/scripts/rollback.sh
+            echo "Production deployed: $(date)"

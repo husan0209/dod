@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Crash - Казино</title>
+</head>
+<body>
+    <h1>Crash</h1>
+    <div id="crash-game">
+        <p>Текущий коэффициент: <span id="multiplier">1.00x</span></p>
+        <form method="post" id="bet-form">
+            {% csrf_token %}
+            <input type="number" name="bet_amount" step="0.01" placeholder="Ставка">
+            <input type="number" name="auto_cashout" step="0.01" placeholder="Авто-кэшаут">
+            <button type="submit">Поставить</button>
+        </form>
+    </div>
+    <div id="result"></div>
+</body>
+</html>

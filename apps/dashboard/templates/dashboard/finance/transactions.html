@@ -1,0 +1,136 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Транзакции{% endblock %}
+{% block page_title %}💰 Все транзакции{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Filters -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-2">
+                        <select class="form-select" name="type">
+                            <option value="">Все типы</option>
+                            <option value="deposit">Депозиты</option>
+                            <option value="withdrawal">Выводы</option>
+                            <option value="bet">Ставки</option>
+                            <option value="win">Выигрыши</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="status">
+                            <option value="">Все статусы</option>
+                            <option value="pending">Ожидают</option>
+                            <option value="completed">Завершены</option>
+                            <option value="failed">Провалены</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="search" placeholder="Поиск по ID или email">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control" name="date_from">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control" name="date_to">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary">Фильтр</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mb-3">
+            <button class="btn btn-success" onclick="exportCSV()">📥 Экспорт CSV</button>
+            <button class="btn btn-success" onclick="exportExcel()">📥 Экспорт Excel</button>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Пользователь</th>
+                                <th>Тип</th>
+                                <th>Сумма</th>
+                                <th>Статус</th>
+                                <th>Дата</th>
+                                <th>Детали</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr>
+                                <td>{{ transaction.id }}</td>
+                                <td>
+                                    {% if transaction.target_user %}
+                                    {{ transaction.target_user.username }}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if transaction.type == 'deposit' %}
+                                        Депозит
+                                    {% elif transaction.type == 'withdrawal' %}
+                                        Вывод
+                                    {% elif transaction.type == 'bet' %}
+                                        Ставка
+                                    {% elif transaction.type == 'win' %}
+                                        Выигрыш
+                                    {% else %}
+                                        {{ transaction.type }}
+                                    {% endif %}
+                                </td>
+                                <td class="{% if transaction.amount_usd >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {% if transaction.amount_usd >= 0 %}+{% endif %}${{ transaction.amount_usd|floatformat:2 }}
+                                </td>
+                                <td>
+                                    {% if transaction.status == 'completed' %}
+                                        ✅ Завершена
+                                    {% elif transaction.status == 'pending' %}
+                                        ⏳ Ожидает
+                                    {% elif transaction.status == 'failed' %}
+                                        ❌ Провалена
+                                    {% else %}
+                                        {{ transaction.status }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ transaction.created_at|date:"d.m.Y H:i" }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-info" onclick="viewDetails({{ transaction.id }})">👁️ Детали</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function exportCSV() {
+    // Implement CSV export
+    alert('CSV export not implemented yet');
+}
+
+function exportExcel() {
+    // Implement Excel export
+    alert('Excel export not implemented yet');
+}
+
+function viewDetails(id) {
+    // Implement details view
+    alert('Details view not implemented yet');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}My Portfolio{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">My Portfolio</h1>
+
+    <!-- Portfolio Summary -->
+    <div class="bg-white p-6 rounded-lg shadow mb-8">
+        <h2 class="text-xl font-bold mb-4">Summary</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-green-600">${{ portfolio.total_invested|floatformat:2 }}</div>
+                <div class="text-sm text-gray-600">Total Invested</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600">${{ portfolio.current_value|floatformat:2 }}</div>
+                <div class="text-sm text-gray-600">Current Value</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold {% if portfolio.total_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                    ${{ portfolio.total_pnl|floatformat:2 }}
+                </div>
+                <div class="text-sm text-gray-600">Total PnL</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold {% if portfolio.total_pnl_percent >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                    {{ portfolio.total_pnl_percent|floatformat:1 }}%
+                </div>
+                <div class="text-sm text-gray-600">Total Return</div>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <div class="text-lg">Win Rate: {{ portfolio.win_rate|floatformat:1 }}%</div>
+            <div class="text-sm text-gray-600">Total Trades: {{ portfolio.total_trades }}</div>
+        </div>
+    </div>
+
+    <!-- Tabs for Active/Settled -->
+    <div class="tabs tabs-boxed mb-6">
+        <a class="tab tab-active" href="#active">Active Positions ({{ portfolio.active_positions|length }})</a>
+        <a class="tab" href="#settled">Settled Positions ({{ portfolio.settled_positions|length }})</a>
+    </div>
+
+    <!-- Active Positions -->
+    <div id="active" class="tab-content">
+        <h2 class="text-2xl font-bold mb-6">Active Positions</h2>
+        {% if portfolio.active_positions %}
+        <div class="grid gap-4">
+            {% for position in portfolio.active_positions %}
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold">{{ position.market }}</h3>
+                        <div class="badge {% if position.side == 'yes' %}badge-success{% else %}badge-error{% endif %}">
+                            {{ position.side|upper }}
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-600">Shares: {{ position.shares|floatformat:8 }}</div>
+                        <div class="text-sm text-gray-600">Avg Price: ${{ position.avg_price|floatformat:4 }}</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <div class="text-sm text-gray-600">Invested</div>
+                        <div class="text-lg font-bold">${{ position.invested|floatformat:2 }}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">Current Value</div>
+                        <div class="text-lg font-bold">${{ position.current_value|floatformat:2 }}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">Unrealized PnL</div>
+                        <div class="text-lg font-bold {% if position.unrealized_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            ${{ position.unrealized_pnl|floatformat:2 }}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">Return</div>
+                        <div class="text-lg font-bold {% if position.pnl_percent >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            {{ position.pnl_percent|floatformat:1 }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white p-8 rounded-lg shadow text-center">
+            <p class="text-gray-600">No active positions</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Settled Positions -->
+    <div id="settled" class="tab-content hidden">
+        <h2 class="text-2xl font-bold mb-6">Settled Positions</h2>
+        {% if portfolio.settled_positions %}
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr>
+                        <th>Market</th>
+                        <th>Side</th>
+                        <th>Invested</th>
+                        <th>Returned</th>
+                        <th>Realized PnL</th>
+                        <th>Settlement</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for position in portfolio.settled_positions %}
+                    <tr>
+                        <td>{{ position.market|truncatechars:30 }}</td>
+                        <td>
+                            <span class="badge {% if position.side == 'yes' %}badge-success{% else %}badge-error{% endif %}">
+                                {{ position.side|upper }}
+                            </span>
+                        </td>
+                        <td>${{ position.invested|floatformat:2 }}</td>
+                        <td>${{ position.returned|floatformat:2 }}</td>
+                        <td class="{% if position.realized_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            ${{ position.realized_pnl|floatformat:2 }}
+                        </td>
+                        <td>${{ position.settlement_amount|floatformat:2 }}</td>
+                        <td>
+                            {% if position.settlement_amount > 0 %}
+                            <span class="text-green-600">Win</span>
+                            {% else %}
+                            <span class="text-red-600">Loss</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="bg-white p-8 rounded-lg shadow text-center">
+            <p class="text-gray-600">No settled positions</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = this.getAttribute('href');
+        
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+        this.classList.add('tab-active');
+        
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+        document.querySelector(target).classList.remove('hidden');
+    });
+});
+</script>
+{% endblock %}

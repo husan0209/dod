@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Prediction Market{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Prediction Market</h1>
+
+    <!-- Categories -->
+    <div class="mb-6">
+        <div class="flex flex-wrap gap-2 mb-4">
+            <a href="{% url 'predictions:index' %}" class="btn {% if not selected_category %}btn-primary{% else %}btn-outline{% endif %}">Все</a>
+            {% for category in categories %}
+            <a href="?category={{ category.id }}" class="btn {% if selected_category == category.id|stringformat:'s' %}btn-primary{% else %}btn-outline{% endif %}">
+                {{ category.icon }} {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="mb-6">
+        <div class="flex flex-wrap gap-4 items-center">
+            <div class="flex gap-2">
+                <a href="?filter=trending" class="btn {% if filter_type == 'trending' %}btn-primary{% else %}btn-outline{% endif %}">🔥 Трендовые</a>
+                <a href="?filter=closing_soon" class="btn {% if filter_type == 'closing_soon' %}btn-primary{% else %}btn-outline{% endif %}">⏰ Закрываются скоро</a>
+                <a href="?filter=resolved" class="btn {% if filter_type == 'resolved' %}btn-primary{% else %}btn-outline{% endif %}">✅ Разрешённые</a>
+            </div>
+            <form method="get" class="flex gap-2">
+                <input type="text" name="q" value="{{ query }}" placeholder="Поиск..." class="input input-bordered">
+                <button type="submit" class="btn btn-primary">🔍</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Markets Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="markets-list">
+        {% for market in markets %}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <div class="flex items-start justify-between">
+                    <div class="badge badge-outline">{{ market.category.name }}</div>
+                    {% if market.is_featured %}<div class="badge badge-primary">Featured</div>{% endif %}
+                </div>
+                <h2 class="card-title text-lg">{{ market.question|truncatechars:80 }}</h2>
+                <div class="flex gap-4 mt-4">
+                    <div class="flex-1">
+                        <div class="text-sm text-green-600">🟢 YES</div>
+                        <div class="text-lg font-bold">${{ market.yes_price|floatformat:4 }} ({{ market.get_yes_probability|floatformat:1 }}%)</div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm text-red-600">🔴 NO</div>
+                        <div class="text-lg font-bold">${{ market.no_price|floatformat:4 }} ({{ market.get_no_probability|floatformat:1 }}%)</div>
+                    </div>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600 mt-2">
+                    <span>📊 ${{ market.volume_usd|floatformat:0 }}</span>
+                    <span>👥 {{ market.unique_traders }}</span>
+                    <span>⏰ {{ market.close_date|date:"M j" }}</span>
+                </div>
+                <div class="card-actions justify-end mt-4">
+                    <a href="{% url 'predictions:market_detail' market.id %}" class="btn btn-primary">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="flex justify-center mt-8">
+        <div class="btn-group">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn">«</a>
+            {% endif %}
+            <span class="btn">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn">»</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

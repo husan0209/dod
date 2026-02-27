@@ -1,0 +1,47 @@
+<!-- Bottom Navigation Component -->
+<!-- templates/miniapp/components/bottom_nav.html -->
+
+<nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 z-50 bg-tg-secondary border-t border-white/10"
+     style="height: var(--bottom-nav-height); padding-bottom: var(--safe-bottom);">
+    <div class="flex h-full">
+        <!-- Home Tab -->
+        <a href="{% url 'miniapp:home' %}" class="nav-tab flex-1 flex flex-col items-center justify-center
+                text-tg-hint hover:text-tg-text transition-colors relative"
+           data-tab="home">
+            <div class="text-xl mb-1">🏠</div>
+            <div class="text-xs">Главная</div>
+        </a>
+
+        <!-- Sports Tab -->
+        <a href="{% url 'miniapp:sports' %}" class="nav-tab flex-1 flex flex-col items-center justify-center
+                text-tg-hint hover:text-tg-text transition-colors relative"
+           data-tab="sports">
+            <div class="text-xl mb-1">⚽</div>
+            <div class="text-xs">Спорт</div>
+        </a>
+
+        <!-- Casino Tab -->
+        <a href="{% url 'miniapp:casino' %}" class="nav-tab flex-1 flex flex-col items-center justify-center
+                text-tg-hint hover:text-tg-text transition-colors relative"
+           data-tab="casino">
+            <div class="text-xl mb-1">🎰</div>
+            <div class="text-xs">Казино</div>
+        </a>
+
+        <!-- Predictions Tab -->
+        <a href="{% url 'miniapp:predictions' %}" class="nav-tab flex-1 flex flex-col items-center justify-center
+                text-tg-hint hover:text-tg-text transition-colors relative"
+           data-tab="predictions">
+            <div class="text-xl mb-1">📊</div>
+            <div class="text-xs">Маркеты</div>
+        </a>
+
+        <!-- Profile Tab -->
+        <a href="{% url 'miniapp:profile' %}" class="nav-tab flex-1 flex flex-col items-center justify-center
+                text-tg-hint hover:text-tg-text transition-colors relative"
+           data-tab="profile">
+            <div class="text-xl mb-1">👤</div>
+            <div class="text-xs">Профиль</div>
+        </a>
+    </div>
+</nav>

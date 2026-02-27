@@ -1,0 +1,43 @@
+<!-- Header Component -->
+<!-- templates/miniapp/components/header.html -->
+
+<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-tg-header shadow-lg"
+        style="height: var(--header-height); padding-top: var(--safe-top);">
+    <div class="flex items-center justify-between px-4 h-full">
+        <!-- Back Button -->
+        <button id="back-btn" class="text-tg-text opacity-70 hover:opacity-100 transition-opacity"
+                onclick="haptic.light(); window.history.back();">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </button>
+
+        <!-- Title -->
+        <h1 class="text-lg font-semibold text-tg-text flex-1 text-center truncate">
+            {% block title %}DOD{% endblock %}
+        </h1>
+
+        <!-- Right Section -->
+        <div class="flex items-center space-x-2">
+            <!-- Balance -->
+            <div class="text-tg-text font-medium text-sm">
+                <span id="balance-display" hx-get="/tg/api/balance/" hx-trigger="load, every 10s"
+                      hx-swap="innerHTML" class="cursor-pointer">
+                    💰 $0.00
+                </span>
+            </div>
+
+            <!-- Notifications -->
+            <button class="relative text-tg-text opacity-70 hover:opacity-100 transition-opacity"
+                    onclick="haptic.light(); showNotificationsModal();">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 17h5l-5-5V7a3 3 0 00-6 0v5l-5 5h5m0 0v2a2 2 0 004 0v-2m-4-2h4"/>
+                </svg>
+                <span id="notification-badge" class="badge-notification hidden">
+                    0
+                </span>
+            </button>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Центр помощи - DOD{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Заголовок -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">💬 Центр помощи</h1>
+      <p class="text-lg text-gray-600">Найдите ответ на свой вопрос или обратитесь в поддержку</p>
+    </div>
+
+    <!-- Поиск -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="max-w-2xl mx-auto">
+        <div class="relative">
+          <input type="text"
+                 id="faq-search"
+                 placeholder="🔍 Поиск по базе знаний..."
+                 class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                 hx-get="{% url 'support:suggest_faq' %}"
+                 hx-trigger="keyup changed delay:300ms"
+                 hx-target="#search-results"
+                 hx-indicator="#search-indicator">
+          <div id="search-indicator" class="htmx-indicator absolute right-3 top-3">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          </div>
+        </div>
+        <div id="search-results" class="mt-4"></div>
+      </div>
+    </div>
+
+    <!-- Популярные вопросы -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">── Популярные вопросы ──</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for faq in popular_faqs %}
+        <a href="{% url 'support:faq_detail' faq.category.slug faq.slug %}"
+           class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+          <div class="flex items-center">
+            <span class="text-2xl mr-3">{{ faq.category.icon }}</span>
+            <div>
+              <h3 class="font-semibold text-gray-900">{{ faq.question }}</h3>
+              <p class="text-sm text-gray-600">{{ faq.category.name }}</p>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Категории FAQ -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">── Категории FAQ ──</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {% for category in faq_categories %}
+        <a href="{% url 'support:faq_list' %}?category={{ category.slug }}"
+           class="bg-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow">
+          <div class="text-4xl mb-2">{{ category.icon }}</div>
+          <div class="font-semibold text-gray-900">{{ category.name }}</div>
+          <div class="text-sm text-gray-600">{{ category.articles_count }} статей</div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Не нашли ответ? -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-8 text-white">
+      <h2 class="text-2xl font-bold mb-6">Не нашли ответ?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Живой чат -->
+        <div class="bg-white bg-opacity-10 rounded-lg p-6">
+          <div class="flex items-center mb-4">
+            <span class="text-3xl mr-3">💬</span>
+            <div>
+              <h3 class="text-xl font-bold">Живой чат</h3>
+              <p class="text-blue-100">Ответ за ~3 минуты</p>
+            </div>
+          </div>
+          <p class="mb-4">Получите мгновенную помощь от наших операторов</p>
+          <div class="flex items-center justify-between">
+            <span class="text-green-300 font-semibold">🟢 Операторы онлайн</span>
+            <button class="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                    onclick="startLiveChat()">
+              Начать чат →
+            </button>
+          </div>
+        </div>
+
+        <!-- Создать тикет -->
+        <div class="bg-white bg-opacity-10 rounded-lg p-6">
+          <div class="flex items-center mb-4">
+            <span class="text-3xl mr-3">📋</span>
+            <div>
+              <h3 class="text-xl font-bold">Создать тикет</h3>
+              <p class="text-blue-100">Ответ за ~4 часа</p>
+            </div>
+          </div>
+          <p class="mb-4">Опишите проблему подробно для квалифицированной помощи</p>
+          <div class="flex items-center justify-between">
+            <span class="text-blue-100">Для сложных вопросов</span>
+            <a href="{% url 'support:create_ticket' %}"
+               class="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+              Создать тикет →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Виджет живого чата -->
+{% include 'support/partials/chat_widget.html' %}
+
+<script>
+// Функция для запуска живого чата
+function startLiveChat() {
+    // Показать виджет чата
+    document.getElementById('chat-widget').classList.remove('hidden');
+    // Инициализировать WebSocket соединение
+    initializeChat();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,635 @@
+[
+  {
+    "model": "dashboard.adminrole",
+    "pk": "550e8400-e29b-41d4-a716-446655440000",
+    "fields": {
+      "name": "Суперадмин",
+      "slug": "superadmin",
+      "description": "Полный доступ ко всем функциям платформы",
+      "permissions": {
+        "dashboard": {
+          "view": true
+        },
+        "users": {
+          "view": true,
+          "edit": true,
+          "ban": true,
+          "delete": true,
+          "change_balance": true,
+          "reset_2fa": true,
+          "change_trust_level": true,
+          "view_sensitive_data": true
+        },
+        "finance": {
+          "view_transactions": true,
+          "approve_withdrawals": true,
+          "approve_withdrawals_limit": 1000000,
+          "reject_withdrawals": true,
+          "manual_deposit": true,
+          "adjust_balance": true,
+          "view_reports": true,
+          "export_data": true
+        },
+        "kyc": {
+          "view": true,
+          "review": true,
+          "approve": true,
+          "reject": true
+        },
+        "sports": {
+          "view": true,
+          "create_events": true,
+          "edit_events": true,
+          "manage_odds": true,
+          "settle_bets": true,
+          "void_bets": true
+        },
+        "casino": {
+          "view": true,
+          "manage_games": true,
+          "view_rounds": true,
+          "adjust_rtp": true
+        },
+        "predictions": {
+          "view": true,
+          "create_markets": true,
+          "edit_markets": true,
+          "resolve_markets": true,
+          "cancel_markets": true
+        },
+        "referral": {
+          "view": true,
+          "manage_partners": true,
+          "approve_payouts": true,
+          "change_tiers": true,
+          "block_partners": true
+        },
+        "support": {
+          "view_tickets": true,
+          "handle_tickets": true,
+          "handle_chats": true,
+          "escalate": true,
+          "view_all_tickets": true,
+          "manage_faq": true,
+          "manage_quick_replies": true
+        },
+        "content": {
+          "manage_banners": true,
+          "manage_promotions": true,
+          "manage_pages": true,
+          "send_notifications": true
+        },
+        "analytics": {
+          "view_dashboard": true,
+          "view_reports": true,
+          "export_reports": true,
+          "view_financial_reports": true
+        },
+        "settings": {
+          "view": true,
+          "edit_general": true,
+          "edit_limits": true,
+          "edit_payment_methods": true,
+          "manage_roles": true,
+          "manage_admins": true
+        },
+        "logs": {
+          "view_admin_logs": true,
+          "view_user_logs": true,
+          "view_system_logs": true
+        }
+      },
+      "level": 100,
+      "is_system": true,
+      "is_active": true,
+      "created_at": "2025-02-27T00:00:00Z"
+    }
+  },
+  {
+    "model": "dashboard.adminrole",
+    "pk": "550e8400-e29b-41d4-a716-446655440001",
+    "fields": {
+      "name": "Админ",
+      "slug": "admin",
+      "description": "Полный доступ кроме управления ролями и админами",
+      "permissions": {
+        "dashboard": {
+          "view": true
+        },
+        "users": {
+          "view": true,
+          "edit": true,
+          "ban": true,
+          "delete": false,
+          "change_balance": false,
+          "reset_2fa": true,
+          "change_trust_level": true,
+          "view_sensitive_data": false
+        },
+        "finance": {
+          "view_transactions": true,
+          "approve_withdrawals": true,
+          "approve_withdrawals_limit": 10000,
+          "reject_withdrawals": true,
+          "manual_deposit": false,
+          "adjust_balance": false,
+          "view_reports": true,
+          "export_data": false
+        },
+        "kyc": {
+          "view": true,
+          "review": true,
+          "approve": true,
+          "reject": true
+        },
+        "sports": {
+          "view": true,
+          "create_events": true,
+          "edit_events": true,
+          "manage_odds": true,
+          "settle_bets": true,
+          "void_bets": false
+        },
+        "casino": {
+          "view": true,
+          "manage_games": false,
+          "view_rounds": true,
+          "adjust_rtp": false
+        },
+        "predictions": {
+          "view": true,
+          "create_markets": true,
+          "edit_markets": true,
+          "resolve_markets": true,
+          "cancel_markets": false
+        },
+        "referral": {
+          "view": true,
+          "manage_partners": true,
+          "approve_payouts": true,
+          "change_tiers": false,
+          "block_partners": true
+        },
+        "support": {
+          "view_tickets": true,
+          "handle_tickets": true,
+          "handle_chats": true,
+          "escalate": true,
+          "view_all_tickets": false,
+          "manage_faq": true,
+          "manage_quick_replies": true
+        },
+        "content": {
+          "manage_banners": true,
+          "manage_promotions": true,
+          "manage_pages": true,
+          "send_notifications": false
+        },
+        "analytics": {
+          "view_dashboard": true,
+          "view_reports": true,
+          "export_reports": false,
+          "view_financial_reports": false
+        },
+        "settings": {
+          "view": false,
+          "edit_general": false,
+          "edit_limits": false,
+          "edit_payment_methods": false,
+          "manage_roles": false,
+          "manage_admins": false
+        },
+        "logs": {
+          "view_admin_logs": true,
+          "view_user_logs": true,
+          "view_system_logs": false
+        }
+      },
+      "level": 50,
+      "is_system": false,
+      "is_active": true,
+      "created_at": "2025-02-27T00:00:00Z"
+    }
+  },
+  {
+    "model": "dashboard.adminrole",
+    "pk": "550e8400-e29b-41d4-a716-446655440002",
+    "fields": {
+      "name": "Модератор",
+      "slug": "moderator",
+      "description": "Модерация контента, KYC, поддержка, predictions",
+      "permissions": {
+        "dashboard": {
+          "view": true
+        },
+        "users": {
+          "view": true,
+          "edit": false,
+          "ban": false,
+          "delete": false,
+          "change_balance": false,
+          "reset_2fa": false,
+          "change_trust_level": false,
+          "view_sensitive_data": false
+        },
+        "finance": {
+          "view_transactions": false,
+          "approve_withdrawals": false,
+          "reject_withdrawals": false,
+          "manual_deposit": false,
+          "adjust_balance": false,
+          "view_reports": false,
+          "export_data": false
+        },
+        "kyc": {
+          "view": true,
+          "review": true,
+          "approve": true,
+          "reject": true
+        },
+        "sports": {
+          "view": false,
+          "create_events": false,
+          "edit_events": false,
+          "manage_odds": false,
+          "settle_bets": false,
+          "void_bets": false
+        },
+        "casino": {
+          "view": false,
+          "manage_games": false,
+          "view_rounds": false,
+          "adjust_rtp": false
+        },
+        "predictions": {
+          "view": true,
+          "create_markets": true,
+          "edit_markets": true,
+          "resolve_markets": true,
+          "cancel_markets": false
+        },
+        "referral": {
+          "view": true,
+          "manage_partners": false,
+          "approve_payouts": false,
+          "change_tiers": false,
+          "block_partners": false
+        },
+        "support": {
+          "view_tickets": true,
+          "handle_tickets": true,
+          "handle_chats": true,
+          "escalate": true,
+          "view_all_tickets": false,
+          "manage_faq": true,
+          "manage_quick_replies": true
+        },
+        "content": {
+          "manage_banners": true,
+          "manage_promotions": true,
+          "manage_pages": true,
+          "send_notifications": false
+        },
+        "analytics": {
+          "view_dashboard": true,
+          "view_reports": true,
+          "export_reports": false,
+          "view_financial_reports": false
+        },
+        "settings": {
+          "view": false,
+          "edit_general": false,
+          "edit_limits": false,
+          "edit_payment_methods": false,
+          "manage_roles": false,
+          "manage_admins": false
+        },
+        "logs": {
+          "view_admin_logs": true,
+          "view_user_logs": false,
+          "view_system_logs": false
+        }
+      },
+      "level": 10,
+      "is_system": false,
+      "is_active": true,
+      "created_at": "2025-02-27T00:00:00Z"
+    }
+  },
+  {
+    "model": "dashboard.adminrole",
+    "pk": "550e8400-e29b-41d4-a716-446655440003",
+    "fields": {
+      "name": "Финансовый менеджер",
+      "slug": "finance_manager",
+      "description": "Управление финансами и выплатами",
+      "permissions": {
+        "dashboard": {
+          "view": true
+        },
+        "users": {
+          "view": true,
+          "edit": false,
+          "ban": false,
+          "delete": false,
+          "change_balance": false,
+          "reset_2fa": false,
+          "change_trust_level": false,
+          "view_sensitive_data": false
+        },
+        "finance": {
+          "view_transactions": true,
+          "approve_withdrawals": true,
+          "approve_withdrawals_limit": 5000,
+          "reject_withdrawals": true,
+          "manual_deposit": false,
+          "adjust_balance": false,
+          "view_reports": true,
+          "export_data": true
+        },
+        "kyc": {
+          "view": true,
+          "review": false,
+          "approve": false,
+          "reject": false
+        },
+        "sports": {
+          "view": false,
+          "create_events": false,
+          "edit_events": false,
+          "manage_odds": false,
+          "settle_bets": false,
+          "void_bets": false
+        },
+        "casino": {
+          "view": false,
+          "manage_games": false,
+          "view_rounds": false,
+          "adjust_rtp": false
+        },
+        "predictions": {
+          "view": false,
+          "create_markets": false,
+          "edit_markets": false,
+          "resolve_markets": false,
+          "cancel_markets": false
+        },
+        "referral": {
+          "view": false,
+          "manage_partners": false,
+          "approve_payouts": false,
+          "change_tiers": false,
+          "block_partners": false
+        },
+        "support": {
+          "view_tickets": false,
+          "handle_tickets": false,
+          "handle_chats": false,
+          "escalate": false,
+          "view_all_tickets": false,
+          "manage_faq": false,
+          "manage_quick_replies": false
+        },
+        "content": {
+          "manage_banners": false,
+          "manage_promotions": false,
+          "manage_pages": false,
+          "send_notifications": false
+        },
+        "analytics": {
+          "view_dashboard": true,
+          "view_reports": true,
+          "export_reports": true,
+          "view_financial_reports": true
+        },
+        "settings": {
+          "view": false,
+          "edit_general": false,
+          "edit_limits": false,
+          "edit_payment_methods": false,
+          "manage_roles": false,
+          "manage_admins": false
+        },
+        "logs": {
+          "view_admin_logs": true,
+          "view_user_logs": false,
+          "view_system_logs": false
+        }
+      },
+      "level": 20,
+      "is_system": false,
+      "is_active": true,
+      "created_at": "2025-02-27T00:00:00Z"
+    }
+  },
+  {
+    "model": "dashboard.adminrole",
+    "pk": "550e8400-e29b-41d4-a716-446655440004",
+    "fields": {
+      "name": "Спорт-менеджер",
+      "slug": "sports_manager",
+      "description": "Управление спортивными событиями и ставками",
+      "permissions": {
+        "dashboard": {
+          "view": true
+        },
+        "users": {
+          "view": true,
+          "edit": false,
+          "ban": false,
+          "delete": false,
+          "change_balance": false,
+          "reset_2fa": false,
+          "change_trust_level": false,
+          "view_sensitive_data": false
+        },
+        "finance": {
+          "view_transactions": false,
+          "approve_withdrawals": false,
+          "reject_withdrawals": false,
+          "manual_deposit": false,
+          "adjust_balance": false,
+          "view_reports": false,
+          "export_data": false
+        },
+        "kyc": {
+          "view": false,
+          "review": false,
+          "approve": false,
+          "reject": false
+        },
+        "sports": {
+          "view": true,
+          "create_events": true,
+          "edit_events": true,
+          "manage_odds": true,
+          "settle_bets": true,
+          "void_bets": true
+        },
+        "casino": {
+          "view": false,
+          "manage_games": false,
+          "view_rounds": false,
+          "adjust_rtp": false
+        },
+        "predictions": {
+          "view": false,
+          "create_markets": false,
+          "edit_markets": false,
+          "resolve_markets": false,
+          "cancel_markets": false
+        },
+        "referral": {
+          "view": false,
+          "manage_partners": false,
+          "approve_payouts": false,
+          "change_tiers": false,
+          "block_partners": false
+        },
+        "support": {
+          "view_tickets": false,
+          "handle_tickets": false,
+          "handle_chats": false,
+          "escalate": false,
+          "view_all_tickets": false,
+          "manage_faq": false,
+          "manage_quick_replies": false
+        },
+        "content": {
+          "manage_banners": false,
+          "manage_promotions": false,
+          "manage_pages": false,
+          "send_notifications": false
+        },
+        "analytics": {
+          "view_dashboard": true,
+          "view_reports": true,
+          "export_reports": false,
+          "view_financial_reports": false
+        },
+        "settings": {
+          "view": false,
+          "edit_general": false,
+          "edit_limits": false,
+          "edit_payment_methods": false,
+          "manage_roles": false,
+          "manage_admins": false
+        },
+        "logs": {
+          "view_admin_logs": true,
+          "view_user_logs": false,
+          "view_system_logs": false
+        }
+      },
+      "level": 15,
+      "is_system": false,
+      "is_active": true,
+      "created_at": "2025-02-27T00:00:00Z"
+    }
+  },
+  {
+    "model": "dashboard.adminrole",
+    "pk": "550e8400-e29b-41d4-a716-446655440005",
+    "fields": {
+      "name": "Оператор поддержки",
+      "slug": "support_operator",
+      "description": "Обработка тикетов и чатов поддержки",
+      "permissions": {
+        "dashboard": {
+          "view": true
+        },
+        "users": {
+          "view": true,
+          "edit": false,
+          "ban": false,
+          "delete": false,
+          "change_balance": false,
+          "reset_2fa": false,
+          "change_trust_level": false,
+          "view_sensitive_data": false
+        },
+        "finance": {
+          "view_transactions": false,
+          "approve_withdrawals": false,
+          "reject_withdrawals": false,
+          "manual_deposit": false,
+          "adjust_balance": false,
+          "view_reports": false,
+          "export_data": false
+        },
+        "kyc": {
+          "view": false,
+          "review": false,
+          "approve": false,
+          "reject": false
+        },
+        "sports": {
+          "view": false,
+          "create_events": false,
+          "edit_events": false,
+          "manage_odds": false,
+          "settle_bets": false,
+          "void_bets": false
+        },
+        "casino": {
+          "view": false,
+          "manage_games": false,
+          "view_rounds": false,
+          "adjust_rtp": false
+        },
+        "predictions": {
+          "view": false,
+          "create_markets": false,
+          "edit_markets": false,
+          "resolve_markets": false,
+          "cancel_markets": false
+        },
+        "referral": {
+          "view": false,
+          "manage_partners": false,
+          "approve_payouts": false,
+          "change_tiers": false,
+          "block_partners": false
+        },
+        "support": {
+          "view_tickets": true,
+          "handle_tickets": true,
+          "handle_chats": true,
+          "escalate": true,
+          "view_all_tickets": false,
+          "manage_faq": true,
+          "manage_quick_replies": true
+        },
+        "content": {
+          "manage_banners": false,
+          "manage_promotions": false,
+          "manage_pages": false,
+          "send_notifications": false
+        },
+        "analytics": {
+          "view_dashboard": false,
+          "view_reports": false,
+          "export_reports": false,
+          "view_financial_reports": false
+        },
+        "settings": {
+          "view": false,
+          "edit_general": false,
+          "edit_limits": false,
+          "edit_payment_methods": false,
+          "manage_roles": false,
+          "manage_admins": false
+        },
+        "logs": {
+          "view_admin_logs": false,
+          "view_user_logs": false,
+          "view_system_logs": false
+        }
+      },
+      "level": 5,
+      "is_system": false,
+      "is_active": true,
+      "created_at": "2025-02-27T00:00:00Z"
+    }
+  }
+]

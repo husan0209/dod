@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Тикет #{{ ticket.ticket_number }} - DOD{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Ticket Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h1 class="text-2xl font-bold">#{{ ticket.ticket_number }}</h1>
+                    <p class="text-gray-600 mt-1">{{ ticket.subject }}</p>
+                </div>
+                <div class="text-right">
+                    <span class="px-3 py-1 rounded text-sm font-medium
+                        {% if ticket.status == 'new' %}bg-gray-100 text-gray-800{% endif %}
+                        {% if ticket.status == 'open' %}bg-blue-100 text-blue-800{% endif %}
+                        {% if ticket.status == 'in_progress' %}bg-yellow-100 text-yellow-800{% endif %}
+                        {% if ticket.status == 'waiting_user' %}bg-orange-100 text-orange-800{% endif %}
+                        {% if ticket.status == 'resolved' %}bg-green-100 text-green-800{% endif %}
+                        {% if ticket.status == 'closed' %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ ticket.get_status_display }}
+                    </span>
+                    <div class="text-sm text-gray-500 mt-1">
+                        Создан: {{ ticket.created_at|date:"d.m.Y H:i" }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                    <span class="font-medium">Категория:</span> {{ ticket.get_category_display }}
+                </div>
+                <div>
+                    <span class="font-medium">Приоритет:</span>
+                    <span class="{% if ticket.priority == 'low' %}text-gray-600{% endif %}
+                                {% if ticket.priority == 'medium' %}text-blue-600{% endif %}
+                                {% if ticket.priority == 'high' %}text-orange-600{% endif %}
+                                {% if ticket.priority == 'critical' %}text-red-600{% endif %}">
+                        {{ ticket.get_priority_display }}
+                    </span>
+                </div>
+                <div>
+                    <span class="font-medium">Источник:</span> {{ ticket.get_source_display }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Сообщения</h2>
+            <div class="space-y-4">
+                {% for message in messages %}
+                <div class="border-l-4 {% if message.sender_type == 'user' %}border-blue-500{% else %}border-green-500{% endif %} pl-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="font-medium">
+                            {% if message.sender_type == 'user' %}
+                                Вы
+                            {% elif message.sender_type == 'operator' %}
+                                Оператор {{ message.sender.get_full_name }}
+                            {% elif message.sender_type == 'system' %}
+                                Система
+                            {% endif %}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            {{ message.created_at|date:"d.m.Y H:i" }}
+                        </div>
+                    </div>
+                    <div class="text-gray-800 whitespace-pre-wrap">{{ message.text }}</div>
+                    {% if message.attachments %}
+                    <div class="mt-2">
+                        <p class="text-sm font-medium">Вложения:</p>
+                        <div class="flex flex-wrap gap-2">
+                            {% for attachment in message.attachments %}
+                            <a href="{{ attachment.file.url }}" target="_blank"
+                               class="text-blue-600 hover:text-blue-800 text-sm">
+                                📎 {{ attachment.original_filename }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Reply Form -->
+        {% if ticket.status in 'new,open,in_progress,waiting_user' %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold mb-4">Ответить</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="{{ form.text.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Ваше сообщение
+                    </label>
+                    {{ form.text }}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.attachments.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        📎 Прикрепить файлы
+                    </label>
+                    {{ form.attachments }}
+                    <p class="text-sm text-gray-500 mt-1">До 5 файлов, максимум 10 МБ каждый</p>
+                </div>
+
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                    Отправить ответ
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Rate Ticket -->
+        {% if ticket.status in 'resolved,closed' and not ticket.rating %}
+        <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+            <h2 class="text-lg font-semibold mb-4">Оцените качество поддержки</h2>
+            <form method="post" action="{% url 'support:rate_ticket' ticket.id %}">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ваша оценка</label>
+                    <div class="flex space-x-2">
+                        {% for i in '12345' %}
+                        <label class="flex items-center">
+                            <input type="radio" name="rating" value="{{ i }}" class="mr-1" required>
+                            <span class="text-yellow-500">{% for j in 'xxxxx' %}{% if forloop.counter <= i %}★{% else %}☆{% endif %}{% endfor %}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">
+                        Комментарий (необязательно)
+                    </label>
+                    <textarea name="comment" id="comment" rows="3" class="w-full border border-gray-300 rounded px-3 py-2"></textarea>
+                </div>
+
+                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                    Оценить
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

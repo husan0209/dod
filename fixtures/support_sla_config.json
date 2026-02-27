@@ -1,0 +1,42 @@
+[
+  {
+    "model": "support.sla_config",
+    "pk": "low",
+    "fields": {
+      "first_response_minutes": 480,
+      "resolution_minutes": 2880,
+      "chat_response_seconds": 300,
+      "business_hours_only": true
+    }
+  },
+  {
+    "model": "support.sla_config",
+    "pk": "medium",
+    "fields": {
+      "first_response_minutes": 240,
+      "resolution_minutes": 1440,
+      "chat_response_seconds": 120,
+      "business_hours_only": true
+    }
+  },
+  {
+    "model": "support.sla_config",
+    "pk": "high",
+    "fields": {
+      "first_response_minutes": 60,
+      "resolution_minutes": 480,
+      "chat_response_seconds": 60,
+      "business_hours_only": false
+    }
+  },
+  {
+    "model": "support.sla_config",
+    "pk": "critical",
+    "fields": {
+      "first_response_minutes": 15,
+      "resolution_minutes": 120,
+      "chat_response_seconds": 30,
+      "business_hours_only": false
+    }
+  }
+]

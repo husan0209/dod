@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}База знаний - DOD{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8">📚 База знаний</h1>
+
+        <!-- Search -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <form method="get" class="max-w-2xl mx-auto">
+                <input type="text"
+                       name="q"
+                       value="{{ query }}"
+                       placeholder="🔍 Поиск по статьям..."
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <button type="submit" class="hidden">Search</button>
+            </form>
+        </div>
+
+        <!-- Categories -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {% for category in categories %}
+            <a href="?category={{ category.slug }}"
+               class="bg-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow">
+                <div class="text-3xl mb-2">{{ category.icon }}</div>
+                <div class="font-semibold">{{ category.name }}</div>
+                <div class="text-sm text-gray-600">{{ category.articles_count }} статей</div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Articles -->
+        <div class="space-y-4">
+            {% for article in articles %}
+            <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+                <h3 class="text-lg font-semibold mb-2">
+                    <a href="{% url 'support:faq_detail' article.category.slug article.slug %}"
+                       class="text-blue-600 hover:text-blue-800">
+                        {{ article.question }}
+                    </a>
+                </h3>
+                <p class="text-gray-600 text-sm">{{ article.answer|truncatechars:200 }}</p>
+                <div class="mt-2 text-sm text-gray-500">
+                    Просмотры: {{ article.views_count }} |
+                    Полезно: {{ article.helpful_yes }}/{{ article.helpful_yes|add:article.helpful_no }}
+                </div>
+            </div>
+            {% empty %}
+            <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                <div class="text-4xl mb-4">📚</div>
+                <h3 class="text-lg font-semibold mb-2">Статьи не найдены</h3>
+                <p class="text-gray-600">Попробуйте изменить поисковый запрос</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

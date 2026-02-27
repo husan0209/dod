@@ -1,0 +1,337 @@
+[
+    {
+        "model": "sports.markettype",
+        "pk": 1,
+        "fields": {
+            "code": "1x2",
+            "name": "Исход матча",
+            "name_en": "Match Result",
+            "description": "Победитель матча или ничья",
+            "sport": null,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "home", "name": "П1", "name_en": "Home"},
+                {"code": "draw", "name": "Ничья", "name_en": "Draw"},
+                {"code": "away", "name": "П2", "name_en": "Away"}
+            ],
+            "sort_order": 1,
+            "is_active": true,
+            "is_popular": true
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 2,
+        "fields": {
+            "code": "12",
+            "name": "Победитель",
+            "name_en": "Winner",
+            "description": "Победитель матча без ничьи",
+            "sport": null,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "home", "name": "П1", "name_en": "Home"},
+                {"code": "away", "name": "П2", "name_en": "Away"}
+            ],
+            "sort_order": 2,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 3,
+        "fields": {
+            "code": "total",
+            "name": "Тотал",
+            "name_en": "Total",
+            "description": "Общее количество голов/очков больше или меньше указанного числа",
+            "sport": null,
+            "has_parameter": true,
+            "outcomes_template": [
+                {"code": "over", "name": "Больше {param}", "name_en": "Over {param}"},
+                {"code": "under", "name": "Меньше {param}", "name_en": "Under {param}"}
+            ],
+            "sort_order": 3,
+            "is_active": true,
+            "is_popular": true
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 4,
+        "fields": {
+            "code": "handicap",
+            "name": "Фора",
+            "name_en": "Handicap",
+            "description": "Преимущество в очках для одной из команд",
+            "sport": null,
+            "has_parameter": true,
+            "outcomes_template": [
+                {"code": "home", "name": "Ф1 ({param})", "name_en": "H1 ({param})"},
+                {"code": "away", "name": "Ф2 ({param_inv})", "name_en": "H2 ({param_inv})"}
+            ],
+            "sort_order": 4,
+            "is_active": true,
+            "is_popular": true
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 5,
+        "fields": {
+            "code": "both_to_score",
+            "name": "Обе забьют",
+            "name_en": "Both Teams To Score",
+            "description": "Забьют ли обе команды",
+            "sport": 1,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "yes", "name": "Да", "name_en": "Yes"},
+                {"code": "no", "name": "Нет", "name_en": "No"}
+            ],
+            "sort_order": 5,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 6,
+        "fields": {
+            "code": "double_chance",
+            "name": "Двойной шанс",
+            "name_en": "Double Chance",
+            "description": "Две возможные исхода из трёх",
+            "sport": 1,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "1x", "name": "1X", "name_en": "1X"},
+                {"code": "12", "name": "12", "name_en": "12"},
+                {"code": "x2", "name": "X2", "name_en": "X2"}
+            ],
+            "sort_order": 6,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 7,
+        "fields": {
+            "code": "exact_score",
+            "name": "Точный счёт",
+            "name_en": "Exact Score",
+            "description": "Угадать точный счёт матча",
+            "sport": 1,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "1-0", "name": "1:0"},
+                {"code": "2-0", "name": "2:0"},
+                {"code": "2-1", "name": "2:1"},
+                {"code": "0-0", "name": "0:0"},
+                {"code": "1-1", "name": "1:1"},
+                {"code": "0-1", "name": "0:1"},
+                {"code": "0-2", "name": "0:2"},
+                {"code": "1-2", "name": "1:2"},
+                {"code": "other", "name": "Другой"}
+            ],
+            "sort_order": 7,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 8,
+        "fields": {
+            "code": "ht_result",
+            "name": "Результат 1 тайма",
+            "name_en": "Half Time Result",
+            "description": "Исход первого тайма",
+            "sport": 1,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "home", "name": "П1", "name_en": "Home"},
+                {"code": "draw", "name": "Ничья", "name_en": "Draw"},
+                {"code": "away", "name": "П2", "name_en": "Away"}
+            ],
+            "sort_order": 8,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 9,
+        "fields": {
+            "code": "total_corners",
+            "name": "Тотал угловых",
+            "name_en": "Total Corners",
+            "description": "Общее количество угловых ударов",
+            "sport": 1,
+            "has_parameter": true,
+            "outcomes_template": [
+                {"code": "over", "name": "Больше {param}", "name_en": "Over {param}"},
+                {"code": "under", "name": "Меньше {param}", "name_en": "Under {param}"}
+            ],
+            "sort_order": 9,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 10,
+        "fields": {
+            "code": "total_cards",
+            "name": "Тотал карточек",
+            "name_en": "Total Cards",
+            "description": "Общее количество карточек",
+            "sport": 1,
+            "has_parameter": true,
+            "outcomes_template": [
+                {"code": "over", "name": "Больше {param}", "name_en": "Over {param}"},
+                {"code": "under", "name": "Меньше {param}", "name_en": "Under {param}"}
+            ],
+            "sort_order": 10,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 11,
+        "fields": {
+            "code": "first_goal",
+            "name": "Первый гол",
+            "name_en": "First Goal",
+            "description": "Кто забьёт первый гол",
+            "sport": 1,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "home", "name": "Хозяева", "name_en": "Home"},
+                {"code": "away", "name": "Гости", "name_en": "Away"},
+                {"code": "no_goal", "name": "Без гола", "name_en": "No Goal"}
+            ],
+            "sort_order": 11,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 12,
+        "fields": {
+            "code": "ind_total_h",
+            "name": "Инд. тотал хозяев",
+            "name_en": "Individual Total Home",
+            "description": "Тотал голов хозяев",
+            "sport": null,
+            "has_parameter": true,
+            "outcomes_template": [
+                {"code": "over", "name": "Больше {param}", "name_en": "Over {param}"},
+                {"code": "under", "name": "Меньше {param}", "name_en": "Under {param}"}
+            ],
+            "sort_order": 12,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 13,
+        "fields": {
+            "code": "ind_total_a",
+            "name": "Инд. тотал гостей",
+            "name_en": "Individual Total Away",
+            "description": "Тотал голов гостей",
+            "sport": null,
+            "has_parameter": true,
+            "outcomes_template": [
+                {"code": "over", "name": "Больше {param}", "name_en": "Over {param}"},
+                {"code": "under", "name": "Меньше {param}", "name_en": "Under {param}"}
+            ],
+            "sort_order": 13,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 14,
+        "fields": {
+            "code": "odd_even",
+            "name": "Чёт/нечёт",
+            "name_en": "Odd/Even",
+            "description": "Общее количество голов чётное или нечётное",
+            "sport": null,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "odd", "name": "Нечёт", "name_en": "Odd"},
+                {"code": "even", "name": "Чёт", "name_en": "Even"}
+            ],
+            "sort_order": 14,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 15,
+        "fields": {
+            "code": "winner_round",
+            "name": "Победитель раунда",
+            "name_en": "Round Winner",
+            "description": "Кто выиграет раунд",
+            "sport": 5,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "home", "name": "П1", "name_en": "Home"},
+                {"code": "away", "name": "П2", "name_en": "Away"}
+            ],
+            "sort_order": 15,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 16,
+        "fields": {
+            "code": "method_victory",
+            "name": "Метод победы",
+            "name_en": "Method of Victory",
+            "description": "Как будет одержана победа",
+            "sport": 5,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "ko", "name": "KO/TKO", "name_en": "KO/TKO"},
+                {"code": "submission", "name": "Сабмишн", "name_en": "Submission"},
+                {"code": "decision", "name": "Решение", "name_en": "Decision"}
+            ],
+            "sort_order": 16,
+            "is_active": true,
+            "is_popular": false
+        }
+    },
+    {
+        "model": "sports.markettype",
+        "pk": 17,
+        "fields": {
+            "code": "map_winner",
+            "name": "Победитель на карте",
+            "name_en": "Map Winner",
+            "description": "Кто выиграет карту",
+            "sport": 6,
+            "has_parameter": false,
+            "outcomes_template": [
+                {"code": "home", "name": "П1", "name_en": "Home"},
+                {"code": "away", "name": "П2", "name_en": "Away"}
+            ],
+            "sort_order": 17,
+            "is_active": true,
+            "is_popular": false
+        }
+    }
+]

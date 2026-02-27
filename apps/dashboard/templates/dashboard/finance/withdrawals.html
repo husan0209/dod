@@ -1,0 +1,99 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Очередь выводов{% endblock %}
+{% block page_title %}💰 Очередь выводов{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Filters -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <select class="form-select" name="status">
+                            <option value="">Все статусы</option>
+                            <option value="pending">Ожидают</option>
+                            <option value="suspicious">Подозрительные</option>
+                            <option value="large">Крупные</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="search" placeholder="Поиск по ID или email">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">Фильтр</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Withdrawals -->
+        {% for withdrawal in withdrawals %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6>#W-{{ withdrawal.id }} | {{ withdrawal.user.username }} | ${{ withdrawal.amount|floatformat:2 }}</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small>Метод: {{ withdrawal.method }}</small><br>
+                                <small>Trust: {{ withdrawal.user.trust_level }}</small><br>
+                                <small>KYC: {% if withdrawal.user.kyc_status == 'approved' %}✅{% else %}❌{% endif %}</small>
+                            </div>
+                            <div class="col-md-6">
+                                <small>Депозит: $5k</small><br>
+                                <small>Ставки: 234</small><br>
+                                <small>GGR: $1.2k</small>
+                            </div>
+                        </div>
+                        <small class="text-muted">⏱️ {{ withdrawal.created_at|timesince }} назад</small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="mb-2">
+                            {% if withdrawal.is_suspicious %}
+                            <span class="badge bg-danger">⚠️ Подозрительный</span>
+                            {% endif %}
+                            {% if withdrawal.amount > 5000 %}
+                            <span class="badge bg-warning">💰 Крупный</span>
+                            {% endif %}
+                        </div>
+                        <button class="btn btn-success btn-sm me-2" onclick="approveWithdrawal({{ withdrawal.id }})">✅ Одобрить</button>
+                        <button class="btn btn-danger btn-sm me-2" onclick="rejectWithdrawal({{ withdrawal.id }})">❌ Отклонить</button>
+                        <button class="btn btn-info btn-sm" onclick="viewUser({{ withdrawal.user.id }})">👤 Профиль</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">
+            {% if error %}
+            {{ error }}
+            {% else %}
+            Нет выводов в очереди.
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function approveWithdrawal(id) {
+    if (confirm('Одобрить вывод?')) {
+        // Implement approval
+        alert('Withdrawal approved');
+    }
+}
+
+function rejectWithdrawal(id) {
+    if (confirm('Отклонить вывод?')) {
+        // Implement rejection
+        alert('Withdrawal rejected');
+    }
+}
+
+function viewUser(userId) {
+    window.location.href = '{% url "dashboard:users" %}';
+}
+</script>
+{% endblock %}

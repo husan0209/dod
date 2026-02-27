@@ -1,0 +1,27 @@
+<div class="comment border-b pb-4 mb-4">
+    <div class="flex items-start gap-4">
+        <div class="avatar placeholder">
+            <div class="bg-neutral-focus text-neutral-content rounded-full w-8">
+                <span class="text-xs">{{ comment.user.username|first|upper }}</span>
+            </div>
+        </div>
+        <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="font-bold">{{ comment.user.username }}</span>
+                {% if comment.side_prediction %}
+                <span class="badge badge-sm {% if comment.side_prediction == 'yes' %}badge-success{% else %}badge-error{% endif %}">
+                    {{ comment.get_side_prediction_display }}
+                </span>
+                {% endif %}
+                <span class="text-sm text-gray-500">{{ comment.created_at|timesince }}</span>
+            </div>
+            <p class="text-gray-700">{{ comment.text }}</p>
+            <div class="flex items-center gap-4 mt-2">
+                <button class="text-sm text-gray-500 hover:text-gray-700">👍 {{ comment.likes_count }}</button>
+                {% if comment.replies.exists %}
+                <span class="text-sm text-gray-500">{{ comment.replies.count }} replies</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,162 @@
+[
+    {
+        "model": "predictions.category",
+        "fields": {
+            "name": "Политика",
+            "name_en": "Politics",
+            "slug": "politics",
+            "icon": "🏛️",
+            "description": "",
+            "color": "#3b82f6",
+            "sort_order": 1,
+            "is_active": true,
+            "markets_count": 0,
+            "total_volume": "0.00",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "predictions.category",
+        "fields": {
+            "name": "Спорт",
+            "name_en": "Sports",
+            "slug": "sports",
+            "icon": "⚽",
+            "description": "",
+            "color": "#10b981",
+            "sort_order": 2,
+            "is_active": true,
+            "markets_count": 0,
+            "total_volume": "0.00",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "predictions.category",
+        "fields": {
+            "name": "Крипто и финансы",
+            "name_en": "Crypto & Finance",
+            "slug": "crypto-finance",
+            "icon": "💰",
+            "description": "",
+            "color": "#f59e0b",
+            "sort_order": 3,
+            "is_active": true,
+            "markets_count": 0,
+            "total_volume": "0.00",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "predictions.category",
+        "fields": {
+            "name": "Технологии",
+            "name_en": "Technology",
+            "slug": "technology",
+            "icon": "💻",
+            "description": "",
+            "color": "#8b5cf6",
+            "sort_order": 4,
+            "is_active": true,
+            "markets_count": 0,
+            "total_volume": "0.00",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "predictions.category",
+        "fields": {
+            "name": "Развлечения",
+            "name_en": "Entertainment",
+            "slug": "entertainment",
+            "icon": "🎬",
+            "description": "",
+            "color": "#ec4899",
+            "sort_order": 5,
+            "is_active": true,
+            "markets_count": 0,
+            "total_volume": "0.00",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "predictions.category",
+        "fields": {
+            "name": "Наука",
+            "name_en": "Science",
+            "slug": "science",
+            "icon": "🔬",
+            "description": "",
+            "color": "#06b6d4",
+            "sort_order": 6,
+            "is_active": true,
+            "markets_count": 0,
+            "total_volume": "0.00",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "predictions.category",
+        "fields": {
+            "name": "Экономика",
+            "name_en": "Economy",
+            "slug": "economy",
+            "icon": "📈",
+            "description": "",
+            "color": "#84cc16",
+            "sort_order": 7,
+            "is_active": true,
+            "markets_count": 0,
+            "total_volume": "0.00",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "predictions.category",
+        "fields": {
+            "name": "Мир",
+            "name_en": "World Events",
+            "slug": "world-events",
+            "icon": "🌍",
+            "description": "",
+            "color": "#f97316",
+            "sort_order": 8,
+            "is_active": true,
+            "markets_count": 0,
+            "total_volume": "0.00",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "predictions.category",
+        "fields": {
+            "name": "Игры и киберспорт",
+            "name_en": "Gaming & Esports",
+            "slug": "gaming",
+            "icon": "🎮",
+            "description": "",
+            "color": "#6366f1",
+            "sort_order": 9,
+            "is_active": true,
+            "markets_count": 0,
+            "total_volume": "0.00",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "predictions.category",
+        "fields": {
+            "name": "Другое",
+            "name_en": "Other",
+            "slug": "other",
+            "icon": "⚖️",
+            "description": "",
+            "color": "#6b7280",
+            "sort_order": 10,
+            "is_active": true,
+            "markets_count": 0,
+            "total_volume": "0.00",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    }
+]

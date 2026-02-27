@@ -1,0 +1,297 @@
+{% extends 'miniapp/base.html' %}
+{% load static %}
+
+{% block title %}DOD{% endblock %}
+
+{% block content %}
+<div class="px-4 py-4 space-y-6">
+    <!-- Welcome Section -->
+    <div class="text-center">
+        <h2 class="text-xl font-semibold mb-2">Привет, {{ request.user.first_name|default:"Пользователь" }}! 👋</h2>
+        <p class="text-tg-hint">Ставки на спорт ⚽ | Казино 🎰 | Маркеты предсказаний 📊</p>
+    </div>
+
+    <!-- Balance Card -->
+    <div class="tg-card">
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="text-tg-hint text-sm mb-1">💰 Баланс</div>
+                <div class="text-xl font-bold" id="main-balance">$1,234.56</div>
+            </div>
+            <div class="flex space-x-2">
+                <button class="tg-btn tg-btn-secondary text-sm px-3 py-2"
+                        onclick="haptic.light(); window.location.href='{% url 'miniapp:wallet' %}?action=deposit'">
+                    ➕
+                </button>
+                <button class="tg-btn tg-btn-outline text-sm px-3 py-2"
+                        onclick="haptic.light(); window.location.href='{% url 'miniapp:wallet' %}?action=withdraw'">
+                    ➖
+                </button>
+                <button class="tg-btn tg-btn-outline text-sm px-3 py-2"
+                        onclick="haptic.light(); window.location.href='{% url 'miniapp:wallet' %}?action=convert'">
+                    🔄
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div>
+        <h3 class="text-lg font-semibold mb-3">🔥 Быстрые действия</h3>
+        <div class="grid grid-4 gap-3">
+            <button class="tg-card text-center p-3 hover:bg-tg-section/80 transition-colors"
+                    onclick="haptic.medium(); window.location.href='{% url 'miniapp:casino' %}?game=crash'">
+                <div class="text-2xl mb-1">🚀</div>
+                <div class="text-xs">CRASH</div>
+                <div class="text-xs text-tg-link">x2.34</div>
+            </button>
+
+            <button class="tg-card text-center p-3 hover:bg-tg-section/80 transition-colors"
+                    onclick="haptic.medium(); window.location.href='{% url 'miniapp:sports' %}'">
+                <div class="text-2xl mb-1">⚽</div>
+                <div class="text-xs">Live</div>
+                <div class="text-xs text-tg-link">5 матчей</div>
+            </button>
+
+            <button class="tg-card text-center p-3 hover:bg-tg-section/80 transition-colors"
+                    onclick="haptic.medium(); window.location.href='{% url 'miniapp:predictions' %}'">
+                <div class="text-2xl mb-1">📊</div>
+                <div class="text-xs">Маркеты</div>
+                <div class="text-xs text-tg-link">78% YES</div>
+            </button>
+
+            <button class="tg-card text-center p-3 hover:bg-tg-section/80 transition-colors"
+                    onclick="haptic.medium(); window.location.href='{% url 'miniapp:casino' %}?game=dice'">
+                <div class="text-2xl mb-1">🎲</div>
+                <div class="text-xs">DICE</div>
+                <div class="text-xs text-tg-hint">Попробуй</div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Live Matches -->
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold">🔴 Live сейчас</h3>
+            <button class="text-tg-link text-sm" onclick="window.location.href='{% url 'miniapp:sports' %}'">
+                Все матчи →
+            </button>
+        </div>
+
+        <div id="live-matches" hx-get="/tg/api/live-matches/" hx-trigger="load, every 30s" hx-swap="innerHTML">
+            <!-- Live matches will be loaded here -->
+            <div class="tg-card">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-500">🟢</span>
+                        <span class="font-medium">Реал Мадрид — Барселона</span>
+                    </div>
+                    <span class="text-sm text-tg-hint">67'</span>
+                </div>
+                <div class="text-center text-lg font-bold mb-2">2 : 1</div>
+                <div class="grid grid-3 gap-2 text-center text-sm">
+                    <button class="tg-btn tg-btn-outline py-2" onclick="haptic.light(); placeBet('1', 2.10)">
+                        1<br><span class="text-xs">2.10</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="haptic.light(); placeBet('X', 3.40)">
+                        X<br><span class="text-xs">3.40</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="haptic.light(); placeBet('2', 3.80)">
+                        2<br><span class="text-xs">3.80</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tg-card">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-500">🟢</span>
+                        <span class="font-medium">МанСити — Ливерпуль</span>
+                    </div>
+                    <span class="text-sm text-tg-hint">23'</span>
+                </div>
+                <div class="text-center text-lg font-bold mb-2">0 : 0</div>
+                <div class="grid grid-3 gap-2 text-center text-sm">
+                    <button class="tg-btn tg-btn-outline py-2" onclick="haptic.light(); placeBet('1', 1.90)">
+                        1<br><span class="text-xs">1.90</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="haptic.light(); placeBet('X', 3.60)">
+                        X<br><span class="text-xs">3.60</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="haptic.light(); placeBet('2', 4.20)">
+                        2<br><span class="text-xs">4.20</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trending Markets -->
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold">📊 Тренд маркеты</h3>
+            <button class="text-tg-link text-sm" onclick="window.location.href='{% url 'miniapp:predictions' %}'">
+                Все маркеты →
+            </button>
+        </div>
+
+        <div class="tg-card">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <div class="font-medium">BTC > $150k к 01.06?</div>
+                    <div class="text-sm text-tg-hint">Объём: $45,678</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-tg-hint">⏰ 12 дней</div>
+                </div>
+            </div>
+
+            <div class="space-y-2 mb-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">YES</span>
+                    <div class="flex items-center space-x-2 flex-1 ml-3">
+                        <div class="progress-bar flex-1">
+                            <div class="progress-fill" style="width: 78%"></div>
+                        </div>
+                        <span class="text-sm font-medium">78%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">NO</span>
+                    <div class="flex items-center space-x-2 flex-1 ml-3">
+                        <div class="progress-bar flex-1">
+                            <div class="progress-fill bg-red-500" style="width: 22%"></div>
+                        </div>
+                        <span class="text-sm font-medium">22%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2">
+                <button class="tg-btn tg-btn-primary flex-1" onclick="haptic.medium(); tradeMarket('yes', 0.78)">
+                    Купить YES $0.78
+                </button>
+                <button class="tg-btn tg-btn-outline flex-1" onclick="haptic.medium(); tradeMarket('no', 0.22)">
+                    Купить NO $0.22
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Winners -->
+    <div>
+        <h3 class="text-lg font-semibold mb-3">🏆 Топ выигрышей</h3>
+        <div class="space-y-2">
+            <div class="tg-list-item">
+                <span class="text-xl mr-3">🥇</span>
+                <span class="flex-1">player123</span>
+                <span class="text-green-400 font-medium">+$5,400 (Crash)</span>
+            </div>
+            <div class="tg-list-item">
+                <span class="text-xl mr-3">🥈</span>
+                <span class="flex-1">winner_x</span>
+                <span class="text-green-400 font-medium">+$3,200 (Slots)</span>
+            </div>
+            <div class="tg-list-item">
+                <span class="text-xl mr-3">🥉</span>
+                <span class="flex-1">lucky7</span>
+                <span class="text-green-400 font-medium">+$2,100 (Спорт)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promo Section -->
+    <div class="tg-card bg-gradient-to-r from-tg-link/10 to-tg-link/5 border border-tg-link/20">
+        <div class="text-center">
+            <div class="text-2xl mb-2">🎉</div>
+            <h4 class="font-semibold mb-1">Приветственный бонус</h4>
+            <p class="text-sm text-tg-hint mb-3">100% на первый депозит до $500</p>
+            <button class="tg-btn tg-btn-primary" onclick="haptic.success(); window.location.href='{% url 'miniapp:wallet' %}?action=deposit'">
+                Получить бонус
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Bet Placement Modal (hidden by default) -->
+<div id="bet-modal" class="hidden">
+    <div class="tg-modal">
+        <div class="tg-modal-handle"></div>
+        <h3 class="text-lg font-semibold mb-4" id="bet-match-title">Матч</h3>
+
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <span id="bet-outcome">Победа 1</span>
+                <span class="font-medium" id="bet-odds">2.10</span>
+            </div>
+
+            <div>
+                <label class="block text-sm text-tg-hint mb-1">Сумма ставки</label>
+                <div class="flex space-x-2 mb-2">
+                    <button class="tg-btn tg-btn-outline flex-1 text-sm" onclick="setBetAmount(5)">$5</button>
+                    <button class="tg-btn tg-btn-outline flex-1 text-sm" onclick="setBetAmount(10)">$10</button>
+                    <button class="tg-btn tg-btn-outline flex-1 text-sm" onclick="setBetAmount(25)">$25</button>
+                    <button class="tg-btn tg-btn-outline flex-1 text-sm" onclick="setBetAmount(50)">$50</button>
+                </div>
+                <input type="number" id="bet-amount" class="tg-input" placeholder="0.00" step="0.01">
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <span>Возможный выигрыш:</span>
+                <span class="font-medium text-green-400" id="potential-win">$0.00</span>
+            </div>
+        </div>
+
+        <div class="flex space-x-2 mt-4">
+            <button class="tg-btn tg-btn-outline flex-1" onclick="closeBetModal()">Отмена</button>
+            <button class="tg-btn tg-btn-primary flex-1" onclick="confirmBet()">⚡ Поставить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Bet placement functions
+let currentBet = null;
+
+function placeBet(outcome, odds) {
+    currentBet = { outcome, odds };
+    document.getElementById('bet-match-title').textContent = 'Реал Мадрид — Барселона'; // Would be dynamic
+    document.getElementById('bet-outcome').textContent = outcome === '1' ? 'Победа 1' : outcome === 'X' ? 'Ничья' : 'Победа 2';
+    document.getElementById('bet-odds').textContent = odds;
+    document.getElementById('bet-modal').classList.remove('hidden');
+    document.getElementById('bet-modal').classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function setBetAmount(amount) {
+    document.getElementById('bet-amount').value = amount;
+    calculatePotentialWin();
+}
+
+function calculatePotentialWin() {
+    const amount = parseFloat(document.getElementById('bet-amount').value) || 0;
+    const odds = currentBet ? currentBet.odds : 0;
+    const win = amount * odds;
+    document.getElementById('potential-win').textContent = `$${win.toFixed(2)}`;
+}
+
+document.getElementById('bet-amount').addEventListener('input', calculatePotentialWin);
+
+function closeBetModal() {
+    document.getElementById('bet-modal').classList.add('hidden');
+    document.getElementById('bet-modal').classList.remove('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function confirmBet() {
+    haptic.heavy();
+    // Would send HTMX request here
+    closeBetModal();
+    tgShowAlert('Ставка принята!', () => {});
+}
+
+function tradeMarket(side, price) {
+    haptic.medium();
+    // Would navigate to market detail
+    window.location.href = '{% url 'miniapp:predictions' %}';
+}
+</script>
+{% endblock %}

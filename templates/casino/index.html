@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Казино - {{ user.username }}</title>
+</head>
+<body>
+    <h1>Казино DOD</h1>
+    <div id="game-list">
+        {% for game in game_types %}
+            <div class="game-card">
+                <h3>{{ game.name }}</h3>
+                <p>{{ game.description }}</p>
+                <a href="{% url 'casino:'|add:game.code %}">Играть</a>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

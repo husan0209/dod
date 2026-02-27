@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Dice - Казино</title>
+</head>
+<body>
+    <h1>Dice</h1>
+    <div id="dice-game">
+        <form method="post" id="dice-form">
+            {% csrf_token %}
+            <input type="number" name="bet_amount" step="0.01" placeholder="Ставка">
+            <input type="number" name="target" step="0.01" placeholder="Цель">
+            <select name="condition">
+                <option value="over">Over</option>
+                <option value="under">Under</option>
+            </select>
+            <button type="submit">Бросить</button>
+        </form>
+    </div>
+    <div id="result"></div>
+</body>
+</html>

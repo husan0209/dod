@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Provably Fair - Казино</title>
+</head>
+<body>
+    <h1>Provably Fair</h1>
+    <div id="seeds">
+        <p>Server Seed Hash: {{ user_seed.server_seed_hash }}</p>
+        <p>Client Seed: {{ user_seed.client_seed }}</p>
+        <p>Nonce: {{ user_seed.nonce }}</p>
+    </div>
+    <div id="verify-form">
+        <form method="post" id="verify-form">
+            {% csrf_token %}
+            <input type="text" name="server_seed" placeholder="Server Seed">
+            <input type="text" name="client_seed" placeholder="Client Seed">
+            <input type="number" name="nonce" placeholder="Nonce">
+            <select name="game_type">
+                <option value="crash">Crash</option>
+                <option value="dice">Dice</option>
+            </select>
+            <textarea name="game_data" placeholder="Game Data"></textarea>
+            <button type="submit">Проверить</button>
+        </form>
+    </div>
+    <div id="history">
+        {% for session in sessions %}
+            <p>{{ session.game_type.name }} - {{ session.win_amount }} - <a href="#">Проверить</a></p>
+        {% endfor %}
+    </div>
+</body>
+</html>

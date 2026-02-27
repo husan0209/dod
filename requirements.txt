@@ -1,0 +1,31 @@
+Django==5.1
+psycopg[binary]==3.3.3
+django-redis==5.4.0
+channels==4.1.0
+channels-redis==4.2.0
+django-celery-results==2.5.1
+python-dotenv==1.0.1
+Pillow==10.4.0
+django-allauth==65.0.0
+django-otp==1.5.0
+qrcode==7.4.2
+phonenumbers==8.13.0
+django-phonenumber-field==8.0.0
+django-countries==7.6.1
+django-timezone-field==7.0
+celery==5.4.0
+redis==5.0.0
+requests==2.32.0
+django-cors-headers==4.4.0
+django-ratelimit==4.1.0
+user-agents==2.2.0
+geoip2==4.8.0
+cryptography==43.0.0
+django-import-export==4.1.0
+PyJWT==2.10.1
+python-telegram-bot==21.0
+django-prometheus==2.3.1
+# bandit==1.7.9
+# safety==3.2.6
+coverage==7.6.1
+locust==2.31.6

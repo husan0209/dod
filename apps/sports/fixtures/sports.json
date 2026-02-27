@@ -1,0 +1,182 @@
+[
+    {
+        "model": "sports.sport",
+        "pk": 1,
+        "fields": {
+            "name": "Футбол",
+            "name_en": "Football",
+            "slug": "football",
+            "icon": "⚽",
+            "sort_order": 1,
+            "is_active": true,
+            "is_popular": true,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 2,
+        "fields": {
+            "name": "Баскетбол",
+            "name_en": "Basketball",
+            "slug": "basketball",
+            "icon": "🏀",
+            "sort_order": 2,
+            "is_active": true,
+            "is_popular": true,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 3,
+        "fields": {
+            "name": "Теннис",
+            "name_en": "Tennis",
+            "slug": "tennis",
+            "icon": "🎾",
+            "sort_order": 3,
+            "is_active": true,
+            "is_popular": true,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 4,
+        "fields": {
+            "name": "Хоккей",
+            "name_en": "Hockey",
+            "slug": "hockey",
+            "icon": "🏒",
+            "sort_order": 4,
+            "is_active": true,
+            "is_popular": false,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 5,
+        "fields": {
+            "name": "MMA/UFC",
+            "name_en": "MMA/UFC",
+            "slug": "mma",
+            "icon": "🥊",
+            "sort_order": 5,
+            "is_active": true,
+            "is_popular": true,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 6,
+        "fields": {
+            "name": "Киберспорт",
+            "name_en": "Esports",
+            "slug": "esports",
+            "icon": "🎮",
+            "sort_order": 6,
+            "is_active": true,
+            "is_popular": true,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 7,
+        "fields": {
+            "name": "Волейбол",
+            "name_en": "Volleyball",
+            "slug": "volleyball",
+            "icon": "🏐",
+            "sort_order": 7,
+            "is_active": true,
+            "is_popular": false,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 8,
+        "fields": {
+            "name": "Бокс",
+            "name_en": "Boxing",
+            "slug": "boxing",
+            "icon": "🥊",
+            "sort_order": 8,
+            "is_active": true,
+            "is_popular": false,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 9,
+        "fields": {
+            "name": "Настольный теннис",
+            "name_en": "Table Tennis",
+            "slug": "table-tennis",
+            "icon": "🏓",
+            "sort_order": 9,
+            "is_active": true,
+            "is_popular": false,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 10,
+        "fields": {
+            "name": "Бейсбол",
+            "name_en": "Baseball",
+            "slug": "baseball",
+            "icon": "⚾",
+            "sort_order": 10,
+            "is_active": true,
+            "is_popular": false,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 11,
+        "fields": {
+            "name": "Американский футбол",
+            "name_en": "American Football",
+            "slug": "american-football",
+            "icon": "🏈",
+            "sort_order": 11,
+            "is_active": true,
+            "is_popular": false,
+            "events_count": 0,
+            "external_id": null
+        }
+    },
+    {
+        "model": "sports.sport",
+        "pk": 12,
+        "fields": {
+            "name": "Регби",
+            "name_en": "Rugby",
+            "slug": "rugby",
+            "icon": "🏉",
+            "sort_order": 12,
+            "is_active": true,
+            "is_popular": false,
+            "events_count": 0,
+            "external_id": null
+        }
+    }
+]

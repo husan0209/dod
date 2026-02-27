@@ -1,0 +1,119 @@
+[
+  {
+    "model": "support.faq_category",
+    "pk": "deposits-withdrawals",
+    "fields": {
+      "name": "💰 Депозиты и выводы",
+      "name_en": "Deposits and Withdrawals",
+      "slug": "deposits-withdrawals",
+      "icon": "💰",
+      "sort_order": 1,
+      "is_active": true,
+      "articles_count": 5
+    }
+  },
+  {
+    "model": "support.faq_category",
+    "pk": "account",
+    "fields": {
+      "name": "👤 Аккаунт и профиль",
+      "name_en": "Account and Profile",
+      "slug": "account",
+      "icon": "👤",
+      "sort_order": 2,
+      "is_active": true,
+      "articles_count": 4
+    }
+  },
+  {
+    "model": "support.faq_category",
+    "pk": "verification",
+    "fields": {
+      "name": "🪪 Верификация",
+      "name_en": "Verification",
+      "slug": "verification",
+      "icon": "🪪",
+      "sort_order": 3,
+      "is_active": true,
+      "articles_count": 3
+    }
+  },
+  {
+    "model": "support.faq_category",
+    "pk": "sports-betting",
+    "fields": {
+      "name": "⚽ Ставки на спорт",
+      "name_en": "Sports Betting",
+      "slug": "sports-betting",
+      "icon": "⚽",
+      "sort_order": 4,
+      "is_active": true,
+      "articles_count": 6
+    }
+  },
+  {
+    "model": "support.faq_category",
+    "pk": "casino",
+    "fields": {
+      "name": "🎰 Казино",
+      "name_en": "Casino",
+      "slug": "casino",
+      "icon": "🎰",
+      "sort_order": 5,
+      "is_active": true,
+      "articles_count": 4
+    }
+  },
+  {
+    "model": "support.faq_category",
+    "pk": "predictions",
+    "fields": {
+      "name": "📊 Маркеты предсказаний",
+      "name_en": "Prediction Markets",
+      "slug": "predictions",
+      "icon": "📊",
+      "sort_order": 6,
+      "is_active": true,
+      "articles_count": 3
+    }
+  },
+  {
+    "model": "support.faq_category",
+    "pk": "referral",
+    "fields": {
+      "name": "🤝 Партнёрская программа",
+      "name_en": "Referral Program",
+      "slug": "referral",
+      "icon": "🤝",
+      "sort_order": 7,
+      "is_active": true,
+      "articles_count": 4
+    }
+  },
+  {
+    "model": "support.faq_category",
+    "pk": "security",
+    "fields": {
+      "name": "🔐 Безопасность",
+      "name_en": "Security",
+      "slug": "security",
+      "icon": "🔐",
+      "sort_order": 8,
+      "is_active": true,
+      "articles_count": 5
+    }
+  },
+  {
+    "model": "support.faq_category",
+    "pk": "technical",
+    "fields": {
+      "name": "💻 Технические вопросы",
+      "name_en": "Technical Issues",
+      "slug": "technical",
+      "icon": "💻",
+      "sort_order": 9,
+      "is_active": true,
+      "articles_count": 4
+    }
+  }
+]

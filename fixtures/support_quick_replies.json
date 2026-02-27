@@ -1,0 +1,92 @@
+[
+  {
+    "model": "support.quick_reply",
+    "pk": "greeting",
+    "fields": {
+      "title": "Приветствие",
+      "text": "Здравствуйте, {username}! Меня зовут {operator_name}. Чем могу помочь?",
+      "category": "greeting",
+      "is_global": true,
+      "created_by": null,
+      "usage_count": 0,
+      "sort_order": 1,
+      "is_active": true,
+      "created_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "support.quick_reply",
+    "pk": "request_details",
+    "fields": {
+      "title": "Запрос деталей",
+      "text": "Для решения вашего вопроса мне нужна дополнительная информация. Пожалуйста, уточните...",
+      "category": "general",
+      "is_global": true,
+      "created_by": null,
+      "usage_count": 0,
+      "sort_order": 2,
+      "is_active": true,
+      "created_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "support.quick_reply",
+    "pk": "withdrawal_delay",
+    "fields": {
+      "title": "Задержка вывода",
+      "text": "Ваш вывод находится на проверке. Обработка занимает до 24 часов. Мы уведомим вас как только средства будут отправлены.",
+      "category": "finance",
+      "is_global": true,
+      "created_by": null,
+      "usage_count": 0,
+      "sort_order": 3,
+      "is_active": true,
+      "created_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "support.quick_reply",
+    "pk": "request_screenshot",
+    "fields": {
+      "title": "Запрос скриншота",
+      "text": "Пожалуйста, отправьте скриншот проблемы для более быстрого решения.",
+      "category": "technical",
+      "is_global": true,
+      "created_by": null,
+      "usage_count": 0,
+      "sort_order": 4,
+      "is_active": true,
+      "created_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "support.quick_reply",
+    "pk": "kyc_needed",
+    "fields": {
+      "title": "KYC нужна",
+      "text": "Для вывода данной суммы необходимо пройти верификацию. Перейдите в раздел Безопасность → KYC.",
+      "category": "verification",
+      "is_global": true,
+      "created_by": null,
+      "usage_count": 0,
+      "sort_order": 5,
+      "is_active": true,
+      "created_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "support.quick_reply",
+    "pk": "closing",
+    "fields": {
+      "title": "Завершение",
+      "text": "Рад был помочь! Если у вас возникнут ещё вопросы — обращайтесь. Хорошего дня, {username}!",
+      "category": "closing",
+      "is_global": true,
+      "created_by": null,
+      "usage_count": 0,
+      "sort_order": 6,
+      "is_active": true,
+      "created_at": "2023-01-01T00:00:00Z"
+    }
+  }
+]

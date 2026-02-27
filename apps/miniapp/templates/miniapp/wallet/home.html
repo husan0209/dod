@@ -1,0 +1,305 @@
+{% extends 'miniapp/base.html' %}
+{% load static %}
+
+{% block title %}Кошелёк{% endblock %}
+
+{% block content %}
+<div class="px-4 py-4 space-y-6">
+    <!-- Balance Card -->
+    <div class="tg-card">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <div class="text-tg-hint text-sm mb-1">Основной баланс</div>
+                <div class="text-2xl font-bold" id="main-balance">$1,234.56</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-3 gap-2">
+            <button class="tg-btn tg-btn-secondary text-sm py-2"
+                    onclick="haptic.light(); showDepositModal()">
+                ➕<br>Пополнить
+            </button>
+            <button class="tg-btn tg-btn-outline text-sm py-2"
+                    onclick="haptic.light(); showWithdrawModal()">
+                ➖<br>Вывести
+            </button>
+            <button class="tg-btn tg-btn-outline text-sm py-2"
+                    onclick="haptic.light(); window.location.href='{% url 'miniapp:wallet' %}convert/'">
+                🔄<br>Конверт
+            </button>
+        </div>
+    </div>
+
+    <!-- Currency Balances -->
+    <div>
+        <h3 class="text-lg font-semibold mb-3">Мои валюты</h3>
+        <div class="space-y-2">
+            <div class="tg-list-item">
+                <div class="flex items-center space-x-2 flex-1">
+                    <span class="text-lg">🇺🇸</span>
+                    <span>USD</span>
+                </div>
+                <span class="font-medium">$1,234.56</span>
+            </div>
+            <div class="tg-list-item">
+                <div class="flex items-center space-x-2 flex-1">
+                    <span class="text-lg">₿</span>
+                    <span>BTC</span>
+                </div>
+                <span class="font-medium">0.01234</span>
+            </div>
+            <div class="tg-list-item">
+                <div class="flex items-center space-x-2 flex-1">
+                    <span class="text-lg">💎</span>
+                    <span>USDT</span>
+                </div>
+                <span class="font-medium">$500.00</span>
+            </div>
+            <div class="tg-list-item">
+                <div class="flex items-center space-x-2 flex-1">
+                    <span class="text-lg">💎</span>
+                    <span>TON</span>
+                </div>
+                <span class="font-medium">123.45</span>
+            </div>
+            <div class="tg-list-item">
+                <div class="flex items-center space-x-2 flex-1">
+                    <span class="text-lg">🇷🇺</span>
+                    <span>RUB</span>
+                </div>
+                <span class="font-medium">₽15,000</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Last Operations -->
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold">Последние операции</h3>
+            <button class="text-tg-link text-sm" onclick="window.location.href='{% url 'miniapp:wallet' %}history/'">
+                Все →
+            </button>
+        </div>
+
+        <div class="space-y-2">
+            <div class="tg-list-item">
+                <div class="flex items-center space-x-2 flex-1">
+                    <span class="text-green-400 text-lg">↓</span>
+                    <div>
+                        <div class="font-medium">Депозит</div>
+                        <div class="text-xs text-tg-hint">Visa •••• 4242</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="font-medium text-green-400">+$100.00</div>
+                    <div class="text-xs text-tg-hint">10:30</div>
+                </div>
+            </div>
+
+            <div class="tg-list-item">
+                <div class="flex items-center space-x-2 flex-1">
+                    <span class="text-red-400 text-lg">↑</span>
+                    <div>
+                        <div class="font-medium">Ставка</div>
+                        <div class="text-xs text-tg-hint">Реал Мадрид — Барса</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="font-medium text-red-400">-$50.00</div>
+                    <div class="text-xs text-tg-hint">09:45</div>
+                </div>
+            </div>
+
+            <div class="tg-list-item">
+                <div class="flex items-center space-x-2 flex-1">
+                    <span class="text-green-400 text-lg">↓</span>
+                    <div>
+                        <div class="font-medium">Выигрыш</div>
+                        <div class="text-xs text-tg-hint">Crash</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="font-medium text-green-400">+$210.00</div>
+                    <div class="text-xs text-tg-hint">09:40</div>
+                </div>
+            </div>
+
+            <div class="tg-list-item">
+                <div class="flex items-center space-x-2 flex-1">
+                    <span class="text-orange-400 text-lg">↑</span>
+                    <div>
+                        <div class="font-medium">Вывод</div>
+                        <div class="text-xs text-tg-hint">USDT TRC20 •••⏳</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="font-medium text-orange-400">-$300.00</div>
+                    <div class="text-xs text-tg-hint">вчера</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deposit Modal -->
+<div id="deposit-modal" class="hidden">
+    <div class="tg-modal">
+        <div class="tg-modal-handle"></div>
+        <h3 class="text-lg font-semibold mb-4">➕ Пополнить</h3>
+
+        <div class="space-y-4">
+            <!-- Currency Selection -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Валюта</label>
+                <select class="tg-select" id="deposit-currency">
+                    <option value="USD">🇺🇸 USD</option>
+                    <option value="BTC">₿ BTC</option>
+                    <option value="USDT">💎 USDT</option>
+                    <option value="TON">💎 TON</option>
+                    <option value="RUB">🇷🇺 RUB</option>
+                </select>
+            </div>
+
+            <!-- Amount -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Сумма</label>
+                <input type="number" id="deposit-amount" class="tg-input" placeholder="0.00" step="0.01">
+                <div class="grid grid-4 gap-2 mt-2">
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setDepositAmount(10)">$10</button>
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setDepositAmount(25)">$25</button>
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setDepositAmount(50)">$50</button>
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setDepositAmount(100)">$100</button>
+                </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Способ оплаты</label>
+                <div class="space-y-2">
+                    <label class="tg-list-item cursor-pointer">
+                        <input type="radio" name="payment-method" value="card" checked class="mr-2">
+                        <span>💳 Банковская карта (RUkassa)</span>
+                    </label>
+                    <label class="tg-list-item cursor-pointer">
+                        <input type="radio" name="payment-method" value="crypto" class="mr-2">
+                        <span>₿ Криптовалюта (NOWpayments)</span>
+                    </label>
+                    <label class="tg-list-item cursor-pointer">
+                        <input type="radio" name="payment-method" value="ton" class="mr-2">
+                        <span>💎 TON (Telegram Payments)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex space-x-2 mt-6">
+            <button class="tg-btn tg-btn-outline flex-1" onclick="closeDepositModal()">Отмена</button>
+            <button class="tg-btn tg-btn-primary flex-1" onclick="processDeposit()">💰 Пополнить</button>
+        </div>
+    </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div id="withdraw-modal" class="hidden">
+    <div class="tg-modal">
+        <div class="tg-modal-handle"></div>
+        <h3 class="text-lg font-semibold mb-4">➖ Вывести</h3>
+
+        <div class="space-y-4">
+            <!-- Currency Selection -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Валюта</label>
+                <select class="tg-select" id="withdraw-currency">
+                    <option value="USDT">💎 USDT</option>
+                    <option value="BTC">₿ BTC</option>
+                    <option value="TON">💎 TON</option>
+                </select>
+            </div>
+
+            <!-- Amount -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Сумма</label>
+                <input type="number" id="withdraw-amount" class="tg-input" placeholder="0.00" step="0.01">
+            </div>
+
+            <!-- Address -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Адрес кошелька</label>
+                <input type="text" id="withdraw-address" class="tg-input" placeholder="Адрес для вывода">
+            </div>
+        </div>
+
+        <div class="text-xs text-tg-hint mb-4">
+            Комиссия: 1 USDT | Время обработки: 10-30 минут
+        </div>
+
+        <div class="flex space-x-2">
+            <button class="tg-btn tg-btn-outline flex-1" onclick="closeWithdrawModal()">Отмена</button>
+            <button class="tg-btn tg-btn-primary flex-1" onclick="processWithdraw()">📤 Вывести</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function showDepositModal() {
+    document.getElementById('deposit-modal').classList.remove('hidden');
+    document.getElementById('deposit-modal').classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function closeDepositModal() {
+    document.getElementById('deposit-modal').classList.add('hidden');
+    document.getElementById('deposit-modal').classList.remove('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function setDepositAmount(amount) {
+    document.getElementById('deposit-amount').value = amount;
+}
+
+function processDeposit() {
+    haptic.heavy();
+    const currency = document.getElementById('deposit-currency').value;
+    const amount = document.getElementById('deposit-amount').value;
+    const method = document.querySelector('input[name="payment-method"]:checked').value;
+
+    if (method === 'ton') {
+        // Telegram Payments
+        tgOpenInvoice('https://example.com/invoice', (status) => {
+            if (status === 'paid') {
+                tgShowAlert('Баланс пополнен!', () => {
+                    closeDepositModal();
+                    location.reload();
+                });
+            }
+        });
+    } else {
+        // External payment
+        const url = `/payments/deposit/?currency=${currency}&amount=${amount}&method=${method}`;
+        tgOpenLink(url, {try_instant_view: false});
+        closeDepositModal();
+    }
+}
+
+function showWithdrawModal() {
+    document.getElementById('withdraw-modal').classList.remove('hidden');
+    document.getElementById('withdraw-modal').classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function closeWithdrawModal() {
+    document.getElementById('withdraw-modal').classList.add('hidden');
+    document.getElementById('withdraw-modal').classList.remove('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function processWithdraw() {
+    haptic.heavy();
+    const currency = document.getElementById('withdraw-currency').value;
+    const amount = document.getElementById('withdraw-amount').value;
+    const address = document.getElementById('withdraw-address').value;
+
+    // Would send HTMX request
+    tgShowAlert('Заявка на вывод создана!', () => {
+        closeWithdrawModal();
+    });
+}
+</script>
+{% endblock %}

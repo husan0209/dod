@@ -1,0 +1,263 @@
+{% extends 'miniapp/base.html' %}
+{% load static %}
+
+{% block title %}Поддержка{% endblock %}
+
+{% block content %}
+<div class="px-4 py-4 space-y-6">
+    <!-- Quick Actions -->
+    <div class="grid grid-2 gap-4">
+        <button class="tg-card text-center p-4 hover:bg-tg-section/80 transition-colors" onclick="newTicket()">
+            <div class="text-3xl mb-2">💬</div>
+            <div class="font-semibold">Новый тикет</div>
+            <div class="text-xs text-tg-hint mt-1">Опишите проблему</div>
+        </button>
+
+        <button class="tg-card text-center p-4 hover:bg-tg-section/80 transition-colors" onclick="showFAQ()">
+            <div class="text-3xl mb-2">❓</div>
+            <div class="font-semibold">FAQ</div>
+            <div class="text-xs text-tg-hint mt-1">Частые вопросы</div>
+        </button>
+    </div>
+
+    <!-- My Tickets -->
+    <div>
+        <h3 class="text-lg font-semibold mb-3">Мои обращения</h3>
+
+        <div class="space-y-3">
+            <!-- Active Ticket -->
+            <div class="tg-card cursor-pointer" onclick="openTicket('DOD-20250320-0042')">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-500 text-sm">🟢</span>
+                        <span class="font-medium">DOD-20250320-0042</span>
+                    </div>
+                    <span class="text-xs text-tg-hint">3 часа назад</span>
+                </div>
+                <div class="text-sm mb-2">Задержка вывода USDT TRC20</div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">В работе</span>
+                    <span class="text-xs text-tg-hint">2 ответа</span>
+                </div>
+            </div>
+
+            <!-- Resolved Ticket -->
+            <div class="tg-card cursor-pointer" onclick="openTicket('DOD-20250319-0038')">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-500 text-sm">✅</span>
+                        <span class="font-medium">DOD-20250319-0038</span>
+                    </div>
+                    <span class="text-xs text-tg-hint">вчера</span>
+                </div>
+                <div class="text-sm mb-2">Вопрос по KYC</div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Решён</span>
+                    <span class="text-xs text-tg-hint">5 ответов</span>
+                </div>
+            </div>
+
+            <!-- Older Ticket -->
+            <div class="tg-card cursor-pointer" onclick="openTicket('DOD-20250315-0021')">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-500 text-sm">✅</span>
+                        <span class="font-medium">DOD-20250315-0021</span>
+                    </div>
+                    <span class="text-xs text-tg-hint">5 дней назад</span>
+                </div>
+                <div class="text-sm mb-2">Проблема с пополнением</div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Решён</span>
+                    <span class="text-xs text-tg-hint">3 ответа</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Load More -->
+        <div class="text-center mt-4">
+            <button class="text-tg-link text-sm" onclick="loadMoreTickets()">
+                Загрузить ещё →
+            </button>
+        </div>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="tg-card">
+        <h3 class="font-semibold mb-3">Контакты</h3>
+        <div class="space-y-2">
+            <div class="flex items-center space-x-3">
+                <span class="text-xl">📧</span>
+                <div>
+                    <div class="text-sm font-medium">Email</div>
+                    <div class="text-xs text-tg-hint">support@dod.com</div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="text-xl">⏰</span>
+                <div>
+                    <div class="text-sm font-medium">Время работы</div>
+                    <div class="text-xs text-tg-hint">24/7</div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="text-xl">📱</span>
+                <div>
+                    <div class="text-sm font-medium">Telegram бот</div>
+                    <div class="text-xs text-tg-hint">@DODPlatformBot</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Response Time -->
+    <div class="tg-card bg-blue-500/10 border border-blue-500/20">
+        <div class="flex items-center space-x-3">
+            <span class="text-blue-400 text-xl">⚡</span>
+            <div>
+                <div class="font-medium text-blue-400">Быстрый ответ</div>
+                <div class="text-xs text-tg-hint">
+                    Среднее время ответа: 15 минут
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Ticket Modal -->
+<div id="new-ticket-modal" class="hidden">
+    <div class="tg-modal">
+        <div class="tg-modal-handle"></div>
+        <h3 class="text-lg font-semibold mb-4">💬 Новый тикет</h3>
+
+        <form id="ticket-form" class="space-y-4">
+            <!-- Category -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Категория</label>
+                <select name="category" class="tg-select" required>
+                    <option value="">Выберите категорию</option>
+                    <option value="wallet">💰 Кошелёк</option>
+                    <option value="sports">⚽ Ставки</option>
+                    <option value="casino">🎰 Казино</option>
+                    <option value="predictions">📊 Маркеты</option>
+                    <option value="referral">🤝 Партнёрка</option>
+                    <option value="technical">🔧 Технические проблемы</option>
+                    <option value="other">❓ Другое</option>
+                </select>
+            </div>
+
+            <!-- Subject -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Тема</label>
+                <input type="text" name="subject" class="tg-input" placeholder="Кратко опишите проблему" required>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Описание</label>
+                <textarea name="description" class="tg-input" rows="4"
+                          placeholder="Подробно опишите вашу проблему или вопрос..." required></textarea>
+            </div>
+
+            <!-- Attachments -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Прикрепить файлы (опционально)</label>
+                <input type="file" id="attachments" multiple accept="image/*,.pdf,.txt"
+                       class="tg-input" onchange="handleFileSelect(event)">
+                <div class="text-xs text-tg-hint mt-1">
+                    Максимум 5 файлов, до 10MB каждый
+                </div>
+                <div id="file-list" class="mt-2 space-y-1"></div>
+            </div>
+        </form>
+
+        <div class="flex space-x-2 mt-6">
+            <button class="tg-btn tg-btn-outline flex-1" onclick="closeNewTicketModal()">Отмена</button>
+            <button class="tg-btn tg-btn-primary flex-1" onclick="submitTicket()">Отправить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function newTicket() {
+    document.getElementById('new-ticket-modal').classList.remove('hidden');
+    document.getElementById('new-ticket-modal').classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function closeNewTicketModal() {
+    document.getElementById('new-ticket-modal').classList.add('hidden');
+    document.getElementById('new-ticket-modal').classList.remove('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+    // Reset form
+    document.getElementById('ticket-form').reset();
+    document.getElementById('file-list').innerHTML = '';
+}
+
+function showFAQ() {
+    window.location.href = '{% url 'miniapp:support' %}faq/';
+}
+
+function openTicket(ticketId) {
+    // Would navigate to ticket detail
+    console.log('Opening ticket:', ticketId);
+}
+
+function loadMoreTickets() {
+    // Would load more tickets
+    console.log('Loading more tickets...');
+}
+
+function handleFileSelect(event) {
+    const files = event.target.files;
+    const fileList = document.getElementById('file-list');
+
+    fileList.innerHTML = '';
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileItem = document.createElement('div');
+        fileItem.className = 'flex items-center justify-between bg-tg-secondary p-2 rounded text-sm';
+        fileItem.innerHTML = `
+            <span>${file.name}</span>
+            <button onclick="removeFile(${i})" class="text-red-400">✕</button>
+        `;
+        fileList.appendChild(fileItem);
+    }
+}
+
+function removeFile(index) {
+    const input = document.getElementById('attachments');
+    const files = Array.from(input.files);
+    files.splice(index, 1);
+
+    // Create new FileList
+    const dt = new DataTransfer();
+    files.forEach(file => dt.items.add(file));
+    input.files = dt.files;
+
+    handleFileSelect({ target: input });
+}
+
+function submitTicket() {
+    const form = document.getElementById('ticket-form');
+    const formData = new FormData(form);
+
+    // Basic validation
+    const category = formData.get('category');
+    const subject = formData.get('subject');
+    const description = formData.get('description');
+
+    if (!category || !subject || !description) {
+        tgShowAlert('Заполните все обязательные поля', () => {});
+        return;
+    }
+
+    haptic.medium();
+
+    // Would submit form via HTMX or fetch
+    closeNewTicketModal();
+    tgShowAlert('Тикет создан! Мы ответим в течение 15 минут.', () => {
+        window.location.reload();
+    });
+}
+</script>
+{% endblock %}

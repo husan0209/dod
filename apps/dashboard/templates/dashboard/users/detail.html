@@ -1,0 +1,284 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ user.username }}{% endblock %}
+{% block page_title %}👤 Пользователь: {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- User Header -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" class="rounded-circle mb-3" width="80" height="80">
+                        {% else %}
+                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width:80px;height:80px;font-size:24px;">
+                                {{ user.username|slice:":1"|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-7">
+                        <h4>{{ user.get_full_name|default:user.username }}</h4>
+                        <p class="mb-1">{{ user.email }}</p>
+                        <p class="mb-1">📞 {{ user.phone|default:'-' }}</p>
+                        <p class="mb-1">🌍 {{ user.country.name|default:'-' }}, {{ user.city|default:'-' }}</p>
+                        <p class="mb-0">📅 Рег: {{ user.date_joined|date:"d.m.Y H:i" }} через {{ user.get_registration_method_display }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-2">
+                            <strong>Trust Level:</strong> {{ user.get_trust_level_display_extended }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>KYC:</strong> 
+                            {% if user.kyc_status == 'approved' %}
+                                ✅ Одобрена
+                            {% elif user.kyc_status == 'pending' %}
+                                ⏳ На проверке
+                            {% elif user.kyc_status == 'rejected' %}
+                                ❌ Отклонена
+                            {% else %}
+                                - Не подана
+                            {% endif %}
+                        </div>
+                        <div class="mb-2">
+                            <strong>2FA:</strong> {% if user.is_2fa_enabled %}✅ Включена{% else %}❌ Отключена{% endif %}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Статус:</strong> 
+                            {% if user.is_online %}
+                                🟢 Онлайн
+                            {% else %}
+                                ⚪ Оффлайн (посл: {{ user.last_activity|default:'-' }})
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">Действия администратора</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100" onclick="editProfile()">✏️ Редактировать профиль</button>
+                    </div>
+                    {% if request.admin_profile.has_permission 'finance' 'adjust_balance' %}
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-success w-100" onclick="adjustBalance()">💰 Корректировка баланса</button>
+                    </div>
+                    {% endif %}
+                    {% if request.admin_profile.has_permission 'users' 'ban' %}
+                    <div class="col-md-3 mb-2">
+                        {% if user.is_active %}
+                        <button class="btn btn-outline-danger w-100" onclick="banUser()">🔒 Заблокировать</button>
+                        {% else %}
+                        <button class="btn btn-outline-success w-100" onclick="unbanUser()">🔓 Разблокировать</button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% if request.admin_profile.has_permission 'users' 'reset_2fa' %}
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-warning w-100" onclick="reset2FA()">🔄 Сбросить 2FA</button>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="row">
+                    {% if request.admin_profile.has_permission 'users' 'change_trust_level' %}
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-info w-100" onclick="changeTrustLevel()">📊 Изменить Trust Level</button>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-secondary w-100" onclick="sendNotification()">📧 Отправить уведомление</button>
+                    </div>
+                    {% if request.admin_profile.role.level >= 100 %}
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-dark w-100" onclick="loginAsUser()">🔑 Войти как пользователь</button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="userTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Обзор</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="finance-tab" data-bs-toggle="tab" data-bs-target="#finance" type="button" role="tab">Финансы</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">Безопасность</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">Логи</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="userTabsContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6>💰 Баланс: ${{ user.balance|floatformat:2 }}</h6>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <strong>Всего депозитов:</strong> $5,000
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Всего выводов:</strong> $3,200
+                            </div>
+                            <div class="col-md-3">
+                                <strong>GGR (для платформы):</strong> $1,800
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Ставок:</strong> 342
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Finance Tab -->
+            <div class="tab-pane fade" id="finance" role="tabpanel">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6>История транзакций</h6>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Тип</th>
+                                        <th>Сумма</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>20.03.2025</td>
+                                        <td>Депозит</td>
+                                        <td class="text-success">+$100.00</td>
+                                        <td>✅</td>
+                                    </tr>
+                                    <tr>
+                                        <td>19.03.2025</td>
+                                        <td>Ставка</td>
+                                        <td class="text-danger">-$50.00</td>
+                                        <td>В игре</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Tab -->
+            <div class="tab-pane fade" id="security" role="tabpanel">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6>История входов</h6>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Время</th>
+                                        <th>IP</th>
+                                        <th>Устройство</th>
+                                        <th>Результат</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>20.03.2025 14:30</td>
+                                        <td>192.168.1.1</td>
+                                        <td>Chrome / Windows</td>
+                                        <td>✅ Успех</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Tab -->
+            <div class="tab-pane fade" id="logs" role="tabpanel">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6>Действия с этим пользователем</h6>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Время</th>
+                                        <th>Админ</th>
+                                        <th>Действие</th>
+                                        <th>Детали</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>20.03.2025 15:00</td>
+                                        <td>admin</td>
+                                        <td>Просмотр профиля</td>
+                                        <td>-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editProfile() {
+    alert('Edit profile not implemented yet');
+}
+
+function adjustBalance() {
+    alert('Adjust balance not implemented yet');
+}
+
+function banUser() {
+    if (confirm('Заблокировать пользователя?')) {
+        alert('User banned');
+    }
+}
+
+function unbanUser() {
+    if (confirm('Разблокировать пользователя?')) {
+        alert('User unbanned');
+    }
+}
+
+function reset2FA() {
+    if (confirm('Сбросить 2FA пользователя?')) {
+        alert('2FA reset');
+    }
+}
+
+function changeTrustLevel() {
+    alert('Change trust level not implemented yet');
+}
+
+function sendNotification() {
+    alert('Send notification not implemented yet');
+}
+
+function loginAsUser() {
+    alert('Login as user not implemented yet');
+}
+</script>
+{% endblock %}

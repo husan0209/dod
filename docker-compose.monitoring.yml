@@ -1,0 +1,65 @@
+# docker-compose.monitoring.yml (расширение prod)
+
+version: '3.9'
+
+services:
+
+  # ── Prometheus ──────────────────
+  prometheus:
+    image: prom/prometheus:v2.50.0
+    restart: always
+    volumes:
+      - ./deploy/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=30d'
+      - '--storage.tsdb.retention.size=10GB'
+
+  # ── Grafana ─────────────────────
+  grafana:
+    image: grafana/grafana:10.3.0
+    restart: always
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./deploy/monitoring/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_SERVER_ROOT_URL: https://yourdomain.com/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: 'true'
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  # ── Node Exporter ───────────────
+  node_exporter:
+    image: prom/node-exporter:v1.7.0
+    restart: always
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+
+  # ── PostgreSQL Exporter ─────────
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    restart: always
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable"
+
+  # ── Redis Exporter ──────────────
+  redis_exporter:
+    image: oliver006/redis_exporter:v1.56.0
+    restart: always
+    environment:
+      REDIS_ADDR: redis://redis:6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+volumes:
+  prometheus_data:
+  grafana_data:

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DOD{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/" class="text-xl font-bold">DOD</a>
+                <div class="space-x-4">
+                    <a href="{% url 'predictions:index' %}" class="text-gray-600 hover:text-gray-900">Prediction Market</a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'predictions:portfolio' %}" class="text-gray-600 hover:text-gray-900">Portfolio</a>
+                    <a href="{% url 'accounts:logout' %}" class="text-gray-600 hover:text-gray-900">Logout</a>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="text-gray-600 hover:text-gray-900">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-white mt-12 py-8">
+        <div class="container mx-auto px-4 text-center text-gray-600">
+            <p>&copy; 2024 DOD. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

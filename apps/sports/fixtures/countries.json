@@ -1,0 +1,86 @@
+[
+    {
+        "model": "sports.country",
+        "pk": 1,
+        "fields": {
+            "name": "Англия",
+            "name_en": "England",
+            "code": "GB",
+            "flag": "🇬🇧",
+            "sort_order": 1,
+            "is_active": true
+        }
+    },
+    {
+        "model": "sports.country",
+        "pk": 2,
+        "fields": {
+            "name": "Испания",
+            "name_en": "Spain",
+            "code": "ES",
+            "flag": "🇪🇸",
+            "sort_order": 2,
+            "is_active": true
+        }
+    },
+    {
+        "model": "sports.country",
+        "pk": 3,
+        "fields": {
+            "name": "Россия",
+            "name_en": "Russia",
+            "code": "RU",
+            "flag": "🇷🇺",
+            "sort_order": 3,
+            "is_active": true
+        }
+    },
+    {
+        "model": "sports.country",
+        "pk": 4,
+        "fields": {
+            "name": "Германия",
+            "name_en": "Germany",
+            "code": "DE",
+            "flag": "🇩🇪",
+            "sort_order": 4,
+            "is_active": true
+        }
+    },
+    {
+        "model": "sports.country",
+        "pk": 5,
+        "fields": {
+            "name": "Франция",
+            "name_en": "France",
+            "code": "FR",
+            "flag": "🇫🇷",
+            "sort_order": 5,
+            "is_active": true
+        }
+    },
+    {
+        "model": "sports.country",
+        "pk": 6,
+        "fields": {
+            "name": "Италия",
+            "name_en": "Italy",
+            "code": "IT",
+            "flag": "🇮🇹",
+            "sort_order": 6,
+            "is_active": true
+        }
+    },
+    {
+        "model": "sports.country",
+        "pk": 7,
+        "fields": {
+            "name": "Международные",
+            "name_en": "International",
+            "code": "INT",
+            "flag": "🌍",
+            "sort_order": 7,
+            "is_active": true
+        }
+    }
+]

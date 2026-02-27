@@ -1,0 +1,459 @@
+{% extends 'miniapp/base.html' %}
+{% load static %}
+
+{% block title %}Маркеты{% endblock %}
+
+{% block content %}
+<div class="px-4 py-4 space-y-6">
+    <!-- Search -->
+    <div class="tg-card">
+        <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-tg-hint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" class="flex-1 bg-transparent outline-none placeholder-tg-hint"
+                   placeholder="Поиск рынков...">
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex space-x-2 overflow-x-auto pb-2">
+        <button class="filter-tab active flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-tg-link text-white">
+            🔥 Тренд
+        </button>
+        <button class="filter-tab flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium text-tg-hint">
+            🆕 Новые
+        </button>
+        <button class="filter-tab flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium text-tg-hint">
+            ⏰ Скоро
+        </button>
+        <button class="filter-tab flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium text-tg-hint">
+            🏆 Завершённые
+        </button>
+        <button class="filter-tab flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium text-tg-hint">
+            📂 Мои
+        </button>
+    </div>
+
+    <!-- Categories -->
+    <div class="grid grid-4 gap-2">
+        <button class="category-btn active px-3 py-2 rounded-lg text-xs font-medium bg-tg-secondary text-tg-text">
+            🌐 Все
+        </button>
+        <button class="category-btn px-3 py-2 rounded-lg text-xs font-medium text-tg-hint">
+            💹 Крипто
+        </button>
+        <button class="category-btn px-3 py-2 rounded-lg text-xs font-medium text-tg-hint">
+            🏛️ Политика
+        </button>
+        <button class="category-btn px-3 py-2 rounded-lg text-xs font-medium text-tg-hint">
+            ⚽ Спорт
+        </button>
+    </div>
+
+    <div class="grid grid-3 gap-2">
+        <button class="category-btn px-3 py-2 rounded-lg text-xs font-medium text-tg-hint">
+            🎬 Шоу
+        </button>
+        <button class="category-btn px-3 py-2 rounded-lg text-xs font-medium text-tg-hint">
+            🔬 Наука
+        </button>
+        <button class="category-btn px-3 py-2 rounded-lg text-xs font-medium text-tg-hint">
+            💰 Экономика
+        </button>
+    </div>
+
+    <!-- Markets List -->
+    <div class="space-y-4">
+        <!-- Trending Market -->
+        <div class="tg-card cursor-pointer" onclick="openMarket('btc-price')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex-1">
+                    <h4 class="font-semibold mb-1">BTC > $150k к 01.06?</h4>
+                    <div class="text-sm text-tg-hint">Объём: $45,678 • 456 участников</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-tg-hint">⏰ 12 дней</div>
+                </div>
+            </div>
+
+            <div class="space-y-2 mb-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">YES</span>
+                    <div class="flex items-center space-x-2 flex-1 ml-3">
+                        <div class="progress-bar flex-1">
+                            <div class="progress-fill" style="width: 78%"></div>
+                        </div>
+                        <span class="text-sm font-medium">78%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">NO</span>
+                    <div class="flex items-center space-x-2 flex-1 ml-3">
+                        <div class="progress-bar flex-1">
+                            <div class="progress-fill bg-red-500" style="width: 22%"></div>
+                        </div>
+                        <span class="text-sm font-medium">22%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2">
+                <button class="tg-btn tg-btn-primary flex-1 text-sm" onclick="event.stopPropagation(); quickTrade('yes', 0.78)">
+                    YES $0.78
+                </button>
+                <button class="tg-btn tg-btn-outline flex-1 text-sm" onclick="event.stopPropagation(); quickTrade('no', 0.22)">
+                    NO $0.22
+                </button>
+            </div>
+        </div>
+
+        <!-- Political Market -->
+        <div class="tg-card cursor-pointer" onclick="openMarket('trump-2028')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex-1">
+                    <h4 class="font-semibold mb-1">🏛️ Трамп выиграет выборы 2028?</h4>
+                    <div class="text-sm text-tg-hint">Объём: $23,456 • 234 участников</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-tg-hint">⏰ 2 мес</div>
+                </div>
+            </div>
+
+            <div class="space-y-2 mb-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">YES</span>
+                    <div class="flex items-center space-x-2 flex-1 ml-3">
+                        <div class="progress-bar flex-1">
+                            <div class="progress-fill" style="width: 55%"></div>
+                        </div>
+                        <span class="text-sm font-medium">55%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">NO</span>
+                    <div class="flex items-center space-x-2 flex-1 ml-3">
+                        <div class="progress-bar flex-1">
+                            <div class="progress-fill bg-red-500" style="width: 45%"></div>
+                        </div>
+                        <span class="text-sm font-medium">45%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2">
+                <button class="tg-btn tg-btn-primary flex-1 text-sm" onclick="event.stopPropagation(); quickTrade('yes', 0.55)">
+                    YES $0.55
+                </button>
+                <button class="tg-btn tg-btn-outline flex-1 text-sm" onclick="event.stopPropagation(); quickTrade('no', 0.45)">
+                    NO $0.45
+                </button>
+            </div>
+        </div>
+
+        <!-- Sports Market -->
+        <div class="tg-card cursor-pointer" onclick="openMarket('chelsea-champions')">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex-1">
+                    <h4 class="font-semibold mb-1">⚽ Челси выйдет в плей-офф ЛЧ?</h4>
+                    <div class="text-sm text-tg-hint">Объём: $12,345 • 89 участников</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-tg-hint">⏰ 3 нед</div>
+                </div>
+            </div>
+
+            <div class="space-y-2 mb-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">YES</span>
+                    <div class="flex items-center space-x-2 flex-1 ml-3">
+                        <div class="progress-bar flex-1">
+                            <div class="progress-fill" style="width: 65%"></div>
+                        </div>
+                        <span class="text-sm font-medium">65%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">NO</span>
+                    <div class="flex items-center space-x-2 flex-1 ml-3">
+                        <div class="progress-bar flex-1">
+                            <div class="progress-fill bg-red-500" style="width: 35%"></div>
+                        </div>
+                        <span class="text-sm font-medium">35%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2">
+                <button class="tg-btn tg-btn-primary flex-1 text-sm" onclick="event.stopPropagation(); quickTrade('yes', 0.65)">
+                    YES $0.65
+                </button>
+                <button class="tg-btn tg-btn-outline flex-1 text-sm" onclick="event.stopPropagation(); quickTrade('no', 0.35)">
+                    NO $0.35
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load More -->
+    <div class="text-center">
+        <button class="tg-btn tg-btn-outline" onclick="loadMoreMarkets()">
+            Загрузить ещё
+        </button>
+    </div>
+</div>
+
+<!-- Trade Modal -->
+<div id="trade-modal" class="hidden">
+    <div class="tg-modal">
+        <div class="tg-modal-handle"></div>
+        <h3 class="text-lg font-semibold mb-4" id="trade-market-title">Маркет</h3>
+
+        <div class="space-y-4">
+            <!-- Market Info -->
+            <div class="tg-card">
+                <div class="text-center mb-3">
+                    <div class="text-sm text-tg-hint">Текущий баланс</div>
+                    <div class="text-lg font-bold">$1,234.56</div>
+                </div>
+
+                <div class="grid grid-2 gap-2 mb-3">
+                    <div class="text-center">
+                        <div class="text-sm text-tg-hint">YES</div>
+                        <div class="text-lg font-bold text-green-400" id="yes-price">$0.78</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm text-tg-hint">NO</div>
+                        <div class="text-lg font-bold text-red-400" id="no-price">$0.22</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trade Type -->
+            <div>
+                <div class="flex space-x-2 mb-3">
+                    <button class="trade-type-btn active flex-1 tg-btn tg-btn-primary text-sm py-2" data-type="buy">
+                        Купить
+                    </button>
+                    <button class="trade-type-btn flex-1 tg-btn tg-btn-outline text-sm py-2" data-type="sell">
+                        Продать
+                    </button>
+                </div>
+            </div>
+
+            <!-- Outcome Selection -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Исход</label>
+                <div class="grid grid-2 gap-2">
+                    <button class="outcome-btn active tg-btn tg-btn-primary text-sm py-2" data-outcome="yes">
+                        YES
+                    </button>
+                    <button class="outcome-btn tg-btn tg-btn-outline text-sm py-2" data-outcome="no">
+                        NO
+                    </button>
+                </div>
+            </div>
+
+            <!-- Amount -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Сумма ($)</label>
+                <input type="number" id="trade-amount" class="tg-input" placeholder="0.00" step="0.01">
+                <div class="grid grid-4 gap-2 mt-2">
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setTradeAmount(10)">$10</button>
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setTradeAmount(25)">$25</button>
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setTradeAmount(50)">$50</button>
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setTradeAmount(100)">$100</button>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="tg-card">
+                <div class="space-y-1 text-sm">
+                    <div class="flex justify-between">
+                        <span>Получите долей:</span>
+                        <span id="shares-received">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Макс. выигрыш:</span>
+                        <span id="max-payout">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex space-x-2 mt-4">
+            <button class="tg-btn tg-btn-outline flex-1" onclick="closeTradeModal()">Отмена</button>
+            <button class="tg-btn tg-btn-primary flex-1" onclick="executeTrade()">Купить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentMarket = null;
+let tradeType = 'buy';
+let selectedOutcome = 'yes';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Filter tabs
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            selectFilter(tab);
+        });
+    });
+
+    // Category buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectCategory(btn);
+        });
+    });
+
+    // Trade modal controls
+    document.querySelectorAll('.trade-type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectTradeType(btn.dataset.type);
+        });
+    });
+
+    document.querySelectorAll('.outcome-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectOutcome(btn.dataset.outcome);
+        });
+    });
+
+    // Update calculations
+    document.getElementById('trade-amount').addEventListener('input', updateTradeCalculations);
+});
+
+function selectFilter(tabElement) {
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active', 'bg-tg-link', 'text-white');
+        tab.classList.add('text-tg-hint');
+    });
+
+    tabElement.classList.add('active', 'bg-tg-link', 'text-white');
+    tabElement.classList.remove('text-tg-hint');
+
+    // Would filter markets
+}
+
+function selectCategory(btnElement) {
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-tg-secondary', 'text-tg-text');
+        btn.classList.add('text-tg-hint');
+    });
+
+    btnElement.classList.add('active', 'bg-tg-secondary', 'text-tg-text');
+    btnElement.classList.remove('text-tg-hint');
+
+    // Would filter by category
+}
+
+function openMarket(marketId) {
+    haptic.light();
+    // Would navigate to market detail page
+    console.log('Opening market:', marketId);
+}
+
+function quickTrade(outcome, price) {
+    haptic.medium();
+    currentMarket = { outcome, price, title: 'BTC > $150k к 01.06?' };
+    selectedOutcome = outcome;
+
+    document.getElementById('trade-market-title').textContent = currentMarket.title;
+    document.getElementById('yes-price').textContent = `$${0.78}`;
+    document.getElementById('no-price').textContent = `$${0.22}`;
+
+    // Update UI based on outcome
+    document.querySelectorAll('.outcome-btn').forEach(btn => {
+        btn.classList.remove('active', 'tg-btn-primary');
+        btn.classList.add('tg-btn-outline');
+        if (btn.dataset.outcome === outcome) {
+            btn.classList.add('active', 'tg-btn-primary');
+            btn.classList.remove('tg-btn-outline');
+        }
+    });
+
+    document.getElementById('trade-modal').classList.remove('hidden');
+    document.getElementById('trade-modal').classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function selectTradeType(type) {
+    tradeType = type;
+
+    document.querySelectorAll('.trade-type-btn').forEach(btn => {
+        btn.classList.remove('active', 'tg-btn-primary');
+        btn.classList.add('tg-btn-outline');
+        if (btn.dataset.type === type) {
+            btn.classList.add('active', 'tg-btn-primary');
+            btn.classList.remove('tg-btn-outline');
+        }
+    });
+
+    const actionBtn = document.querySelector('#trade-modal .tg-btn-primary:last-child');
+    actionBtn.textContent = type === 'buy' ? 'Купить' : 'Продать';
+}
+
+function selectOutcome(outcome) {
+    selectedOutcome = outcome;
+
+    document.querySelectorAll('.outcome-btn').forEach(btn => {
+        btn.classList.remove('active', 'tg-btn-primary');
+        btn.classList.add('tg-btn-outline');
+        if (btn.dataset.outcome === outcome) {
+            btn.classList.add('active', 'tg-btn-primary');
+            btn.classList.remove('tg-btn-outline');
+        }
+    });
+
+    updateTradeCalculations();
+}
+
+function setTradeAmount(amount) {
+    document.getElementById('trade-amount').value = amount;
+    updateTradeCalculations();
+}
+
+function updateTradeCalculations() {
+    const amount = parseFloat(document.getElementById('trade-amount').value) || 0;
+    const price = selectedOutcome === 'yes' ? 0.78 : 0.22;
+
+    if (tradeType === 'buy') {
+        const shares = Math.floor(amount / price);
+        const maxPayout = shares * 1; // Simplified
+        document.getElementById('shares-received').textContent = shares;
+        document.getElementById('max-payout').textContent = `$${maxPayout.toFixed(2)}`;
+    } else {
+        // Sell calculations would be different
+        document.getElementById('shares-received').textContent = 'N/A';
+        document.getElementById('max-payout').textContent = `$${amount.toFixed(2)}`;
+    }
+}
+
+function closeTradeModal() {
+    document.getElementById('trade-modal').classList.add('hidden');
+    document.getElementById('trade-modal').classList.remove('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function executeTrade() {
+    const amount = document.getElementById('trade-amount').value;
+
+    if (!amount || amount <= 0) {
+        tgShowAlert('Введите сумму', () => {});
+        return;
+    }
+
+    haptic.heavy();
+    closeTradeModal();
+
+    // Would send trade request
+    tgShowAlert(`${tradeType === 'buy' ? 'Покупка' : 'Продажа'} выполнена!`, () => {});
+}
+
+function loadMoreMarkets() {
+    haptic.light();
+    // Would load more markets via HTMX
+    console.log('Loading more markets...');
+}
+</script>
+{% endblock %}

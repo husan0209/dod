@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Market{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <h1 class="text-3xl font-bold mb-8">Create Prediction Market</h1>
+
+    {% if error %}
+    <div class="alert alert-error mb-6">
+        <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <div class="bg-white p-6 rounded-lg shadow">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-control mb-4">
+                <label class="label">Question (RU)</label>
+                <textarea name="question" class="textarea textarea-bordered" rows="3" required></textarea>
+                <label class="label">
+                    <span class="label-text-alt">⚠️ Must have a clear YES or NO answer</span>
+                </label>
+            </div>
+
+            <div class="form-control mb-4">
+                <label class="label">Question (EN) - Optional</label>
+                <textarea name="question_en" class="textarea textarea-bordered" rows="3"></textarea>
+            </div>
+
+            <div class="form-control mb-4">
+                <label class="label">Description and Rules</label>
+                <textarea name="description" class="textarea textarea-bordered" rows="5" required></textarea>
+                <label class="label">
+                    <span class="label-text-alt">Explain how the market will be resolved</span>
+                </label>
+            </div>
+
+            <div class="form-control mb-4">
+                <label class="label">Description (EN) - Optional</label>
+                <textarea name="description_en" class="textarea textarea-bordered" rows="5"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="form-control">
+                    <label class="label">Category</label>
+                    <select name="category" class="select select-bordered" required>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.icon }} {{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">Initial Liquidity ($)</label>
+                    <input type="number" name="initial_liquidity" value="10000" step="100" min="1000" class="input input-bordered" required>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="form-control">
+                    <label class="label">Close Date</label>
+                    <input type="datetime-local" name="close_date" class="input input-bordered" required>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">Resolution Date</label>
+                    <input type="datetime-local" name="resolution_date" class="input input-bordered" required>
+                </div>
+            </div>
+
+            <div class="form-control mb-4">
+                <label class="label">Source URL</label>
+                <input type="url" name="source_url" class="input input-bordered" placeholder="https://...">
+            </div>
+
+            <div class="form-control mb-4">
+                <label class="label">Resolution Source</label>
+                <input type="text" name="resolution_source" class="input input-bordered" placeholder="e.g., CoinGecko API">
+            </div>
+
+            <div class="form-control mb-6">
+                <label class="label">Tags (comma-separated)</label>
+                <input type="text" name="tags" class="input input-bordered" placeholder="bitcoin, crypto, price">
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="btn btn-primary">Create Market</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

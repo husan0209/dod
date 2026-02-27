@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DOD Mini App</title>
+
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'miniapp/css/miniapp.css' %}">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{% static 'miniapp/manifest.json' %}">
+
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'miniapp/img/icon-192.png' %}">
+
+    <!-- Meta tags for PWA -->
+    <meta name="theme-color" content="#00e701">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body class="bg-tg-bg text-tg-text font-sans antialiased overflow-x-hidden -webkit-overflow-scrolling-touch">
+    <!-- Header -->
+    {% include 'miniapp/components/header.html' %}
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Bottom Navigation -->
+    {% include 'miniapp/components/bottom_nav.html' %}
+
+    <!-- Telegram SDK Integration -->
+    <script src="{% static 'miniapp/js/telegram.js' %}"></script>
+
+    <!-- App JavaScript -->
+    <script src="{% static 'miniapp/js/app.js' %}"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('{% static 'miniapp/sw.js' %}')
+                .then(registration => {
+                    console.log('SW registered:', registration);
+                })
+                .catch(error => {
+                    console.log('SW registration failed:', error);
+                });
+        }
+    </script>
+</body>
+</html>

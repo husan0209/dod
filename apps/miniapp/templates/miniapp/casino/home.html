@@ -1,0 +1,402 @@
+{% extends 'miniapp/base.html' %}
+{% load static %}
+
+{% block title %}Казино{% endblock %}
+
+{% block content %}
+<div class="px-4 py-4 space-y-6">
+    <!-- Balance Display -->
+    <div class="tg-card">
+        <div class="text-center">
+            <div class="text-tg-hint text-sm mb-1">Ваш баланс</div>
+            <div class="text-xl font-bold" id="casino-balance">$1,234.56</div>
+        </div>
+    </div>
+
+    <!-- Game Categories -->
+    <div class="flex space-x-2 overflow-x-auto pb-2">
+        <button class="category-tab active flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-tg-link text-white">
+            🔥 Все игры
+        </button>
+        <button class="category-tab flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium text-tg-hint">
+            💎 Новые
+        </button>
+        <button class="category-tab flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium text-tg-hint">
+            ⭐ Популярные
+        </button>
+        <button class="category-tab flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium text-tg-hint">
+            🏆 Турниры
+        </button>
+    </div>
+
+    <!-- Games Grid -->
+    <div class="space-y-4">
+        <!-- First Row -->
+        <div class="grid grid-2 gap-4">
+            <!-- Crash -->
+            <div class="game-card tg-card text-center p-4 hover:bg-tg-section/80 transition-colors cursor-pointer"
+                 onclick="openGame('crash')">
+                <div class="text-4xl mb-2">🚀</div>
+                <div class="font-semibold mb-1">CRASH</div>
+                <div class="text-sm text-tg-link">x2.34 сейчас</div>
+                <div class="text-xs text-tg-hint mt-1">Играют: 1,234</div>
+            </div>
+
+            <!-- Mines -->
+            <div class="game-card tg-card text-center p-4 hover:bg-tg-section/80 transition-colors cursor-pointer"
+                 onclick="openGame('mines')">
+                <div class="text-4xl mb-2">💣</div>
+                <div class="font-semibold mb-1">MINES</div>
+                <div class="text-sm text-tg-link">До 10x</div>
+                <div class="text-xs text-tg-hint mt-1">Играют: 856</div>
+            </div>
+        </div>
+
+        <!-- Second Row -->
+        <div class="grid grid-2 gap-4">
+            <!-- Dice -->
+            <div class="game-card tg-card text-center p-4 hover:bg-tg-section/80 transition-colors cursor-pointer"
+                 onclick="openGame('dice')">
+                <div class="text-4xl mb-2">🎲</div>
+                <div class="font-semibold mb-1">DICE</div>
+                <div class="text-sm text-tg-link">До 99x</div>
+                <div class="text-xs text-tg-hint mt-1">Играют: 2,145</div>
+            </div>
+
+            <!-- Plinko -->
+            <div class="game-card tg-card text-center p-4 hover:bg-tg-section/80 transition-colors cursor-pointer"
+                 onclick="openGame('plinko')">
+                <div class="text-4xl mb-2">📍</div>
+                <div class="font-semibold mb-1">PLINKO</div>
+                <div class="text-sm text-tg-link">До 1000x</div>
+                <div class="text-xs text-tg-hint mt-1">Играют: 678</div>
+            </div>
+        </div>
+
+        <!-- Third Row -->
+        <div class="grid grid-2 gap-4">
+            <!-- Roulette -->
+            <div class="game-card tg-card text-center p-4 hover:bg-tg-section/80 transition-colors cursor-pointer"
+                 onclick="openGame('roulette')">
+                <div class="text-4xl mb-2">🎡</div>
+                <div class="font-semibold mb-1">ROULETTE</div>
+                <div class="text-sm text-tg-link">До 36x</div>
+                <div class="text-xs text-tg-hint mt-1">Играют: 423</div>
+            </div>
+
+            <!-- Slots -->
+            <div class="game-card tg-card text-center p-4 hover:bg-tg-section/80 transition-colors cursor-pointer"
+                 onclick="openGame('slots')">
+                <div class="text-4xl mb-2">🎰</div>
+                <div class="font-semibold mb-1">SLOTS</div>
+                <div class="text-sm text-tg-link">До 5000x</div>
+                <div class="text-xs text-tg-hint mt-1">Играют: 1,567</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Winners -->
+    <div>
+        <h3 class="text-lg font-semibold mb-3">🏆 Последние выигрыши</h3>
+        <div class="space-y-2">
+            <div class="tg-list-item">
+                <span class="text-xl mr-3">🥇</span>
+                <span class="flex-1">player123</span>
+                <div class="text-right">
+                    <div class="text-green-400 font-medium">+$5,400</div>
+                    <div class="text-xs text-tg-hint">Crash</div>
+                </div>
+            </div>
+            <div class="tg-list-item">
+                <span class="text-xl mr-3">🥈</span>
+                <span class="flex-1">winner_x</span>
+                <div class="text-right">
+                    <div class="text-green-400 font-medium">+$3,200</div>
+                    <div class="text-xs text-tg-hint">Slots</div>
+                </div>
+            </div>
+            <div class="tg-list-item">
+                <span class="text-xl mr-3">🥉</span>
+                <span class="flex-1">lucky7</span>
+                <div class="text-right">
+                    <div class="text-green-400 font-medium">+$2,100</div>
+                    <div class="text-xs text-tg-hint">Mines</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fair Play Notice -->
+    <div class="tg-card bg-blue-500/10 border border-blue-500/20">
+        <div class="flex items-center space-x-2">
+            <span class="text-blue-400 text-lg">🎲</span>
+            <div>
+                <div class="font-medium text-blue-400 mb-1">Провербельная честность</div>
+                <div class="text-xs text-tg-hint">
+                    Все игры используют криптографически безопасные RNG.
+                    <a href="#" class="text-tg-link">Проверить честность</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Game Fullscreen Overlay (hidden by default) -->
+<div id="game-overlay" class="hidden fixed inset-0 z-50 bg-tg-bg">
+    <!-- Game Header -->
+    <div class="flex items-center justify-between p-4 bg-tg-header">
+        <div class="flex items-center space-x-2">
+            <button class="text-tg-text hover:text-tg-hint transition-colors"
+                    onclick="closeGame()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <span class="font-semibold" id="game-title">Игра</span>
+        </div>
+        <div class="text-right">
+            <div class="text-sm text-tg-hint">Баланс</div>
+            <div class="font-medium" id="game-balance">$1,234.56</div>
+        </div>
+    </div>
+
+    <!-- Game Content -->
+    <div id="game-content" class="flex-1 p-4">
+        <!-- Game content will be loaded here -->
+        <div class="text-center py-20">
+            <div class="text-6xl mb-4" id="game-icon">🎮</div>
+            <div class="text-xl font-semibold mb-2" id="game-name">Загрузка игры...</div>
+            <div class="text-tg-hint">Подготовка игрового поля</div>
+        </div>
+    </div>
+
+    <!-- Game Controls -->
+    <div id="game-controls" class="p-4 bg-tg-secondary border-t border-white/10">
+        <div class="grid grid-3 gap-2 mb-3">
+            <button class="tg-btn tg-btn-outline py-2 text-sm" onclick="setBetAmount(1)">$1</button>
+            <button class="tg-btn tg-btn-outline py-2 text-sm" onclick="setBetAmount(10)">$10</button>
+            <button class="tg-btn tg-btn-outline py-2 text-sm" onclick="setBetAmount(100)">$100</button>
+        </div>
+        <input type="number" id="game-bet-amount" class="tg-input mb-3" placeholder="Сумма ставки" value="10">
+
+        <div class="grid grid-2 gap-2">
+            <button class="tg-btn tg-btn-outline" onclick="closeGame()">Выйти</button>
+            <button class="tg-btn tg-btn-primary" id="game-action-btn" onclick="playGame()">Играть</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentGame = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Category tabs
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            haptic.light();
+            selectCategory(tab);
+        });
+    });
+
+    // Game cards hover effect
+    document.querySelectorAll('.game-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            haptic.light();
+        });
+    });
+});
+
+function selectCategory(tabElement) {
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.classList.remove('active', 'bg-tg-link', 'text-white');
+        tab.classList.add('text-tg-hint');
+    });
+
+    tabElement.classList.add('active', 'bg-tg-link', 'text-white');
+    tabElement.classList.remove('text-tg-hint');
+}
+
+function openGame(gameType) {
+    haptic.medium();
+    currentGame = gameType;
+
+    // Hide navigation
+    document.getElementById('bottom-nav').style.display = 'none';
+    document.getElementById('header').style.display = 'none';
+
+    // Show game overlay
+    const overlay = document.getElementById('game-overlay');
+    overlay.classList.remove('hidden');
+
+    // Set game info
+    const gameInfo = getGameInfo(gameType);
+    document.getElementById('game-title').textContent = gameInfo.name;
+    document.getElementById('game-icon').textContent = gameInfo.icon;
+    document.getElementById('game-name').textContent = gameInfo.name;
+
+    // Load game content
+    loadGameContent(gameType);
+
+    // Update balance
+    updateGameBalance();
+}
+
+function closeGame() {
+    haptic.light();
+
+    // Show navigation
+    document.getElementById('bottom-nav').style.display = 'block';
+    document.getElementById('header').style.display = 'block';
+
+    // Hide game overlay
+    document.getElementById('game-overlay').classList.add('hidden');
+
+    currentGame = null;
+}
+
+function getGameInfo(gameType) {
+    const games = {
+        crash: { name: 'CRASH', icon: '🚀' },
+        mines: { name: 'MINES', icon: '💣' },
+        dice: { name: 'DICE', icon: '🎲' },
+        plinko: { name: 'PLINKO', icon: '📍' },
+        roulette: { name: 'ROULETTE', icon: '🎡' },
+        slots: { name: 'SLOTS', icon: '🎰' }
+    };
+    return games[gameType] || { name: 'Неизвестная игра', icon: '🎮' };
+}
+
+function loadGameContent(gameType) {
+    const content = document.getElementById('game-content');
+
+    // Mock game content - would be replaced with actual game components
+    switch(gameType) {
+        case 'crash':
+            content.innerHTML = `
+                <div class="text-center">
+                    <div class="text-6xl mb-4">🚀</div>
+                    <div class="text-4xl font-bold text-tg-link mb-2" id="crash-multiplier">1.00x</div>
+                    <div class="text-tg-hint mb-4">Ждём следующего раунда...</div>
+                    <canvas id="crash-chart" width="300" height="200" class="border border-tg-hint rounded"></canvas>
+                </div>
+            `;
+            // Simulate crash game
+            simulateCrash();
+            break;
+
+        case 'mines':
+            content.innerHTML = `
+                <div class="text-center">
+                    <div class="text-4xl mb-4">💣</div>
+                    <div class="text-tg-hint mb-4">Выберите ячейки без мин</div>
+                    <div class="grid grid-5 gap-1 max-w-xs mx-auto">
+                        ${Array(25).fill().map((_, i) =>
+                            `<button class="aspect-square bg-tg-section rounded border border-tg-hint hover:bg-tg-link/20 transition-colors"
+                                     onclick="revealCell(${i})" id="cell-${i}"></button>`
+                        ).join('')}
+                    </div>
+                    <div class="mt-4 text-sm text-tg-hint">
+                        Осталось ячеек: <span id="cells-left">20</span>
+                    </div>
+                </div>
+            `;
+            break;
+
+        case 'dice':
+            content.innerHTML = `
+                <div class="text-center">
+                    <div class="text-6xl mb-4">🎲</div>
+                    <div class="text-2xl mb-2">Цель: <span class="font-bold" id="dice-target">50.00</span></div>
+                    <input type="range" id="dice-slider" min="1" max="99" value="50" class="w-full mb-4">
+                    <div class="text-lg">Шанс выигрыша: <span class="font-bold" id="dice-chance">50.00%</span></div>
+                    <div class="text-sm text-tg-hint mt-2">Выигрыш: <span id="dice-payout">2.00x</span></div>
+                </div>
+            `;
+            setupDiceGame();
+            break;
+
+        default:
+            content.innerHTML = `
+                <div class="text-center py-20">
+                    <div class="text-6xl mb-4">🎮</div>
+                    <div class="text-xl font-semibold">Игра в разработке</div>
+                </div>
+            `;
+    }
+}
+
+function simulateCrash() {
+    let multiplier = 1.00;
+    const interval = setInterval(() => {
+        multiplier += Math.random() * 0.1;
+        document.getElementById('crash-multiplier').textContent = `${multiplier.toFixed(2)}x`;
+
+        if (multiplier > 10 || Math.random() < 0.01) {
+            clearInterval(interval);
+            haptic.heavy(); // Crash sound
+            setTimeout(() => {
+                document.getElementById('crash-multiplier').textContent = '💥 CRASH!';
+                setTimeout(() => openGame('crash'), 2000);
+            }, 500);
+        }
+    }, 100);
+}
+
+function revealCell(cellId) {
+    const cell = document.getElementById(`cell-${cellId}`);
+    const isMine = Math.random() < 0.2; // 20% chance of mine
+
+    if (isMine) {
+        cell.textContent = '💣';
+        cell.classList.add('bg-red-500');
+        haptic.error();
+        // Game over
+    } else {
+        cell.textContent = '💎';
+        cell.classList.add('bg-green-500');
+        haptic.success();
+
+        const cellsLeft = document.getElementById('cells-left');
+        cellsLeft.textContent = parseInt(cellsLeft.textContent) - 1;
+    }
+
+    cell.disabled = true;
+}
+
+function setupDiceGame() {
+    const slider = document.getElementById('dice-slider');
+    const target = document.getElementById('dice-target');
+    const chance = document.getElementById('dice-chance');
+    const payout = document.getElementById('dice-payout');
+
+    slider.addEventListener('input', () => {
+        const value = parseFloat(slider.value);
+        target.textContent = value.toFixed(2);
+        chance.textContent = `${value.toFixed(2)}%`;
+        payout.textContent = `${(100 / value).toFixed(2)}x`;
+    });
+}
+
+function setBetAmount(amount) {
+    document.getElementById('game-bet-amount').value = amount;
+}
+
+function updateGameBalance() {
+    // Would fetch real balance
+    document.getElementById('game-balance').textContent = '$1,234.56';
+}
+
+function playGame() {
+    haptic.heavy();
+    const amount = document.getElementById('game-bet-amount').value;
+
+    if (!amount || amount <= 0) {
+        tgShowAlert('Введите сумму ставки', () => {});
+        return;
+    }
+
+    // Would send game request
+    tgShowAlert('Ставка принята! Игра началась.', () => {});
+}
+</script>
+{% endblock %}

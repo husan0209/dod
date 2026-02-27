@@ -1,0 +1,215 @@
+<!-- Виджет живого чата -->
+<div id="chat-widget" class="fixed bottom-4 right-4 z-50 hidden">
+  <!-- Кнопка чата -->
+  <button id="chat-button"
+          class="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-colors"
+          onclick="toggleChat()">
+    <span class="text-2xl">💬</span>
+    <span id="unread-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+  </button>
+
+  <!-- Окно чата -->
+  <div id="chat-window" class="hidden absolute bottom-16 right-0 w-80 h-96 bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col">
+    <!-- Заголовок -->
+    <div class="bg-blue-500 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
+      <h3 class="font-semibold">💬 Чат с поддержкой</h3>
+      <div class="flex space-x-2">
+        <button class="hover:bg-blue-600 rounded px-2 py-1" onclick="minimizeChat()">─</button>
+        <button class="hover:bg-blue-600 rounded px-2 py-1" onclick="closeChat()">✕</button>
+      </div>
+    </div>
+
+    <!-- Содержимое чата -->
+    <div id="chat-content" class="flex-1 p-4 overflow-y-auto">
+      <!-- Начальный экран -->
+      <div id="chat-start" class="text-center">
+        <div class="mb-4">
+          <span class="text-4xl">👋</span>
+          <h4 class="font-semibold text-gray-900 mt-2">Здравствуйте!</h4>
+          <p class="text-gray-600">Чем можем помочь?</p>
+        </div>
+
+        <!-- Выбор категории -->
+        <div class="mb-4">
+          <p class="text-sm text-gray-600 mb-2">Выберите категорию:</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button class="category-btn bg-gray-100 hover:bg-blue-100 px-3 py-2 rounded text-sm" data-category="finance">💰 Финансы</button>
+            <button class="category-btn bg-gray-100 hover:bg-blue-100 px-3 py-2 rounded text-sm" data-category="account">👤 Аккаунт</button>
+            <button class="category-btn bg-gray-100 hover:bg-blue-100 px-3 py-2 rounded text-sm" data-category="casino">🎰 Казино</button>
+            <button class="category-btn bg-gray-100 hover:bg-blue-100 px-3 py-2 rounded text-sm" data-category="sport_bet">⚽ Ставки</button>
+          </div>
+        </div>
+
+        <!-- Поле сообщения -->
+        <div class="mb-4">
+          <textarea id="initial-message"
+                    placeholder="Опишите вашу проблему..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded resize-none"
+                    rows="3"></textarea>
+        </div>
+
+        <button id="start-chat-btn"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
+                disabled
+                onclick="startChat()">
+          Начать чат
+        </button>
+      </div>
+
+      <!-- Активный чат -->
+      <div id="chat-active" class="hidden h-full flex flex-col">
+        <!-- Сообщения -->
+        <div id="messages" class="flex-1 space-y-3 mb-3">
+          <!-- Сообщения будут добавляться сюда -->
+        </div>
+
+        <!-- Индикатор печати -->
+        <div id="typing-indicator" class="hidden text-sm text-gray-500 mb-2">
+          Оператор печатает...
+        </div>
+
+        <!-- Форма отправки -->
+        <div class="border-t pt-3">
+          <div class="flex space-x-2">
+            <input type="text"
+                   id="message-input"
+                   placeholder="Введите сообщение..."
+                   class="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+              →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Переменные для чата
+let chatSocket = null;
+let currentSession = null;
+
+// Функции управления чатом
+function toggleChat() {
+    const widget = document.getElementById('chat-widget');
+    const window = document.getElementById('chat-window');
+
+    if (window.classList.contains('hidden')) {
+        window.classList.remove('hidden');
+        widget.classList.remove('hidden');
+        initializeChat();
+    } else {
+        window.classList.add('hidden');
+    }
+}
+
+function minimizeChat() {
+    document.getElementById('chat-window').classList.add('hidden');
+}
+
+function closeChat() {
+    document.getElementById('chat-window').classList.add('hidden');
+    if (chatSocket) {
+        chatSocket.close();
+        chatSocket = null;
+    }
+    currentSession = null;
+    // Сбросить к начальному состоянию
+    document.getElementById('chat-start').classList.remove('hidden');
+    document.getElementById('chat-active').classList.add('hidden');
+}
+
+// Инициализация чата
+function initializeChat() {
+    // Если уже инициализирован, пропустить
+    if (chatSocket) return;
+
+    // Здесь будет инициализация WebSocket
+    // Для демонстрации используем mock
+    console.log('Chat initialized');
+}
+
+// Выбор категории
+document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('bg-blue-500', 'text-white'));
+        this.classList.add('bg-blue-500', 'text-white');
+
+        const messageInput = document.getElementById('initial-message');
+        const startBtn = document.getElementById('start-chat-btn');
+
+        if (messageInput.value.trim()) {
+            startBtn.disabled = false;
+        }
+    });
+});
+
+// Проверка заполнения
+document.getElementById('initial-message').addEventListener('input', function() {
+    const startBtn = document.getElementById('start-chat-btn');
+    const categorySelected = document.querySelector('.category-btn.bg-blue-500');
+
+    startBtn.disabled = !this.value.trim() || !categorySelected;
+});
+
+// Начало чата
+function startChat() {
+    const category = document.querySelector('.category-btn.bg-blue-500').dataset.category;
+    const message = document.getElementById('initial-message').value.trim();
+
+    // Переключить на активный чат
+    document.getElementById('chat-start').classList.add('hidden');
+    document.getElementById('chat-active').classList.remove('hidden');
+
+    // Отправить начальное сообщение
+    sendInitialMessage(category, message);
+}
+
+// Отправка начального сообщения
+function sendInitialMessage(category, message) {
+    // Здесь будет отправка через WebSocket или AJAX
+    console.log('Starting chat:', category, message);
+}
+
+// Отправка сообщения
+function sendMessage() {
+    const input = document.getElementById('message-input');
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    // Добавить сообщение в чат
+    addMessage('user', message);
+
+    // Очистить поле
+    input.value = '';
+
+    // Здесь будет отправка через WebSocket
+}
+
+// Добавление сообщения в чат
+function addMessage(sender, text, timestamp = null) {
+    const messagesDiv = document.getElementById('messages');
+    const messageDiv = document.createElement('div');
+
+    messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+    messageDiv.innerHTML = `
+        <div class="max-w-xs px-4 py-2 rounded-lg ${sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-900'}">
+            ${text}
+        </div>
+    `;
+
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Обработка клавиш
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+}
+</script>

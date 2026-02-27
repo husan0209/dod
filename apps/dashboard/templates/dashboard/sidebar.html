@@ -1,0 +1,113 @@
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+    <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+            {% if admin_profile.has_permission 'dashboard' 'view' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                   href="{% url 'dashboard:dashboard' %}">
+                    📊 Дашборд
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'users' 'view' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'users' %}active{% endif %}"
+                   href="{% url 'dashboard:users' %}">
+                    👥 Пользователи
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'finance' 'view_transactions' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'finance' %}active{% endif %}"
+                   href="{% url 'dashboard:finance' %}">
+                    💰 Финансы
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'sports' 'view' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'sports' %}active{% endif %}"
+                   href="{% url 'dashboard:sports' %}">
+                    ⚽ Спорт
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'casino' 'view' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'casino' %}active{% endif %}"
+                   href="{% url 'dashboard:casino' %}">
+                    🎰 Казино
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'predictions' 'view' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'predictions' %}active{% endif %}"
+                   href="{% url 'dashboard:predictions' %}">
+                    📊 Predictions
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'referral' 'view' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'referral' %}active{% endif %}"
+                   href="{% url 'dashboard:referral' %}">
+                    🤝 Партнёрка
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'support' 'view_tickets' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'support' %}active{% endif %}"
+                   href="{% url 'dashboard:support' %}">
+                    🎧 Поддержка
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'content' 'manage_banners' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'content' %}active{% endif %}"
+                   href="{% url 'dashboard:content' %}">
+                    📄 Контент
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'analytics' 'view_dashboard' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}"
+                   href="{% url 'dashboard:analytics' %}">
+                    📈 Аналитика
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'settings' 'view' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
+                   href="{% url 'dashboard:settings' %}">
+                    ⚙️ Настройки
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if admin_profile.has_permission 'logs' 'view_admin_logs' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'logs' %}active{% endif %}"
+                   href="{% url 'dashboard:logs' %}">
+                    📋 Логи
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>

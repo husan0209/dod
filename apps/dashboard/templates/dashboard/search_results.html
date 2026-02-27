@@ -1,0 +1,22 @@
+{% if query %}
+<div class="dropdown-item disabled">🔍 Результаты поиска: "{{ query }}"</div>
+{% endif %}
+
+{% if results %}
+    {% for result in results %}
+        {% if forloop.first or result.type != results|slice:":forloop.counter0"|last.type %}
+            {% if result.type == 'user' %}
+                <div class="dropdown-item disabled">👥 Пользователи</div>
+            {% elif result.type == 'ticket' %}
+                <div class="dropdown-item disabled">📋 Тикеты</div>
+            {% endif %}
+        {% endif %}
+        <a class="dropdown-item" href="{{ result.url }}">
+            {{ result.title }} | {{ result.subtitle }}
+        </a>
+    {% endfor %}
+{% else %}
+    {% if query %}
+        <div class="dropdown-item disabled">Ничего не найдено</div>
+    {% endif %}
+{% endif %}

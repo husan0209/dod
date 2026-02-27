@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>История игр - Казино</title>
+</head>
+<body>
+    <h1>История игр</h1>
+    <div id="filters">
+        <form method="get">
+            <select name="game_type">
+                <option value="">Все</option>
+                <option value="crash">Crash</option>
+                <option value="dice">Dice</option>
+            </select>
+            <select name="period">
+                <option value="1d">1 день</option>
+                <option value="7d">7 дней</option>
+                <option value="30d">30 дней</option>
+            </select>
+            <select name="result">
+                <option value="">Все</option>
+                <option value="won">Выигрыш</option>
+                <option value="lost">Проигрыш</option>
+            </select>
+            <button type="submit">Фильтр</button>
+        </form>
+    </div>
+    <div id="history-list">
+        {% for session in sessions %}
+            <div class="session">
+                <p>{{ session.started_at }} - {{ session.game_type.name }} - Ставка: {{ session.bet_amount }} - Выигрыш: {{ session.win_amount }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

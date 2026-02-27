@@ -1,0 +1,362 @@
+{% extends 'miniapp/base.html' %}
+{% load static %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block content %}
+<div class="px-4 py-4 space-y-6">
+    <!-- Profile Header -->
+    <div class="tg-card text-center">
+        <div class="mb-4">
+            <div class="w-20 h-20 bg-tg-link rounded-full mx-auto mb-3 flex items-center justify-center text-2xl">
+                👤
+            </div>
+            <h2 class="text-xl font-semibold">{{ request.user.first_name|default:"Пользователь" }} {{ request.user.last_name|default:"" }}</h2>
+            <p class="text-tg-hint">@{{ request.user.username }}</p>
+            <div class="inline-flex items-center px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium mt-2">
+                🟢 TG Premium
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-4 gap-4 mb-4">
+            <div>
+                <div class="text-lg font-bold">$1,234</div>
+                <div class="text-xs text-tg-hint">Баланс</div>
+            </div>
+            <div>
+                <div class="text-lg font-bold">342</div>
+                <div class="text-xs text-tg-hint">Ставок</div>
+            </div>
+            <div>
+                <div class="text-lg font-bold">168</div>
+                <div class="text-xs text-tg-hint">Побед</div>
+                <div class="text-xs text-green-400">49%</div>
+            </div>
+            <div>
+                <div class="text-lg font-bold text-green-400">+$456</div>
+                <div class="text-xs text-tg-hint">Прибыль</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu -->
+    <div class="space-y-2">
+        <button class="tg-list-item w-full text-left" onclick="window.location.href='{% url 'miniapp:wallet' %}'">
+            <span class="text-xl mr-3">💰</span>
+            <span>Кошелёк</span>
+            <span class="ml-auto text-tg-hint">></span>
+        </button>
+
+        <button class="tg-list-item w-full text-left" onclick="window.location.href='{% url 'miniapp:sports' %}my-bets/'">
+            <span class="text-xl mr-3">📜</span>
+            <span>История ставок</span>
+            <span class="ml-auto text-tg-hint">></span>
+        </button>
+
+        <button class="tg-list-item w-full text-left" onclick="window.location.href='{% url 'miniapp:predictions' %}portfolio/'">
+            <span class="text-xl mr-3">📊</span>
+            <span>Мои позиции</span>
+            <span class="ml-auto text-tg-hint">></span>
+        </button>
+
+        <button class="tg-list-item w-full text-left" onclick="showReferralModal()">
+            <span class="text-xl mr-3">🤝</span>
+            <span>Партнёрская программа</span>
+            <span class="ml-auto text-tg-hint">></span>
+        </button>
+
+        <button class="tg-list-item w-full text-left" onclick="window.location.href='{% url 'miniapp:support' %}'">
+            <span class="text-xl mr-3">🎧</span>
+            <span>Поддержка</span>
+            <span class="ml-auto text-tg-hint">></span>
+        </button>
+
+        <button class="tg-list-item w-full text-left" onclick="window.location.href='{% url 'miniapp:support' %}faq/'">
+            <span class="text-xl mr-3">❓</span>
+            <span>FAQ</span>
+            <span class="ml-auto text-tg-hint">></span>
+        </button>
+
+        <button class="tg-list-item w-full text-left" onclick="showSettingsModal()">
+            <span class="text-xl mr-3">⚙️</span>
+            <span>Настройки</span>
+            <span class="ml-auto text-tg-hint">></span>
+        </button>
+
+        <button class="tg-list-item w-full text-left" onclick="showLinkAccountModal()">
+            <span class="text-xl mr-3">🔗</span>
+            <span>Привязать аккаунт</span>
+            <span class="ml-auto text-tg-hint">></span>
+        </button>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="tg-card">
+        <h3 class="font-semibold mb-3">Быстрые действия</h3>
+        <div class="grid grid-2 gap-3">
+            <button class="tg-btn tg-btn-outline text-sm py-3" onclick="shareReferral()">
+                📤 Поделиться
+            </button>
+            <button class="tg-btn tg-btn-outline text-sm py-3" onclick="copyReferralLink()">
+                📋 Копировать ссылку
+            </button>
+        </div>
+    </div>
+
+    <!-- Logout -->
+    <div class="text-center">
+        <button class="text-tg-hint text-sm hover:text-tg-text transition-colors" onclick="confirmLogout()">
+            Выйти из аккаунта
+        </button>
+    </div>
+</div>
+
+<!-- Referral Modal -->
+<div id="referral-modal" class="hidden">
+    <div class="tg-modal">
+        <div class="tg-modal-handle"></div>
+        <h3 class="text-lg font-semibold mb-4">🤝 Партнёрская программа</h3>
+
+        <div class="space-y-4">
+            <!-- Status -->
+            <div class="tg-card">
+                <div class="text-center mb-3">
+                    <div class="text-sm text-tg-hint">Ваш статус</div>
+                    <div class="text-lg font-bold text-yellow-400">🥈 Продвинутый</div>
+                </div>
+
+                <div class="grid grid-2 gap-4 text-center">
+                    <div>
+                        <div class="text-lg font-bold">40%</div>
+                        <div class="text-xs text-tg-hint">Комиссия GGR</div>
+                    </div>
+                    <div>
+                        <div class="text-lg font-bold">$890.12</div>
+                        <div class="text-xs text-tg-hint">Заработано</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-2 gap-4">
+                <div class="tg-card text-center">
+                    <div class="text-xl font-bold">23</div>
+                    <div class="text-xs text-tg-hint">Рефералов</div>
+                </div>
+                <div class="tg-card text-center">
+                    <div class="text-xl font-bold">$234.56</div>
+                    <div class="text-xs text-tg-hint">Баланс</div>
+                </div>
+            </div>
+
+            <!-- Referral Link -->
+            <div class="tg-card">
+                <h4 class="font-semibold mb-2">Ваша ссылка</h4>
+                <div class="bg-tg-secondary p-3 rounded-lg mb-3">
+                    <div class="text-xs text-tg-hint break-all">
+                        t.me/DODPlatformBot?start=ref_DOD-X7K9M2
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="tg-btn tg-btn-outline flex-1 text-sm" onclick="copyReferralLink()">
+                        📋 Копировать
+                    </button>
+                    <button class="tg-btn tg-btn-primary flex-1 text-sm" onclick="shareReferral()">
+                        📤 Поделиться
+                    </button>
+                </div>
+            </div>
+
+            <!-- Withdraw -->
+            <div class="tg-card">
+                <button class="tg-btn tg-btn-primary w-full" onclick="withdrawReferralEarnings()">
+                    Вывести на баланс ($234.56)
+                </button>
+            </div>
+        </div>
+
+        <button class="tg-btn tg-btn-outline w-full mt-4" onclick="closeReferralModal()">Закрыть</button>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settings-modal" class="hidden">
+    <div class="tg-modal">
+        <div class="tg-modal-handle"></div>
+        <h3 class="text-lg font-semibold mb-4">⚙️ Настройки</h3>
+
+        <div class="space-y-4">
+            <!-- Language -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Язык</label>
+                <select class="tg-select">
+                    <option value="ru" selected>Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <!-- Currency -->
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Валюта отображения</label>
+                <select class="tg-select">
+                    <option value="USD" selected>USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="RUB">RUB (₽)</option>
+                </select>
+            </div>
+
+            <!-- Notifications -->
+            <div>
+                <h4 class="font-semibold mb-2">Уведомления через бота</h4>
+                <div class="space-y-2">
+                    <label class="tg-list-item cursor-pointer">
+                        <input type="checkbox" checked class="mr-3">
+                        <span>Результаты ставок</span>
+                    </label>
+                    <label class="tg-list-item cursor-pointer">
+                        <input type="checkbox" checked class="mr-3">
+                        <span>Депозиты</span>
+                    </label>
+                    <label class="tg-list-item cursor-pointer">
+                        <input type="checkbox" checked class="mr-3">
+                        <span>Выводы</span>
+                    </label>
+                    <label class="tg-list-item cursor-pointer">
+                        <input type="checkbox" class="mr-3">
+                        <span>Промо-акции</span>
+                    </label>
+                    <label class="tg-list-item cursor-pointer">
+                        <input type="checkbox" checked class="mr-3">
+                        <span>Резолюция маркетов</span>
+                    </label>
+                    <label class="tg-list-item cursor-pointer">
+                        <input type="checkbox" checked class="mr-3">
+                        <span>Реферальная активность</span>
+                    </label>
+                    <label class="tg-list-item cursor-pointer">
+                        <input type="checkbox" checked class="mr-3">
+                        <span>Безопасность</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex space-x-2 mt-4">
+            <button class="tg-btn tg-btn-outline flex-1" onclick="closeSettingsModal()">Отмена</button>
+            <button class="tg-btn tg-btn-primary flex-1" onclick="saveSettings()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<!-- Link Account Modal -->
+<div id="link-account-modal" class="hidden">
+    <div class="tg-modal">
+        <div class="tg-modal-handle"></div>
+        <h3 class="text-lg font-semibold mb-4">🔗 Привязать аккаунт</h3>
+
+        <div class="space-y-4">
+            <div class="text-sm text-tg-hint text-center mb-4">
+                Привяжите существующий аккаунт DOD к Telegram для синхронизации данных
+            </div>
+
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Email</label>
+                <input type="email" id="link-email" class="tg-input" placeholder="your@email.com">
+            </div>
+
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Пароль</label>
+                <input type="password" id="link-password" class="tg-input" placeholder="••••••••">
+            </div>
+        </div>
+
+        <div class="flex space-x-2 mt-4">
+            <button class="tg-btn tg-btn-outline flex-1" onclick="closeLinkAccountModal()">Отмена</button>
+            <button class="tg-btn tg-btn-primary flex-1" onclick="linkExistingAccount()">Привязать</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function showReferralModal() {
+    document.getElementById('referral-modal').classList.remove('hidden');
+    document.getElementById('referral-modal').classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function closeReferralModal() {
+    document.getElementById('referral-modal').classList.add('hidden');
+    document.getElementById('referral-modal').classList.remove('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function shareReferral() {
+    haptic.light();
+    tgSwitchInlineQuery('ref_DOD-X7K9M2', ['users', 'groups']);
+}
+
+function copyReferralLink() {
+    haptic.light();
+    const link = 't.me/DODPlatformBot?start=ref_DOD-X7K9M2';
+    navigator.clipboard.writeText(link).then(() => {
+        tgShowAlert('Ссылка скопирована!', () => {});
+    });
+}
+
+function withdrawReferralEarnings() {
+    haptic.medium();
+    // Would process withdrawal
+    tgShowAlert('Средства выведены на баланс!', () => {
+        closeReferralModal();
+    });
+}
+
+function showSettingsModal() {
+    document.getElementById('settings-modal').classList.remove('hidden');
+    document.getElementById('settings-modal').classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function closeSettingsModal() {
+    document.getElementById('settings-modal').classList.add('hidden');
+    document.getElementById('settings-modal').classList.remove('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function saveSettings() {
+    haptic.light();
+    closeSettingsModal();
+    tgShowAlert('Настройки сохранены!', () => {});
+}
+
+function showLinkAccountModal() {
+    document.getElementById('link-account-modal').classList.remove('hidden');
+    document.getElementById('link-account-modal').classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function closeLinkAccountModal() {
+    document.getElementById('link-account-modal').classList.add('hidden');
+    document.getElementById('link-account-modal').classList.remove('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function linkExistingAccount() {
+    const email = document.getElementById('link-email').value;
+    const password = document.getElementById('link-password').value;
+
+    if (!email || !password) {
+        tgShowAlert('Заполните все поля', () => {});
+        return;
+    }
+
+    haptic.medium();
+    closeLinkAccountModal();
+    tgShowAlert('Аккаунт успешно привязан!', () => {});
+}
+
+function confirmLogout() {
+    tgShowConfirm('Выйти из аккаунта?', (confirmed) => {
+        if (confirmed) {
+            // Would logout
+            window.location.href = '/accounts/logout/';
+        }
+    });
+}
+</script>
+{% endblock %}

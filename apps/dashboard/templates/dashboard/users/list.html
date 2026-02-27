@@ -1,0 +1,195 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Пользователи{% endblock %}
+{% block page_title %}👥 Пользователи{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Filters and Search -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Поиск...">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="status">
+                            <option value="">Все статусы</option>
+                            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Активные</option>
+                            <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Неактивные</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="kyc">
+                            <option value="">Все KYC</option>
+                            <option value="none" {% if kyc_filter == 'none' %}selected{% endif %}>Не подана</option>
+                            <option value="pending" {% if kyc_filter == 'pending' %}selected{% endif %}>На проверке</option>
+                            <option value="approved" {% if kyc_filter == 'approved' %}selected{% endif %}>Одобрена</option>
+                            <option value="rejected" {% if kyc_filter == 'rejected' %}selected{% endif %}>Отклонена</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="trust">
+                            <option value="">Все Trust</option>
+                            <option value="1" {% if trust_filter == '1' %}selected{% endif %}>1 - Новый</option>
+                            <option value="2" {% if trust_filter == '2' %}selected{% endif %}>2 - Базовый</option>
+                            <option value="3" {% if trust_filter == '3' %}selected{% endif %}>3 - Проверенный</option>
+                            <option value="4" {% if trust_filter == '4' %}selected{% endif %}>4 - Доверенный</option>
+                            <option value="5" {% if trust_filter == '5' %}selected{% endif %}>5 - VIP</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary">Фильтр</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mb-3">
+            <button class="btn btn-success" onclick="exportCSV()">📥 Экспорт CSV</button>
+            <button class="btn btn-success" onclick="exportExcel()">📥 Экспорт Excel</button>
+            <div class="float-end">
+                <select id="bulk-action" class="form-select d-inline-block w-auto">
+                    <option value="">Массовые действия</option>
+                    <option value="ban">Заблокировать</option>
+                    <option value="unban">Разблокировать</option>
+                    <option value="change_trust">Изменить Trust Level</option>
+                </select>
+                <button class="btn btn-warning" onclick="applyBulkAction()">Применить</button>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all"></th>
+                                <th>👤 Пользователь</th>
+                                <th>Email</th>
+                                <th>Баланс</th>
+                                <th>Trust</th>
+                                <th>KYC</th>
+                                <th>Регистрация</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in page_obj %}
+                            <tr>
+                                <td><input type="checkbox" class="user-checkbox" value="{{ user.id }}"></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar me-2">
+                                            {% if user.avatar %}
+                                                <img src="{{ user.avatar.url }}" class="rounded-circle" width="32" height="32">
+                                            {% else %}
+                                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width:32px;height:32px;">
+                                                    {{ user.username|slice:":1"|upper }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <strong>{{ user.username }}</strong><br>
+                                            <small class="text-muted">{{ user.get_trust_level_display_extended }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>${{ user.balance|floatformat:2 }}</td>
+                                <td>{{ user.trust_level }}</td>
+                                <td>
+                                    {% if user.kyc_status == 'approved' %}
+                                        ✅
+                                    {% elif user.kyc_status == 'pending' %}
+                                        ⏳
+                                    {% elif user.kyc_status == 'rejected' %}
+                                        ❌
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.date_joined|date:"d.m.Y" }}</td>
+                                <td>
+                                    {% if user.is_online %}
+                                        🟢 Онлайн
+                                    {% else %}
+                                        ⚪ Оффлайн
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'dashboard:user_detail' user.id %}" class="btn btn-sm btn-outline-primary">👁️ Просмотр</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="User pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if kyc_filter %}&kyc={{ kyc_filter }}{% endif %}{% if trust_filter %}&trust={{ trust_filter }}{% endif %}">Предыдущая</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if kyc_filter %}&kyc={{ kyc_filter }}{% endif %}{% if trust_filter %}&trust={{ trust_filter }}{% endif %}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if kyc_filter %}&kyc={{ kyc_filter }}{% endif %}{% if trust_filter %}&trust={{ trust_filter }}{% endif %}">Следующая</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Select all checkbox
+document.getElementById('select-all').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+
+function exportCSV() {
+    // Implement CSV export
+    alert('CSV export not implemented yet');
+}
+
+function exportExcel() {
+    // Implement Excel export
+    alert('Excel export not implemented yet');
+}
+
+function applyBulkAction() {
+    const action = document.getElementById('bulk-action').value;
+    const selected = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
+    
+    if (!action || selected.length === 0) {
+        alert('Выберите действие и пользователей');
+        return;
+    }
+    
+    // Implement bulk actions
+    alert(`Bulk action ${action} for users: ${selected.join(', ')}`);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,58 @@
+<nav class="navbar navbar-dark bg-dark border-bottom">
+    <div class="container-fluid">
+        <button class="navbar-toggler d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="{% url 'dashboard:dashboard' %}">DOD Admin</a>
+        
+        <!-- Search -->
+        <div class="d-flex flex-grow-1 justify-content-center position-relative">
+            <div class="input-group">
+                <input class="form-control bg-secondary text-light border-secondary" 
+                       type="search" 
+                       name="q" 
+                       id="global-search"
+                       placeholder="Глобальный поиск..." 
+                       aria-label="Search"
+                       hx-get="{% url 'dashboard:global_search' %}"
+                       hx-trigger="keyup changed delay:300ms"
+                       hx-target="#search-results"
+                       hx-indicator="#search-indicator">
+                <button class="btn btn-outline-light" type="button" id="search-indicator" style="display:none;">
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                </button>
+            </div>
+            <div id="search-results" class="dropdown-menu w-100 show" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+        
+        <ul class="navbar-nav flex-row">
+            <!-- Notifications -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    🔔 <span class="badge bg-danger">3</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                    <li><a class="dropdown-item" href="#">Новые KYC заявки: 2</a></li>
+                    <li><a class="dropdown-item" href="#">Выводы на одобрение: 5</a></li>
+                    <li><a class="dropdown-item" href="#">SLA нарушены: 1</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Все уведомления</a></li>
+                </ul>
+            </li>
+            
+            <!-- Profile -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    👤 {{ user.username }} ({{ admin_profile.role.name }})
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" href="#">Профиль</a></li>
+                    <li><a class="dropdown-item" href="#">Настройки</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Выход</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>

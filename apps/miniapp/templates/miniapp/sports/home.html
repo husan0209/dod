@@ -1,0 +1,329 @@
+{% extends 'miniapp/base.html' %}
+{% load static %}
+
+{% block title %}Спорт{% endblock %}
+
+{% block content %}
+<div class="px-4 py-4 space-y-6">
+    <!-- Sport Selector -->
+    <div class="tg-card">
+        <div class="flex space-x-1 overflow-x-auto pb-2" id="sports-selector">
+            <!-- Sports will be loaded here -->
+            <button class="sport-tab active flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium"
+                    data-sport="all">
+                🔥 Все
+            </button>
+            <button class="sport-tab flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium text-tg-hint"
+                    data-sport="football">
+                ⚽ Футбол
+            </button>
+            <button class="sport-tab flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium text-tg-hint"
+                    data-sport="basketball">
+                🏀 Баскетбол
+            </button>
+            <button class="sport-tab flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium text-tg-hint"
+                    data-sport="tennis">
+                🎾 Теннис
+            </button>
+            <button class="sport-tab flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium text-tg-hint"
+                    data-sport="hockey">
+                🏒 Хоккей
+            </button>
+            <button class="sport-tab flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium text-tg-hint"
+                    data-sport="boxing">
+                🥊 Бокс
+            </button>
+            <button class="sport-tab flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium text-tg-hint"
+                    data-sport="esports">
+                🎮 Киберспорт
+            </button>
+        </div>
+    </div>
+
+    <!-- Time Filters -->
+    <div class="flex space-x-2">
+        <button class="time-filter active flex-1 tg-btn tg-btn-primary text-sm py-2">
+            🔴 Live <span class="badge ml-1">5</span>
+        </button>
+        <button class="time-filter flex-1 tg-btn tg-btn-outline text-sm py-2">
+            Сегодня
+        </button>
+        <button class="time-filter flex-1 tg-btn tg-btn-outline text-sm py-2">
+            Завтра
+        </button>
+    </div>
+
+    <!-- Live Matches Section -->
+    <div id="live-matches-section">
+        <h3 class="text-lg font-semibold mb-3">🔴 Live матчи</h3>
+
+        <div id="live-matches" hx-get="/tg/api/live-matches/" hx-trigger="load, every 30s" hx-swap="innerHTML">
+            <!-- Live matches loaded via HTMX -->
+            <div class="tg-card">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-500">🟢</span>
+                        <span class="font-medium">Реал Мадрид — Барселона</span>
+                    </div>
+                    <span class="text-sm text-tg-hint">67'</span>
+                </div>
+                <div class="text-center text-lg font-bold mb-2">2 : 1</div>
+                <div class="grid grid-3 gap-2 text-center text-sm">
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('1', 2.10)">
+                        1<br><span class="text-xs">2.10</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('X', 3.40)">
+                        X<br><span class="text-xs">3.40</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('2', 3.80)">
+                        2<br><span class="text-xs">3.80</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tg-card">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-500">🟢</span>
+                        <span class="font-medium">МанСити — Ливерпуль</span>
+                    </div>
+                    <span class="text-sm text-tg-hint">23'</span>
+                </div>
+                <div class="text-center text-lg font-bold mb-2">0 : 0</div>
+                <div class="grid grid-3 gap-2 text-center text-sm">
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('1', 1.90)">
+                        1<br><span class="text-xs">1.90</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('X', 3.60)">
+                        X<br><span class="text-xs">3.60</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('2', 4.20)">
+                        2<br><span class="text-xs">4.20</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Matches Section -->
+    <div id="today-matches-section" class="hidden">
+        <h3 class="text-lg font-semibold mb-3">Сегодня</h3>
+
+        <div class="space-y-3">
+            <div class="tg-card">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-blue-500">🕐</span>
+                        <span class="font-medium">Арсенал — Челси</span>
+                    </div>
+                    <span class="text-sm text-tg-hint">19:00</span>
+                </div>
+                <div class="grid grid-3 gap-2 text-center text-sm">
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('1', 1.85)">
+                        1<br><span class="text-xs">1.85</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('X', 3.50)">
+                        X<br><span class="text-xs">3.50</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('2', 4.40)">
+                        2<br><span class="text-xs">4.40</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tg-card">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-blue-500">🕐</span>
+                        <span class="font-medium">МанЮн — Тоттенхэм</span>
+                    </div>
+                    <span class="text-sm text-tg-hint">21:30</span>
+                </div>
+                <div class="grid grid-3 gap-2 text-center text-sm">
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('1', 2.20)">
+                        1<br><span class="text-xs">2.20</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('X', 3.30)">
+                        X<br><span class="text-xs">3.30</span>
+                    </button>
+                    <button class="tg-btn tg-btn-outline py-2" onclick="placeBet('2', 3.50)">
+                        2<br><span class="text-xs">3.50</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tomorrow's Matches Section -->
+    <div id="tomorrow-matches-section" class="hidden">
+        <h3 class="text-lg font-semibold mb-3">Завтра</h3>
+        <div class="text-center text-tg-hint py-8">
+            Матчи на завтра появятся позже
+        </div>
+    </div>
+</div>
+
+<!-- Bet Coupon Modal -->
+<div id="bet-coupon-modal" class="hidden">
+    <div class="tg-modal">
+        <div class="tg-modal-handle"></div>
+        <h3 class="text-lg font-semibold mb-4">Купон ставки</h3>
+
+        <div class="space-y-3">
+            <div class="tg-card">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-medium" id="coupon-match">Матч</span>
+                    <span class="text-sm text-tg-hint" id="coupon-time">Время</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span id="coupon-outcome">Исход</span>
+                    <span class="font-medium" id="coupon-odds">Коэффициент</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm text-tg-hint mb-2">Сумма ставки</label>
+                <input type="number" id="bet-amount" class="tg-input" placeholder="0.00" step="0.01">
+                <div class="grid grid-4 gap-2 mt-2">
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setBetAmount(5)">$5</button>
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setBetAmount(10)">$10</button>
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setBetAmount(25)">$25</button>
+                    <button class="tg-btn tg-btn-outline text-xs py-1" onclick="setBetAmount(50)">$50</button>
+                </div>
+            </div>
+
+            <div class="flex justify-between text-sm">
+                <span>Возможный выигрыш:</span>
+                <span class="font-medium text-green-400" id="potential-win">$0.00</span>
+            </div>
+        </div>
+
+        <div class="flex space-x-2 mt-4">
+            <button class="tg-btn tg-btn-outline flex-1" onclick="closeBetCoupon()">Отмена</button>
+            <button class="tg-btn tg-btn-primary flex-1" onclick="placeBetFromCoupon()">⚡ Поставить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentBet = null;
+let currentTimeFilter = 'live';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Sport selector
+    document.querySelectorAll('.sport-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            haptic.light();
+            selectSport(tab.dataset.sport);
+        });
+    });
+
+    // Time filter
+    document.querySelectorAll('.time-filter').forEach(filter => {
+        filter.addEventListener('click', () => {
+            haptic.light();
+            selectTimeFilter(filter.textContent.trim().split(' ')[0].toLowerCase());
+        });
+    });
+
+    // Bet amount input
+    document.getElementById('bet-amount').addEventListener('input', calculatePotentialWin);
+});
+
+function selectSport(sport) {
+    document.querySelectorAll('.sport-tab').forEach(tab => {
+        tab.classList.remove('active');
+        tab.classList.add('text-tg-hint');
+    });
+
+    const activeTab = document.querySelector(`[data-sport="${sport}"]`);
+    activeTab.classList.add('active');
+    activeTab.classList.remove('text-tg-hint');
+
+    // Would filter matches by sport
+    console.log('Selected sport:', sport);
+}
+
+function selectTimeFilter(filter) {
+    currentTimeFilter = filter;
+
+    document.querySelectorAll('.time-filter').forEach(f => {
+        f.classList.remove('active', 'tg-btn-primary');
+        f.classList.add('tg-btn-outline');
+    });
+
+    const activeFilter = Array.from(document.querySelectorAll('.time-filter'))
+        .find(f => f.textContent.trim().toLowerCase().startsWith(filter));
+
+    if (activeFilter) {
+        activeFilter.classList.add('active', 'tg-btn-primary');
+        activeFilter.classList.remove('tg-btn-outline');
+    }
+
+    // Show/hide sections
+    document.getElementById('live-matches-section').classList.toggle('hidden', filter !== 'live');
+    document.getElementById('today-matches-section').classList.toggle('hidden', filter !== 'сегодня');
+    document.getElementById('tomorrow-matches-section').classList.toggle('hidden', filter !== 'завтра');
+}
+
+function placeBet(outcome, odds) {
+    currentBet = {
+        outcome,
+        odds,
+        match: 'Реал Мадрид — Барселона', // Would be dynamic
+        time: '67\'' // Would be dynamic
+    };
+
+    document.getElementById('coupon-match').textContent = currentBet.match;
+    document.getElementById('coupon-time').textContent = currentBet.time;
+    document.getElementById('coupon-outcome').textContent = getOutcomeText(outcome);
+    document.getElementById('coupon-odds').textContent = odds;
+
+    document.getElementById('bet-coupon-modal').classList.remove('hidden');
+    document.getElementById('bet-coupon-modal').classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+
+    haptic.medium();
+}
+
+function getOutcomeText(outcome) {
+    switch(outcome) {
+        case '1': return 'Победа 1';
+        case 'X': return 'Ничья';
+        case '2': return 'Победа 2';
+        default: return outcome;
+    }
+}
+
+function setBetAmount(amount) {
+    document.getElementById('bet-amount').value = amount;
+    calculatePotentialWin();
+}
+
+function calculatePotentialWin() {
+    const amount = parseFloat(document.getElementById('bet-amount').value) || 0;
+    const odds = currentBet ? currentBet.odds : 0;
+    const win = amount * odds;
+    document.getElementById('potential-win').textContent = `$${win.toFixed(2)}`;
+}
+
+function closeBetCoupon() {
+    document.getElementById('bet-coupon-modal').classList.add('hidden');
+    document.getElementById('bet-coupon-modal').classList.remove('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function placeBetFromCoupon() {
+    const amount = document.getElementById('bet-amount').value;
+
+    if (!amount || amount <= 0) {
+        tgShowAlert('Введите сумму ставки', () => {});
+        return;
+    }
+
+    haptic.heavy();
+    closeBetCoupon();
+
+    // Would send HTMX POST request
+    tgShowAlert('Ставка принята!', () => {});
+}
+</script>
+{% endblock %}

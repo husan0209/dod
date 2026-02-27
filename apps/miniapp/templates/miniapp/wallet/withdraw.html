@@ -1,0 +1,245 @@
+{% extends 'miniapp/base.html' %}
+{% load static %}
+
+{% block title %}Вывести{% endblock %}
+
+{% block content %}
+<div class="px-4 py-4 space-y-6">
+    <!-- Header Info -->
+    <div class="text-center">
+        <h2 class="text-xl font-semibold mb-2">➖ Вывести средства</h2>
+        <p class="text-tg-hint">Выберите валюту и укажите адрес</p>
+    </div>
+
+    <!-- Current Balance -->
+    <div class="tg-card">
+        <div class="text-center">
+            <div class="text-tg-hint text-sm mb-1">Доступно для вывода</div>
+            <div class="text-xl font-bold">$1,234.56</div>
+        </div>
+    </div>
+
+    <!-- Currency Selection -->
+    <div class="tg-card">
+        <h3 class="font-semibold mb-3">Валюта вывода</h3>
+        <div class="space-y-2">
+            <label class="tg-list-item cursor-pointer">
+                <input type="radio" name="currency" value="USDT" checked class="mr-3">
+                <div class="flex-1">
+                    <div class="font-medium">💎 USDT (Tether)</div>
+                    <div class="text-xs text-tg-hint">TRC20, ERC20, BEP20</div>
+                    <div class="text-xs text-green-400">Баланс: $500.00</div>
+                </div>
+            </label>
+            <label class="tg-list-item cursor-pointer">
+                <input type="radio" name="currency" value="BTC" class="mr-3">
+                <div class="flex-1">
+                    <div class="font-medium">₿ BTC (Bitcoin)</div>
+                    <div class="text-xs text-tg-hint">Bitcoin Network</div>
+                    <div class="text-xs text-green-400">Баланс: 0.01234 BTC</div>
+                </div>
+            </label>
+            <label class="tg-list-item cursor-pointer">
+                <input type="radio" name="currency" value="TON" class="mr-3">
+                <div class="flex-1">
+                    <div class="font-medium">💎 TON</div>
+                    <div class="text-xs text-tg-hint">The Open Network</div>
+                    <div class="text-xs text-green-400">Баланс: 123.45 TON</div>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <!-- Amount -->
+    <div class="tg-card">
+        <h3 class="font-semibold mb-3">Сумма вывода</h3>
+        <input type="number" id="amount" class="tg-input mb-2" placeholder="0.00" step="0.01">
+        <div class="flex justify-between text-xs text-tg-hint mb-3">
+            <span>Мин: $10.00</span>
+            <span>Макс: $10,000.00</span>
+        </div>
+
+        <div class="grid grid-4 gap-2">
+            <button class="tg-btn tg-btn-outline text-sm py-2" onclick="setAmount(50)">$50</button>
+            <button class="tg-btn tg-btn-outline text-sm py-2" onclick="setAmount(100)">$100</button>
+            <button class="tg-btn tg-btn-outline text-sm py-2" onclick="setAmount(250)">$250</button>
+            <button class="tg-btn tg-btn-outline text-sm py-2" onclick="setAmount(500)">$500</button>
+        </div>
+    </div>
+
+    <!-- Wallet Address -->
+    <div class="tg-card">
+        <h3 class="font-semibold mb-3">Адрес кошелька</h3>
+        <input type="text" id="wallet-address" class="tg-input mb-2"
+               placeholder="Введите адрес для вывода">
+        <div class="text-xs text-tg-hint mb-2">
+            Убедитесь, что адрес указан правильно. Мы не несем ответственности за потерянные средства.
+        </div>
+
+        <!-- Quick Addresses -->
+        <div class="space-y-1">
+            <button class="text-left w-full text-sm text-tg-link py-1"
+                    onclick="pasteAddress('TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t')">TR7...otSzgjLj6t</button>
+            <button class="text-left w-full text-sm text-tg-link py-1"
+                    onclick="pasteAddress('0x742d35Cc6634C0532925a3b844Bc454e4438f44e')">0x74...8f44e</button>
+        </div>
+    </div>
+
+    <!-- Withdrawal Summary -->
+    <div class="tg-card">
+        <h3 class="font-semibold mb-3">Сводка</h3>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span>Сумма вывода:</span>
+                <span id="withdraw-amount">$0.00</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Комиссия:</span>
+                <span id="fee">$1.00</span>
+            </div>
+            <div class="flex justify-between font-medium">
+                <span>Итого к получению:</span>
+                <span id="total-receive">$0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Notice -->
+    <div class="tg-card bg-yellow-500/10 border border-yellow-500/20">
+        <div class="flex items-start space-x-2">
+            <span class="text-yellow-400 text-lg">⚠️</span>
+            <div>
+                <div class="font-medium text-yellow-400 mb-1">Важно!</div>
+                <div class="text-xs text-tg-hint">
+                    Выводы обрабатываются в течение 10-30 минут.
+                    Проверьте адрес кошелька перед подтверждением.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Button -->
+    <div class="tg-card">
+        <button class="tg-btn tg-btn-primary w-full" onclick="confirmWithdraw()">
+            📤 Подтвердить вывод
+        </button>
+        <div class="text-xs text-tg-hint text-center mt-2">
+            Нажимая кнопку, вы соглашаетесь с <a href="#" class="text-tg-link">правилами вывода</a>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirm-modal" class="hidden">
+    <div class="tg-modal">
+        <div class="tg-modal-handle"></div>
+        <h3 class="text-lg font-semibold mb-4">Подтвердить вывод</h3>
+
+        <div class="space-y-3 mb-4">
+            <div class="flex justify-between">
+                <span>Валюта:</span>
+                <span id="confirm-currency">USDT</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Сумма:</span>
+                <span id="confirm-amount">$0.00</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Адрес:</span>
+                <span id="confirm-address" class="text-xs break-all">...</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Комиссия:</span>
+                <span id="confirm-fee">$1.00</span>
+            </div>
+        </div>
+
+        <div class="text-red-400 text-sm mb-4 text-center">
+            Проверьте все данные перед подтверждением!
+        </div>
+
+        <div class="flex space-x-2">
+            <button class="tg-btn tg-btn-outline flex-1" onclick="closeConfirmModal()">Отмена</button>
+            <button class="tg-btn tg-btn-primary flex-1" onclick="processWithdraw()">✅ Подтвердить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedCurrency = 'USDT';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Update amount calculations
+    document.getElementById('amount').addEventListener('input', updateCalculations);
+
+    // Update currency selection
+    document.querySelectorAll('input[name="currency"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            selectedCurrency = e.target.value;
+            updateCalculations();
+        });
+    });
+});
+
+function setAmount(amount) {
+    document.getElementById('amount').value = amount;
+    updateCalculations();
+}
+
+function pasteAddress(address) {
+    document.getElementById('wallet-address').value = address;
+    haptic.light();
+}
+
+function updateCalculations() {
+    const amount = parseFloat(document.getElementById('amount').value) || 0;
+    const fee = Math.max(amount * 0.001, 1.00); // 0.1% min $1
+    const total = amount - fee;
+
+    document.getElementById('withdraw-amount').textContent = `$${amount.toFixed(2)}`;
+    document.getElementById('fee').textContent = `$${fee.toFixed(2)}`;
+    document.getElementById('total-receive').textContent = `$${total.toFixed(2)}`;
+}
+
+function confirmWithdraw() {
+    const amount = document.getElementById('amount').value;
+    const address = document.getElementById('wallet-address').value;
+
+    if (!amount || amount < 10) {
+        tgShowAlert('Минимальная сумма вывода $10', () => {});
+        return;
+    }
+
+    if (!address) {
+        tgShowAlert('Укажите адрес кошелька', () => {});
+        return;
+    }
+
+    // Show confirmation modal
+    document.getElementById('confirm-currency').textContent = selectedCurrency;
+    document.getElementById('confirm-amount').textContent = `$${amount}`;
+    document.getElementById('confirm-address').textContent = address;
+    document.getElementById('confirm-fee').textContent = document.getElementById('fee').textContent;
+
+    document.getElementById('confirm-modal').classList.remove('hidden');
+    document.getElementById('confirm-modal').classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+
+    haptic.medium();
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirm-modal').classList.add('hidden');
+    document.getElementById('confirm-modal').classList.remove('fixed', 'inset-0', 'z-50', 'flex', 'items-end');
+}
+
+function processWithdraw() {
+    haptic.heavy();
+    closeConfirmModal();
+
+    // Would send HTMX request to create withdrawal
+    tgShowAlert('Заявка на вывод создана! Обработка займет 10-30 минут.', () => {
+        window.location.href = '{% url 'miniapp:wallet' %}';
+    });
+}
+</script>
+{% endblock %}

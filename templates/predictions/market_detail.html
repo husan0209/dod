@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ market.question }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Breadcrumb -->
+    <div class="mb-4">
+        <a href="{% url 'predictions:index' %}" class="text-blue-600 hover:text-blue-800">Prediction Market</a>
+        > {{ market.category.name }} > {{ market.question|truncatechars:50 }}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+            <!-- Question -->
+            <h1 class="text-2xl font-bold mb-4">{{ market.question }}</h1>
+
+            <!-- Description -->
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <p class="text-gray-700">{{ market.description }}</p>
+                {% if market.source_url %}
+                <p class="mt-2"><strong>Source:</strong> <a href="{{ market.source_url }}" class="text-blue-600">{{ market.source_url }}</a></p>
+                {% endif %}
+            </div>
+
+            <!-- Chart -->
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <h2 class="text-xl font-bold mb-4">Price Chart</h2>
+                <div class="flex gap-2 mb-4">
+                    <button class="btn btn-sm" onclick="changePeriod('1d')">1D</button>
+                    <button class="btn btn-sm" onclick="changePeriod('7d')">7D</button>
+                    <button class="btn btn-sm" onclick="changePeriod('1M')">1M</button>
+                    <button class="btn btn-sm" onclick="changePeriod('3M')">3M</button>
+                </div>
+                <canvas id="priceChart" width="400" height="200"></canvas>
+            </div>
+
+            <!-- Trading Form -->
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <h2 class="text-xl font-bold mb-4">Trade</h2>
+                <div class="tabs tabs-boxed mb-4">
+                    <a class="tab tab-active" id="buy-tab">Buy</a>
+                    <a class="tab" id="sell-tab">Sell</a>
+                </div>
+                
+                <form id="trade-form" hx-post="{% url 'predictions:trade' market.id %}" hx-target="#trade-result">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="buy">
+                    <input type="hidden" name="currency" value="USD">
+                    
+                    <div class="form-control mb-4">
+                        <label class="label">Side</label>
+                        <div class="flex gap-4">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="side" value="yes" checked class="radio">
+                                <span class="ml-2">🟢 YES (${{ market.yes_price|floatformat:4 }})</span>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="side" value="no" class="radio">
+                                <span class="ml-2">🔴 NO (${{ market.no_price|floatformat:4 }})</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-control mb-4">
+                        <label class="label">Amount (USD)</label>
+                        <input type="number" name="amount" step="0.01" class="input input-bordered" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Buy</button>
+                </form>
+                
+                <div id="trade-result" class="mt-4"></div>
+            </div>
+
+            <!-- Recent Trades -->
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <h2 class="text-xl font-bold mb-4">Recent Trades</h2>
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra w-full">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Side</th>
+                                <th>Amount</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trade in recent_trades %}
+                            <tr>
+                                <td>{{ trade.created_at|date:"H:i" }}</td>
+                                <td>{{ trade.user.username|truncatechars:10 }}</td>
+                                <td>{{ trade.get_action_display }}</td>
+                                <td>{{ trade.get_side_display }}</td>
+                                <td>${{ trade.total_cost|floatformat:2 }}</td>
+                                <td>${{ trade.price|floatformat:4 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Comments -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-4">Comments ({{ market.comments_count }})</h2>
+                
+                {% if user.is_authenticated %}
+                <form hx-post="{% url 'predictions:add_comment' market.id %}" hx-target="#comments-list" hx-swap="afterbegin">
+                    {% csrf_token %}
+                    <textarea name="text" class="textarea textarea-bordered w-full mb-2" placeholder="Add a comment..." required></textarea>
+                    <button type="submit" class="btn btn-primary">Post Comment</button>
+                </form>
+                {% endif %}
+                
+                <div id="comments-list" class="mt-4 space-y-4">
+                    {% for comment in comments %}
+                    {% include 'predictions/components/comment.html' with comment=comment %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1">
+            <!-- Market Stats -->
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <h3 class="text-lg font-bold mb-4">Market Stats</h3>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span>Volume 24h:</span>
+                        <span>${{ market.volume_24h_usd|floatformat:0 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Total Volume:</span>
+                        <span>${{ market.volume_usd|floatformat:0 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Unique Traders:</span>
+                        <span>{{ market.unique_traders }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>YES Holders:</span>
+                        <span>{{ market.yes_holders }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>NO Holders:</span>
+                        <span>{{ market.no_holders }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Liquidity:</span>
+                        <span>${{ market.liquidity_usd|floatformat:0 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Close Date:</span>
+                        <span>{{ market.close_date|date:"M j, Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Position -->
+            {% if user.is_authenticated %}
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-lg font-bold mb-4">Your Position</h3>
+                {% if position_yes or position_no %}
+                {% if position_yes %}
+                <div class="mb-4">
+                    <div class="flex justify-between">
+                        <span>🟢 YES Shares:</span>
+                        <span>{{ position_yes.shares|floatformat:8 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Invested:</span>
+                        <span>${{ position_yes.total_invested|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Current Value:</span>
+                        <span>${{ position_yes.current_value|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>PnL:</span>
+                        <span class="{% if position_yes.total_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            ${{ position_yes.total_pnl|floatformat:2 }} ({{ position_yes.pnl_percent|floatformat:1 }}%)
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                {% if position_no %}
+                <div>
+                    <div class="flex justify-between">
+                        <span>🔴 NO Shares:</span>
+                        <span>{{ position_no.shares|floatformat:8 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Invested:</span>
+                        <span>${{ position_no.total_invested|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Current Value:</span>
+                        <span>${{ position_no.current_value|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>PnL:</span>
+                        <span class="{% if position_no.total_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            ${{ position_no.total_pnl|floatformat:2 }} ({{ position_no.pnl_percent|floatformat:1 }}%)
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                {% else %}
+                <p class="text-gray-600">No position in this market</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPeriod = '7d';
+
+function changePeriod(period) {
+    currentPeriod = period;
+    loadChart();
+}
+
+function loadChart() {
+    fetch(`{% url 'predictions:chart_data' market.id %}?period=${currentPeriod}`)
+        .then(response => response.json())
+        .then(data => {
+            // Update chart with data
+            console.log(data);
+        });
+}
+
+document.addEventListener('DOMContentLoaded', loadChart);
+
+// HTMX setup for trade form
+document.getElementById('buy-tab').addEventListener('click', function() {
+    document.querySelector('input[name=action]').value = 'buy';
+    this.classList.add('tab-active');
+    document.getElementById('sell-tab').classList.remove('tab-active');
+});
+
+document.getElementById('sell-tab').addEventListener('click', function() {
+    document.querySelector('input[name=action]').value = 'sell';
+    this.classList.add('tab-active');
+    document.getElementById('buy-tab').classList.remove('tab-active');
+});
+</script>
+{% endblock %}

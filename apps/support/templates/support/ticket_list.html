@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static support_tags %}
+
+{% block title %}Мои тикеты - DOD{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">📋 Мои тикеты</h1>
+            <a href="{% url 'support:create_ticket' %}"
+               class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                + Новое обращение
+            </a>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <form method="get" class="flex flex-wrap gap-4">
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Статус</label>
+                    <select name="status" id="status" class="border border-gray-300 rounded px-3 py-2">
+                        <option value="">Все</option>
+                        <option value="new" {% if status_filter == 'new' %}selected{% endif %}>Новый</option>
+                        <option value="open" {% if status_filter == 'open' %}selected{% endif %}>Открыт</option>
+                        <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>В работе</option>
+                        <option value="waiting_user" {% if status_filter == 'waiting_user' %}selected{% endif %}>Ожидание ответа</option>
+                        <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Решён</option>
+                        <option value="closed" {% if status_filter == 'closed' %}selected{% endif %}>Закрыт</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Категория</label>
+                    <select name="category" id="category" class="border border-gray-300 rounded px-3 py-2">
+                        <option value="">Все</option>
+                        <option value="finance">Финансы</option>
+                        <option value="deposit">Депозиты</option>
+                        <option value="withdrawal">Выводы</option>
+                        <option value="account">Аккаунт</option>
+                        <option value="verification">Верификация</option>
+                        <option value="sport_bet">Ставки</option>
+                        <option value="casino">Казино</option>
+                        <option value="technical">Технические</option>
+                        <option value="security">Безопасность</option>
+                        <option value="complaint">Жалобы</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+
+                <div class="flex items-end">
+                    <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors">
+                        Фильтр
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tickets -->
+        <div class="space-y-4">
+            {% for ticket in tickets %}
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold">
+                            <a href="{% url 'support:ticket_detail' ticket.id %}"
+                               class="text-blue-600 hover:text-blue-800">
+                                #{{ ticket.ticket_number }}: {{ ticket.subject }}
+                            </a>
+                        </h3>
+                        <p class="text-gray-600 text-sm mt-1">{{ ticket.description|truncatechars:100 }}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="px-2 py-1 rounded text-sm font-medium
+                            {% if ticket.status == 'new' %}bg-gray-100 text-gray-800{% endif %}
+                            {% if ticket.status == 'open' %}bg-blue-100 text-blue-800{% endif %}
+                            {% if ticket.status == 'in_progress' %}bg-yellow-100 text-yellow-800{% endif %}
+                            {% if ticket.status == 'waiting_user' %}bg-orange-100 text-orange-800{% endif %}
+                            {% if ticket.status == 'resolved' %}bg-green-100 text-green-800{% endif %}
+                            {% if ticket.status == 'closed' %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ ticket.get_status_display }}
+                        </span>
+                        <div class="text-sm text-gray-500 mt-1">
+                            {{ ticket.created_at|date:"d.m.Y H:i" }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-sm text-gray-600">
+                    <div>
+                        Категория: {{ ticket.get_category_display }}
+                        {% if ticket.priority != 'medium' %}
+                        <span class="ml-2 px-2 py-1 rounded text-xs font-medium
+                            {% if ticket.priority == 'low' %}bg-gray-100 text-gray-800{% endif %}
+                            {% if ticket.priority == 'high' %}bg-orange-100 text-orange-800{% endif %}
+                            {% if ticket.priority == 'critical' %}bg-red-100 text-red-800{% endif %}">
+                            {{ ticket.get_priority_display }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        SLA: <span class="{% if ticket|sla_status == 'breached' %}text-red-600{% else %}text-green-600{% endif %}">
+                            {{ ticket|sla_status }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                <div class="text-4xl mb-4">📋</div>
+                <h3 class="text-lg font-semibold mb-2">У вас нет тикетов</h3>
+                <p class="text-gray-600 mb-4">Если у вас возникли вопросы, создайте новое обращение</p>
+                <a href="{% url 'support:create_ticket' %}"
+                   class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-block">
+                    Создать тикет
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if tickets.has_other_pages %}
+        <div class="mt-8 flex justify-center">
+            <div class="flex space-x-2">
+                {% if tickets.has_previous %}
+                <a href="?page={{ tickets.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}"
+                   class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">
+                    ← Предыдущая
+                </a>
+                {% endif %}
+
+                <span class="px-3 py-2">
+                    Страница {{ tickets.number }} из {{ tickets.paginator.num_pages }}
+                </span>
+
+                {% if tickets.has_next %}
+                <a href="?page={{ tickets.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}"
+                   class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">
+                    Следующая →
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

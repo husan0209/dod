@@ -1,0 +1,122 @@
+/* Admin Panel Styles */
+
+body {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+}
+
+.navbar-dark {
+    background-color: #1a1a1a !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+.sidebar {
+    background-color: #1a1a1a !important;
+    border-right: 1px solid #333 !important;
+}
+
+.sidebar .nav-link {
+    color: #cccccc;
+    padding: 0.75rem 1rem;
+}
+
+.sidebar .nav-link:hover {
+    color: #ffffff;
+    background-color: #333;
+}
+
+.sidebar .nav-link.active {
+    color: #00e701;
+    background-color: #333;
+    border-left: 3px solid #00e701;
+}
+
+.card {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+}
+
+.card.bg-secondary {
+    background-color: #333 !important;
+}
+
+.alert {
+    border: none;
+}
+
+.btn-outline-light {
+    color: #cccccc;
+    border-color: #cccccc;
+}
+
+.btn-outline-light:hover {
+    color: #ffffff;
+    background-color: #333;
+    border-color: #cccccc;
+}
+
+.form-control.bg-secondary {
+    background-color: #333 !important;
+    border-color: #555;
+    color: #ffffff !important;
+}
+
+.form-control.bg-secondary:focus {
+    background-color: #333 !important;
+    border-color: #00e701;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 231, 1, 0.25);
+}
+
+.dropdown-menu {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+}
+
+.dropdown-item {
+    color: #cccccc;
+}
+
+.dropdown-item:hover {
+    color: #ffffff;
+    background-color: #333;
+}
+
+.badge {
+    font-size: 0.7em;
+}
+
+/* Tables */
+.table {
+    color: #ffffff;
+}
+
+.table thead th {
+    border-bottom: 2px solid #333;
+    color: #cccccc;
+}
+
+.table td {
+    border-bottom: 1px solid #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 56px;
+        left: -250px;
+        width: 250px;
+        height: calc(100vh - 56px);
+        transition: left 0.3s;
+        z-index: 1000;
+    }
+    
+    .sidebar.show {
+        left: 0;
+    }
+    
+    .navbar-toggler {
+        display: block;
+    }
+}

@@ -1,0 +1,126 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Финансы{% endblock %}
+{% block page_title %}💰 Финансы{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Today's Metrics -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">Сегодня</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h4 class="text-success">${{ deposits_today|floatformat:0 }}</h4>
+                            <p>Депозиты ({{ deposits_count }} шт)</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h4 class="text-danger">${{ withdrawals_today|floatformat:0 }}</h4>
+                            <p>Выводы ({{ withdrawals_count }} шт)</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h4 class="{% if net_flow >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                {% if net_flow >= 0 %}+{% endif %}${{ net_flow|floatformat:0 }}
+                            </h4>
+                            <p>Нет-поток</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">Ожидают действия</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="alert alert-warning">
+                            <h6>⏳ Выводов на одобрение: {{ pending_withdrawals_count }}</h6>
+                            <p class="mb-0">${{ pending_withdrawals_amount|floatformat:0 }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-danger">
+                            <h6>⚠️ Подозрительных: 3</h6>
+                            <p class="mb-0">$4,567</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="alert alert-info">
+                            <h6>🟡 Крупных (> $5k): 2</h6>
+                            <p class="mb-0">$15,000</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Systems -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">Платёжные системы</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between">
+                            <span>NOWpayments</span>
+                            <span>✅ Работает | $12,345 сегодня</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between">
+                            <span>RUkassa</span>
+                            <span>✅ Работает | $33,333 сегодня</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Platform Balance -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Баланс платформы</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <strong>Горячий кошелёк BTC:</strong> 1.234 BTC
+                        </div>
+                        <div class="mb-2">
+                            <strong>Горячий кошелёк USDT:</strong> $45,678
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <strong>RUkassa баланс:</strong> ₽2,345,678
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-4">
+            <a href="{% url 'dashboard:finance_withdrawals' %}" class="btn btn-primary">Очередь выводов</a>
+            <a href="{% url 'dashboard:finance_transactions' %}" class="btn btn-secondary">Все транзакции</a>
+            <a href="#" class="btn btn-success">Финансовые отчёты</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
