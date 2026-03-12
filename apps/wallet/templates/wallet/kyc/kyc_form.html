@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}KYC форма{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-6 space-y-4">
+  <h1 class="text-2xl font-bold text-white mb-4">🪪 Верификация личности</h1>
+
+  <div class="bg-dod-surface/70 rounded-2xl p-5 text-sm space-y-4">
+    <div class="flex items-center justify-between text-xs text-text-secondary">
+      <span>Шаг {{ step }} из 3</span>
+      <div class="flex gap-1">
+        <span class="w-10 h-1 rounded-full {% if step >= 1 %}bg-accent{% else %}bg-dod-surface{% endif %}"></span>
+        <span class="w-10 h-1 rounded-full {% if step >= 2 %}bg-accent{% else %}bg-dod-surface{% endif %}"></span>
+        <span class="w-10 h-1 rounded-full {% if step >= 3 %}bg-accent{% else %}bg-dod-surface{% endif %}"></span>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="step" value="{{ step }}">
+
+      {% for field in form %}
+        <div>
+          <label class="block text-xs text-text-secondary mb-1">
+            {{ field.label }}
+            {% if field.field.required %}<span class="text-red-400">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.help_text %}
+            <p class="mt-1 text-[11px] text-text-secondary">{{ field.help_text }}</p>
+          {% endif %}
+          {% for error in field.errors %}
+            <p class="mt-1 text-[11px] text-red-400">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endfor %}
+
+      {% if form.non_field_errors %}
+        <div class="text-xs text-red-400">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <div class="pt-2 border-t border-dod-surface flex justify-between items-center">
+        {% if step > 1 %}
+          <a href="?step={{ step|add:"-1" }}" class="text-xs text-text-secondary hover:text-white">
+            ← Назад
+          </a>
+        {% else %}
+          <span></span>
+        {% endif %}
+        <button type="submit" class="btn-premium text-sm">
+          {% if step < 3 %}Далее →{% else %}Отправить на проверку{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\games\plinko.py
+# hypothesis_version: 6.151.9
+
+[0.3, 0.5, 1.5, 110, 'bet_amount', 'high', 'landing_position', 'low', 'medium', 'multiplier', 'path', 'plinko', 'risk', 'rows']

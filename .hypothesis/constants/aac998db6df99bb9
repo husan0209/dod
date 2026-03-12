@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\predictions\services\trading_service.py
+# hypothesis_version: 6.151.9
+
+[100, '%Y%m%d%H%M%S', '0', 'Insufficient balance', 'Insufficient shares', 'Invalid side', 'Market not found', 'No position found', 'TRD', 'avg_price', 'bet', 'buy', 'fee', 'message', 'new_no_price', 'new_yes_price', 'no', 'payout', 'position_shares', 'potential_payout', 'prediction_trade', 'sell', 'shares', 'shares_sold', 'total_cost', 'trade', 'trade_id', 'win', 'yes']

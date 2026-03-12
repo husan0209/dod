@@ -1,0 +1,11 @@
+{% load wallet_tags %}
+{% if wallet %}
+  <span class="text-xs text-text-secondary">Баланс</span>
+  <span class="text-sm font-bold text-accent-success">
+    {% user_balance request.user %}
+  </span>
+{% else %}
+  <span class="text-xs text-text-secondary">Баланс</span>
+  <span class="text-sm font-bold text-accent-success">$0.00</span>
+{% endif %}
+

@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\accounts\validators.py
+# hypothesis_version: 6.151.9
+
+[1024, '.jpeg', '.jpg', '.png', '.webp', '^[\\w.]+$']

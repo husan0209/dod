@@ -10,7 +10,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,localhost:9000,127.0.0.1:9000,0.0.0.0').split(',')
+
+# Server port - hardcoded to 9000
+SERVER_PORT = 9000
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -87,6 +90,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.dashboard.context_processors.dashboard_context',
             ],
         },
     },
@@ -224,19 +228,57 @@ CELERY_BEAT_SCHEDULE = {
     },
     'auto-close-resolved': {
         'task': 'apps.support.tasks.auto_close_resolved_tickets',
-        'schedule': crontab(hour=3, minute=0),  # ежедневно в 3:00 UTC
+        'schedule': crontab(hour='3', minute='0'),  # ежедневно в 3:00 UTC
     },
     'support-daily-report': {
         'task': 'apps.support.tasks.generate_support_daily_report',
-        'schedule': crontab(hour=7, minute=0),  # ежедневно в 7:00 UTC
+        'schedule': crontab(hour='7', minute='0'),  # ежедневно в 7:00 UTC
     },
     'update-faq-stats': {
         'task': 'apps.support.tasks.update_faq_stats',
-        'schedule': crontab(hour=2, minute=0),  # ежедневно в 2:00 UTC
+        'schedule': crontab(hour='2', minute='0'),  # ежедневно в 2:00 UTC
     },
     'cleanup-old-attachments': {
         'task': 'apps.support.tasks.cleanup_old_attachments',
-        'schedule': crontab(hour=4, minute=0),  # ежедневно в 4:00 UTC
+        'schedule': crontab(hour='4', minute='0'),  # ежедневно в 4:00 UTC
+    },
+    # Payments tasks
+    'payments-check-pending-deposits': {
+        'task': 'apps.payments.tasks.check_pending_deposits',
+        'schedule': crontab(minute='*/5'),
+    },
+    'payments-check-pending-payouts': {
+        'task': 'apps.payments.tasks.check_pending_payouts',
+        'schedule': crontab(minute='*/5'),
+    },
+    'payments-expire-old-deposits': {
+        'task': 'apps.payments.tasks.expire_old_deposits',
+        'schedule': crontab(minute='*/10'),
+    },
+    'payments-retry-failed-payouts': {
+        'task': 'apps.payments.tasks.retry_failed_payouts',
+        'schedule': crontab(minute='*/15'),
+    },
+    # Miniapp analytics and notifications
+    'miniapp-update-analytics': {
+        'task': 'apps.miniapp.tasks.update_miniapp_analytics',
+        'schedule': crontab(minute='*/5'),
+    },
+    'miniapp-cleanup-sessions': {
+        'task': 'apps.miniapp.tasks.cleanup_expired_sessions',
+        'schedule': crontab(minute='0', hour='*'),
+    },
+    'miniapp-daily-digest': {
+        'task': 'apps.miniapp.tasks.send_daily_digest',
+        'schedule': crontab(hour='8', minute='0'),
+    },
+    'miniapp-daily-report': {
+        'task': 'apps.miniapp.tasks.generate_miniapp_report',
+        'schedule': crontab(hour='9', minute='0'),
+    },
+    'miniapp-sync-telegram-data': {
+        'task': 'apps.miniapp.tasks.sync_telegram_user_data',
+        'schedule': crontab(hour='3', minute='30'),
     },
 }
 
@@ -253,7 +295,21 @@ CHANNEL_LAYERS = {
 OTP_TOTP_ISSUER = 'DOD'
 
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if os.getenv('CSRF_TRUSTED_ORIGINS') else []
+
+# CSRF Configuration
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:9000',
+    'http://127.0.0.1:9000',
+    'http://0.0.0.0:9000',
+    'https://localhost:9000',
+    'https://127.0.0.1:9000',
+]
+csrf_trusted_origins_env = os.getenv('CSRF_TRUSTED_ORIGINS')
+if csrf_trusted_origins_env:
+    CSRF_TRUSTED_ORIGINS.extend(csrf_trusted_origins_env.split(','))
+
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SECURE = False if DEBUG else True
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

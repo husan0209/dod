@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %} | DOD{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-group {
+        @apply space-y-2;
+    }
+    
+    .form-label {
+        @apply block text-sm font-medium text-slate-200 ml-0.5;
+    }
+    
+    .input-icon {
+        @apply absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5;
+    }
+    
+    .input-with-icon {
+        @apply pl-10;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md">
+        <!-- Login Card -->
+        <div class="card mb-6">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg mb-4">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v2a2 2 0 01-2 2H7a2 2 0 01-2-2v-2m12-4v2a2 2 0 11-4 0v-2m0 0H9a2 2 0 00-2 2v2a2 2 0 002 2h4z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-white mb-1">{% trans "Welcome Back" %}</h1>
+                <p class="text-slate-400">{% trans "Sign in to your account to continue" %}</p>
+            </div>
+            
+            <!-- Non-field Errors -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-error mb-6">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div>
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <form method="post" class="space-y-5" id="login_form">
+                {% csrf_token %}
+                
+                <!-- Email/Username Field -->
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                        {% trans "Email Address" %}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <input type="email" 
+                            name="{{ form.username.name }}" 
+                            id="{{ form.username.id_for_label }}"
+                            class="form-input input-with-icon"
+                            placeholder="your@email.com"
+                            autocomplete="email"
+                            required>
+                    </div>
+                    {% if form.username.errors %}
+                        <p class="text-sm text-red-400">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Password Field -->
+                <div class="form-group">
+                    <div class="flex items-center justify-between">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">
+                            {% trans "Password" %}
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <a href="{% url 'accounts:password_reset' %}" class="text-xs text-primary-400 hover:text-primary-300 font-medium">
+                            {% trans "Forgot password?" %}
+                        </a>
+                    </div>
+                    <div class="relative">
+                        <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        <input type="password" 
+                            name="{{ form.password.name }}" 
+                            id="{{ form.password.id_for_label }}"
+                            class="form-input input-with-icon"
+                            placeholder="••••••••"
+                            autocomplete="current-password"
+                            required>
+                    </div>
+                    {% if form.password.errors %}
+                        <p class="text-sm text-red-400">{{ form.password.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Remember Me Checkbox (Optional) -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                        name="remember_me" 
+                        id="remember_me" 
+                        class="w-4 h-4 bg-slate-900 border border-slate-700 rounded focus:ring-primary-500 cursor-pointer">
+                    <label for="remember_me" class="ml-2 text-sm text-slate-400 cursor-pointer">
+                        {% trans "Remember me for 30 days" %}
+                    </label>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-full py-3 font-semibold mt-6" id="submit_btn">
+                    {% trans "Sign In" %}
+                </button>
+            </form>
+            
+            <!-- OAuth/Social Login (Optional) -->
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-slate-800"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-slate-900 text-slate-400">{% trans "Or continue with" %}</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <a href="#" class="btn btn-secondary py-2 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10.5 1.5H5.75A4.25 4.25 0 001.5 5.75v8.5A4.25 4.25 0 005.75 18.5h8.5a4.25 4.25 0 004.25-4.25V9.5" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="text-xs font-medium">Google</span>
+                </a>
+                <a href="#" class="btn btn-secondary py-2 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c6.627 0 12 5.373 12 12s-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0zm3.034 16.5c1.381 0 2.75-.246 4.036-.72-.36 1.28-1.32 2.4-2.519 2.88-1.199.48-2.638.72-4.198.72-4.418 0-8-3.582-8-8s3.582-8 8-8c1.56 0 3 .24 4.198.72 1.199.48 2.159 1.6 2.519 2.88-1.286-.474-2.655-.72-4.036-.72-3.313 0-6 2.687-6 6s2.687 6 6 6z"></path>
+                    </svg>
+                    <span class="text-xs font-medium">Telegram</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Footer Link -->
+        <div class="text-center">
+            <p class="text-slate-400">
+                {% trans "Don't have an account?" %}
+                <a href="{% url 'accounts:register' %}" class="text-primary-400 font-medium hover:text-primary-300">
+                    {% trans "Create one now" %}
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add loading state to submit button
+    document.getElementById('login_form').addEventListener('submit', function() {
+        const btn = document.getElementById('submit_btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner mr-2"></span>{% trans "Signing in..." %}';
+    });
+</script>
+{% endblock %}

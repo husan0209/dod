@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Настройка 2FA - DOD{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <h1 class="text-4xl font-bold mb-8 text-white">Включение двухфакторной аутентификации</h1>
+    
+    <div class="bg-gray-900 border border-gray-800 rounded-lg p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- QR Code -->
+            <div>
+                <h2 class="text-lg font-bold mb-4 text-white">Шаг 1: Отсканируйте QR код</h2>
+                <div class="bg-white p-4 rounded-lg mb-4">
+                    {% if qr_code %}
+                        <img src="{{ qr_code }}" alt="QR Code" class="w-full">
+                    {% else %}
+                        <div class="text-center text-gray-500 py-8">QR код загружается...</div>
+                    {% endif %}
+                </div>
+                <p class="text-sm text-gray-400 mb-4">
+                    Отсканируйте этот QR код с помощью приложения Google Authenticator, Яндекс.Ключ или аналогичного приложения.
+                </p>
+            </div>
+            
+            <!-- Manual Entry -->
+            <div>
+                <h2 class="text-lg font-bold mb-4 text-white">Или введите вручную</h2>
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-6 font-mono text-sm text-indigo-400 break-all">
+                    {{ secret }}
+                </div>
+                
+                <h2 class="text-lg font-bold mb-4 text-white">Шаг 2: Введите код</h2>
+                
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    <div>
+                        <label for="{{ form.totp_code.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                            Код из приложения
+                        </label>
+                        {{ form.totp_code }}
+                        {% if form.totp_code.errors %}
+                            <div class="text-red-400 text-sm mt-1">
+                                {{ form.totp_code.errors|first }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-full">
+                        Подтвердить и включить 2FA
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Backup Codes -->
+        <div class="mt-8 pt-8 border-t border-gray-700">
+            <h2 class="text-lg font-bold mb-4 text-white">⚠️ Резервные коды</h2>
+            <p class="text-gray-400 mb-4">
+                Сохраните эти коды в безопасном месте. Они понадобятся вам, если вы потеряете доступ к приложению 2FA.
+            </p>
+            
+            <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 font-mono text-sm space-y-2 mb-4">
+                {% for code in backup_codes %}
+                    <div class="text-indigo-400">{{ code }}</div>
+                {% endfor %}
+            </div>
+            
+            <p class="text-xs text-gray-500">
+                ✓ Каждый код может быть использован только один раз.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

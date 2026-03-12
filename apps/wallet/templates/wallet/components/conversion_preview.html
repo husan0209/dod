@@ -1,0 +1,12 @@
+{% load wallet_tags %}
+{% if preview %}
+  <div class="mt-4 p-3 rounded-lg bg-dod-surface/70 text-sm space-y-1">
+    <div>Курс: 1 {{ preview.from_currency }} = {{ preview.exchange_rate }} {{ preview.to_currency }}</div>
+    <div>Комиссия: {{ preview.fee_percent }}% ({{ preview.fee_amount }})</div>
+    <div>Вы отдаёте: {{ preview.from_amount }} {{ preview.from_currency }}</div>
+    <div>Вы получите: {{ preview.to_amount }} {{ preview.to_currency }}</div>
+  </div>
+{% elif error %}
+  <p class="mt-2 text-sm text-red-400">{{ error }}</p>
+{% endif %}
+

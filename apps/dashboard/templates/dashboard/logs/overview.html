@@ -1,0 +1,86 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Логи | DOD Admin{% endblock %}
+{% block page_title %}Логи и аудит{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="glass-card p-6">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Модуль</label>
+                <input type="text" name="module" value="{{ module_filter }}" placeholder="users / finance / security ..."
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+            </div>
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Результат</label>
+                <select name="ok"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                    <option value="" {% if ok_filter == "" %}selected{% endif %}>Все</option>
+                    <option value="1" {% if ok_filter == "1" %}selected{% endif %}>Успешно</option>
+                    <option value="0" {% if ok_filter == "0" %}selected{% endif %}>Ошибки</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit"
+                    class="w-full btn-premium py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 shadow-blue-500/20">Фильтр</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="glass-card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-white/5 bg-white/[0.02]">
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Время</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Админ</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Модуль</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Действие</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Описание</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest text-right">Статус</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    {% for log in page_obj %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="px-6 py-4 text-xs text-text-muted">{{ log.created_at|date:"d.m H:i:s" }}</td>
+                        <td class="px-6 py-4 text-xs text-white font-bold">{{ log.admin_user.username|default:"System" }}</td>
+                        <td class="px-6 py-4 text-xs text-text-secondary">{{ log.module }}</td>
+                        <td class="px-6 py-4 text-xs text-text-secondary">{{ log.action_type }}</td>
+                        <td class="px-6 py-4 text-xs text-white max-w-[520px] truncate" title="{{ log.description }}">{{ log.description }}</td>
+                        <td class="px-6 py-4 text-right">
+                            {% if log.is_successful %}
+                            <span class="badge-premium bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]">OK</span>
+                            {% else %}
+                            <span class="badge-premium bg-rose-500/10 text-rose-400 border-rose-500/20 text-[10px]">FAIL</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td class="px-6 py-10 text-center text-sm text-text-muted" colspan="6">Логи не найдены</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="px-6 py-4 border-t border-white/5 flex items-center justify-between">
+            <div class="text-xs text-text-muted uppercase tracking-widest font-bold">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</div>
+            <div class="flex space-x-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if module_filter %}&module={{ module_filter }}{% endif %}{% if ok_filter %}&ok={{ ok_filter }}{% endif %}"
+                    class="px-3 py-1.5 glass-card text-xs text-white hover:bg-white/10 transition-all font-bold">Назад</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if module_filter %}&module={{ module_filter }}{% endif %}{% if ok_filter %}&ok={{ ok_filter }}{% endif %}"
+                    class="px-3 py-1.5 glass-card text-xs text-white hover:bg-white/10 transition-all font-bold">Вперед</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

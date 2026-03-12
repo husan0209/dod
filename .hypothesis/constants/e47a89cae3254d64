@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\services\payout_service.py
+# hypothesis_version: 6.151.9
+
+['SITE_URL', 'both', 'cancelled', 'completed', 'completed_at', 'created', 'crypto', 'currency', 'duplicate', 'error_message', 'extra_id', 'failed', 'invalid_state', 'max_retries', 'nowpayments', 'payout_id', 'processing', 'provider', 'provider_payout_id', 'provider_response', 'provider_status', 'raw_response', 'retry_count', 'rukassa', 'status', 'transaction', 'updated_at', 'withdrawal', 'withdrawal_request', 'Выплаты отключены']

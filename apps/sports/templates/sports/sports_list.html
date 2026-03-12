@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ставки на спорт - DOD{% endblock %}
+
+{% block content %}
+<div class="sports-container">
+    <!-- Заголовок -->
+    <div class="hero-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container">
+            <h1 class="display-4 text-white mb-2">⚽ Ставки на спорт</h1>
+            <p class="lead text-white-50">Более 1000+ событий ежедневно. Лучшие коэффициенты на рынке</p>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <!-- Избранные события -->
+        {% if featured_events %}
+        <section class="mb-5">
+            <h2 class="section-title mb-4">🔥 Топ события (избранное)</h2>
+            <div class="row">
+                {% for event in featured_events %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    {% include 'sports/includes/event_card_compact.html' %}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Виды спорта -->
+        <section class="mb-5">
+            <h2 class="section-title mb-4">🎯 Выберите вид спорта</h2>
+            <div class="sports-grid">
+                {% for sport in sports %}
+                <a href="{% url 'sports:sport_detail' sport.slug %}" class="sport-card">
+                    <div class="sport-card__icon">{{ sport.icon }}</div>
+                    <div class="sport-card__content">
+                        <h3>{{ sport.name }}</h3>
+                        <p class="text-muted small">{{ sport.events_count }} событий</p>
+                    </div>
+                    <div class="sport-card__arrow">→</div>
+                </a>
+                {% empty %}
+                <div class="alert alert-info w-100">
+                    Сейчас событий нет. Проверьте позже!
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Быстрые ссылки -->
+        <div class="quick-links mb-5">
+            <a href="{% url 'sports:upcoming_events' %}" class="btn btn-outline-primary">
+                Все предстоящие события
+            </a>
+            <a href="{% url 'sports:user_bets' %}" class="btn btn-outline-success">
+                Мои ставки
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.sports-container {
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+.hero-section {
+    padding: 40px 0;
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3748;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 12px;
+    display: inline-block;
+}
+
+.sports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.sport-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.sport-card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.sport-card__icon {
+    font-size: 48px;
+    margin-right: 15px;
+}
+
+.sport-card__content h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.sport-card__arrow {
+    color: #667eea;
+    font-size: 20px;
+    margin-left: auto;
+}
+
+.quick-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+</style>
+{% endblock %}

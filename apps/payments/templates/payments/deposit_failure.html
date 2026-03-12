@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Ошибка пополнения{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-12">
+  <div class="bg-dod-surface/70 rounded-2xl p-8 text-center space-y-6">
+    <!-- Error Icon -->
+    <div class="flex justify-center">
+      <div class="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center">
+        <span class="text-5xl">❌</span>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div>
+      <h1 class="text-3xl font-bold text-white mb-2">Ошибка пополнения</h1>
+      <p class="text-text-secondary">
+        К сожалению, не удалось завершить пополнение
+      </p>
+    </div>
+
+    <!-- Transaction Details -->
+    {% if deposit %}
+    <div class="bg-black/20 rounded-lg p-6 space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-text-secondary">Заказ</span>
+        <span class="text-sm text-white font-mono">{{ deposit.order_id }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-text-secondary">Сумма</span>
+        <span class="text-lg font-bold text-white">
+          {{ deposit.amount }} {{ deposit.currency.code }}
+        </span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-text-secondary">Способ оплаты</span>
+        <span class="text-sm text-white">{{ deposit.payment_method.name }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-text-secondary">Статус</span>
+        <span class="text-sm text-red-400">
+          {% if deposit.status == 'failed' %}Ошибка
+          {% elif deposit.status == 'expired' %}Истекло время
+          {% elif deposit.status == 'cancelled' %}Отменено
+          {% else %}{{ deposit.get_status_display }}{% endif %}
+        </span>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Possible Reasons -->
+    <div class="bg-yellow-500/10 border border-yellow-500/40 rounded-lg p-4 text-left">
+      <h3 class="text-sm font-medium text-yellow-200 mb-2">Возможные причины:</h3>
+      <ul class="text-xs text-yellow-100 space-y-1 list-disc list-inside">
+        <li>Недостаточно средств на счёте</li>
+        <li>Истекло время на оплату</li>
+        <li>Платёж был отменён</li>
+        <li>Технические проблемы у платёжной системы</li>
+        <li>Неверные платёжные данные</li>
+      </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row gap-3 pt-6">
+      <a href="{% url 'payments:deposit_page' %}" 
+         class="flex-1 bg-accent hover:bg-accent/90 text-white font-medium py-3 px-6 rounded-lg transition-colors text-center">
+        Попробовать снова
+      </a>
+      <a href="{% url 'wallet:overview' %}" 
+         class="flex-1 bg-dod-surface hover:bg-dod-surface/80 text-white font-medium py-3 px-6 rounded-lg transition-colors text-center">
+        Вернуться в кошелёк
+      </a>
+    </div>
+
+    <!-- Support -->
+    <div class="pt-6 border-t border-dod-surface">
+      <p class="text-xs text-text-secondary">
+        Если проблема повторяется, обратитесь в 
+        <a href="{% url 'support:center' %}" class="text-accent hover:underline">службу поддержки</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

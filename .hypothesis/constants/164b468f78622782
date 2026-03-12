@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\config\settings\development.py
+# hypothesis_version: 6.151.9
+
+[',', 'ALLOWED_HOSTS', 'cache+memory://', 'localhost,127.0.0.1', 'memory://', 'test']

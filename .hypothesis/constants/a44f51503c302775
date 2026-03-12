@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\dashboard\urls.py
+# hypothesis_version: 6.151.9
+
+['api/search/', 'api/stats/', 'casino', 'casino/', 'dashboard', 'finance', 'finance/', 'finance/withdrawals/', 'finance_transactions', 'finance_withdrawals', 'global_search', 'predictions', 'predictions/', 'sports', 'sports/', 'stats', 'user_detail', 'users', 'users/']

@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\services\payment_service.py
+# hypothesis_version: 6.151.9
+
+['100', 'amount_received', 'both', 'code', 'completed', 'completed_at', 'created', 'crypto', 'currency', 'deposit', 'deposit_id', 'deposit_order_id', 'duplicate', 'expires_at', 'fee', 'icon', 'invalid_state', 'max', 'method', 'methods', 'min', 'name', 'payment_url', 'pending', 'processing_time', 'provider', 'provider__sort_order', 'provider_name', 'provider_order_id', 'raw_response', 'sort_order', 'status', 'transaction', 'updated_at']

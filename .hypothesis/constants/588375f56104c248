@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\accounts\services\otp_service.py
+# hypothesis_version: 6.151.9
+
+['-', '2FA включена', '2FA отключена', 'DOD', 'PNG', 'TOTP', 'TOTP не настроена', 'backup_codes', 'black', 'is_2fa_enabled', 'is_used', 'provisioning_uri', 'qr_code', 'secret', 'security', 'totp', 'two_fa_method', 'used_at', 'white', 'Неверный TOTP код', 'Неверный пароль', '⚠️', '🔄', '🔒', '🔓']

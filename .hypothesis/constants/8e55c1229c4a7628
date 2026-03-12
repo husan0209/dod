@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\dashboard\views\api.py
+# hypothesis_version: 6.151.9
+
+['-created_at', '0', 'admin_user', 'amount_usd', 'bet_win', 'casino_ggr', 'casino_win', 'completed', 'deposit', 'deposits_today', 'id', 'in_progress', 'kyc_pending', 'net_flow', 'online_users', 'open', 'open_tickets', 'pending', 'prediction_win', 'predictions_ggr', 'q', 'query', 'recent_actions', 'results', 'sports_ggr', 'subtitle', 'ticket', 'tickets_sla_violated', 'title', 'total', 'total_ggr', 'type', 'updated_at', 'url', 'user', 'withdrawal', 'withdrawals_pending', 'withdrawals_today']

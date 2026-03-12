@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\support\services\assignment_service.py
+# hypothesis_version: 6.151.9
+
+['assigned', 'assigned_at', 'assigned_to', 'critical', 'current_chats_count', 'online', 'open', 'operator', 'operator_profile', 'status', 'system']

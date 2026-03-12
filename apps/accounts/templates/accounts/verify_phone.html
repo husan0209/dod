@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Подтверждение телефона - DOD{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[calc(100vh-200px)]">
+    <div class="w-full max-w-md">
+        <div class="bg-gray-900 border border-gray-800 rounded-lg p-8">
+            <h1 class="text-3xl font-bold mb-2 text-white">Подтверждение телефона</h1>
+            <p class="text-gray-400 mb-8">Введите код из SMS отправленного на <strong>{{ phone }}</strong></p>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div>
+                    <label for="{{ form.code.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                        Код подтверждения
+                    </label>
+                    {{ form.code }}
+                    {% if form.code.errors %}
+                        <div class="text-red-400 text-sm mt-1">
+                            {{ form.code.errors|first }}
+                        </div>
+                    {% endif %}
+                    <p class="text-sm text-gray-500 mt-2">Код действует 10 минут</p>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-full">
+                    Подтвердить
+                </button>
+            </form>
+            
+            <div class="mt-8 pt-8 border-t border-gray-800 text-center space-y-2">
+                <a href="{% url 'accounts:link_phone' %}" class="text-indigo-400 hover:text-indigo-300 text-sm block">
+                    Отправить код повторно
+                </a>
+                <a href="{% url 'accounts:profile' %}" class="text-gray-400 hover:text-gray-300 text-sm block">
+                    Вернуться к профилю
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

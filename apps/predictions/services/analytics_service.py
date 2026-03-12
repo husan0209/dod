@@ -2,8 +2,11 @@ from decimal import Decimal
 
 from django.db.models import Sum, Count, F, Q, Case, When, DecimalField
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 
-from ..models import UserPosition, Trade, Market, PriceHistory
+from ..models import Position, Trade, PredictionMarket, PriceHistory
+
+User = get_user_model()
 
 
 class AnalyticsService:
@@ -31,10 +34,21 @@ class AnalyticsService:
             invested = position.total_invested
             returned = position.total_returned
             realized_pnl = position.realized_pnl
-            current_value = position.current_value()
-            unrealized_pnl = position.unrealized_pnl()
-            total_pnl = position.total_pnl()
-            pnl_percent = position.pnl_percent()
+            
+            # Рассчитать текущую стоимость позиции
+            if position.side == 'yes':
+                current_price = position.market.yes_price
+            else:
+                current_price = position.market.no_price
+                
+            current_value = position.shares * current_price
+            unrealized_pnl = current_value - invested + returned
+            total_pnl = realized_pnl + unrealized_pnl
+            
+            if invested > 0:
+                pnl_percent = (total_pnl / invested * 100)
+            else:
+                pnl_percent = Decimal('0')
 
             position_data = {
                 "market": position.market.question[:50],
@@ -49,7 +63,7 @@ class AnalyticsService:
                 "unrealized_pnl": float(unrealized_pnl),
                 "total_pnl": float(total_pnl),
                 "pnl_percent": float(pnl_percent),
-                "potential_payout": float(position.potential_payout()),
+                "potential_payout": float(position.shares),
                 "is_settled": position.is_settled,
                 "settlement_amount": float(position.settlement_amount) if position.settlement_amount else 0,
             }
@@ -65,13 +79,18 @@ class AnalyticsService:
                 total_current_value += current_value
 
         total_pnl = total_realized_pnl + (total_current_value - total_invested + total_returned)
-        total_pnl_percent = (total_pnl / total_invested * 100) if total_invested > 0 else 0
+        if total_invested > 0:
+            total_pnl_percent = (total_pnl / total_invested * 100)
+        else:
+            total_pnl_percent = Decimal('0')
 
-        # Win rate from trades
-        trades = Trade.objects.filter(user=user)
-        win_trades = trades.filter(action='sell', total_cost__lt=0).count()  # Sell with positive pnl
-        total_trades = trades.count()
-        win_rate = (win_trades / total_trades * 100) if total_trades > 0 else 0
+        # Win rate from settled positions with positive pnl
+        settled_positions_count = len(settled_positions)
+        winning_positions = sum(1 for pos in settled_positions if pos['total_pnl'] > 0)
+        win_rate = (winning_positions / settled_positions_count * 100) if settled_positions_count > 0 else 0
+
+        # Total trades count
+        total_trades = Trade.objects.filter(user=user).count()
 
         return {
             "total_invested": float(total_invested),
@@ -102,9 +121,9 @@ class AnalyticsService:
             hours = 24
         elif period == '7d':
             hours = 168
-        elif period == '1M':
+        elif period == '30d':
             hours = 720
-        elif period == '3M':
+        elif period == '90d':
             hours = 2160
         else:  # 'all'
             hours = None
@@ -141,63 +160,128 @@ class AnalyticsService:
         """
         Таблица лидеров.
         """
-        # This is complex - need to aggregate pnl per user
-        # For simplicity, use total pnl from positions and trades
-        # In real implementation, might need a cached table
-
         users_with_pnl = []
 
-        # Get all users with positions
-        users = Position.objects.values('user').distinct()
+        # Get all users with trades
+        users = User.objects.filter(
+            position__isnull=False
+        ).distinct()
 
-        for user_dict in users:
-            user_id = user_dict['user']
-            portfolio = AnalyticsService.get_user_portfolio_by_id(user_id)
+        for user in users:
+            portfolio = AnalyticsService.get_user_portfolio(user)
             
             if portfolio['total_pnl'] != 0:
+                roi = (portfolio['total_pnl_percent']) if portfolio['total_invested'] > 0 else 0
+                
                 users_with_pnl.append({
-                    "user_id": user_id,
+                    "user_id": str(user.id),
+                    "username": user.username,
+                    "avatar": user.profile.avatar.url if hasattr(user, 'profile') and user.profile.avatar else None,
                     "pnl": portfolio['total_pnl'],
+                    "roi": roi,
                     "trades": portfolio['total_trades'],
+                    "invested": portfolio['total_invested'],
+                    "current": portfolio['current_value'],
                     "win_rate": portfolio['win_rate'],
                 })
 
-        # Sort by pnl desc
-        users_with_pnl.sort(key=lambda x: x['pnl'], reverse=True)
+        # Sort by ROI desc
+        users_with_pnl.sort(key=lambda x: x['roi'], reverse=True)
 
         leaderboard = []
         for i, user_data in enumerate(users_with_pnl[:limit], 1):
             leaderboard.append({
                 "rank": i,
                 "user_id": user_data['user_id'],
+                "username": user_data['username'],
+                "avatar": user_data['avatar'],
                 "pnl": round(user_data['pnl'], 2),
+                "roi": round(user_data['roi'], 2),
                 "trades": user_data['trades'],
+                "invested": round(user_data['invested'], 2),
+                "current": round(user_data['current'], 2),
                 "win_rate": round(user_data['win_rate'], 2),
             })
 
         return leaderboard
 
     @staticmethod
-    def get_user_portfolio_by_id(user_id):
+    def get_market_activity(market_id, limit=50):
         """
-        Helper to get portfolio by user id.
+        Активность маркета: последние операции.
         """
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
         try:
-            user = User.objects.get(id=user_id)
-            return AnalyticsService.get_user_portfolio(user)
-        except User.DoesNotExist:
-            return {
-                "total_invested": 0,
-                "total_returned": 0,
-                "current_value": 0,
-                "total_pnl": 0,
-                "total_pnl_percent": 0,
-                "realized_pnl": 0,
-                "unrealized_pnl": 0,
-                "active_positions": [],
-                "settled_positions": [],
-                "total_trades": 0,
-                "win_rate": 0,
-            }
+            market = PredictionMarket.objects.get(id=market_id)
+        except PredictionMarket.DoesNotExist:
+            return []
+
+        trades = Trade.objects.filter(
+            market=market
+        ).select_related('user').order_by('-created_at')[:limit]
+
+        activity = []
+        for trade in trades:
+            activity.append({
+                "type": "trade",
+                "action": trade.action,
+                "side": trade.side,
+                "user": trade.user.username,
+                "shares": float(trade.shares),
+                "price": float(trade.price),
+                "total": float(trade.total_cost),
+                "timestamp": trade.created_at.isoformat()
+            })
+
+        return activity
+
+    @staticmethod
+    def get_user_trades(user, limit=50):
+        """
+        Все трейды пользователя.
+        """
+        trades = Trade.objects.filter(
+            user=user
+        ).select_related('market').order_by('-created_at')[:limit]
+
+        result = []
+        for trade in trades:
+            result.append({
+                "trade_id": trade.trade_id,
+                "market": trade.market.question[:50],
+                "market_id": str(trade.market.id),
+                "action": trade.action,
+                "side": trade.side,
+                "shares": float(trade.shares),
+                "price": float(trade.price),
+                "total_cost": float(trade.total_cost),
+                "fee_amount": float(trade.fee_amount),
+                "timestamp": trade.created_at.isoformat()
+            })
+
+        return result
+
+    @staticmethod
+    def get_market_summary(market_id):
+        """
+        Краткая статистика маркета.
+        """
+        try:
+            market = PredictionMarket.objects.get(id=market_id)
+        except PredictionMarket.DoesNotExist:
+            return None
+
+        positions_count = Position.objects.filter(market=market, shares__gt=0).count()
+        traders_count = Position.objects.filter(market=market, shares__gt=0).values('user').distinct().count()
+        
+        return {
+            "market_id": str(market.id),
+            "question": market.question,
+            "yes_price": float(market.yes_price),
+            "no_price": float(market.no_price),
+            "volume_usd": float(market.volume_usd),
+            "trades_count": market.trades_count,
+            "positions_count": positions_count,
+            "traders_count": traders_count,
+            "status": market.status,
+            "close_date": market.close_date.isoformat() if market.close_date else None,
+        }

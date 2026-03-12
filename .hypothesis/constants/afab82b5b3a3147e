@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\accounts\services\sms_service.py
+# hypothesis_version: 6.151.9
+
+[200, 600, 3600, 86400, '0', 'DOD', 'NEXMO_API_KEY', 'NEXMO_API_SECRET', 'NEXMO_FROM_NUMBER', 'SMS_API_KEY', 'SMS_API_SECRET', 'SMS_API_URL', 'SMS_PROVIDER', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_FROM_NUMBER', 'api_key', 'api_secret', 'attempts', 'created_at', 'custom', 'from', 'is_used', 'message', 'messages', 'nexmo', 'phone', 'signature', 'status', 'text', 'to', 'twilio']

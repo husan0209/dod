@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}История транзакций{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+  <h1 class="text-2xl font-bold text-white mb-4">📊 История транзакций</h1>
+
+  <!-- Filters -->
+  <div class="bg-dod-surface/70 rounded-2xl p-4">
+    <form method="get" class="flex flex-wrap gap-4">
+      <!-- Type Filter -->
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-medium text-text-secondary mb-2">Тип</label>
+        <select name="type" 
+                class="w-full bg-black/40 border border-dod-surface rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                onchange="this.form.submit()">
+          <option value="all" {% if type_filter == 'all' %}selected{% endif %}>Все</option>
+          <option value="deposits" {% if type_filter == 'deposits' %}selected{% endif %}>Пополнения</option>
+          <option value="withdrawals" {% if type_filter == 'withdrawals' %}selected{% endif %}>Выводы</option>
+        </select>
+      </div>
+
+      <!-- Status Filter -->
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-medium text-text-secondary mb-2">Статус</label>
+        <select name="status" 
+                class="w-full bg-black/40 border border-dod-surface rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                onchange="this.form.submit()">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Все</option>
+          {% for status in all_statuses %}
+          <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>{{ status }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Reset Button -->
+      <div class="flex items-end">
+        <a href="{% url 'payments:transaction_history' %}" 
+           class="bg-black/40 hover:bg-black/60 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+          Сбросить
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Transactions List -->
+  <div class="bg-dod-surface/70 rounded-2xl overflow-hidden">
+    {% if transactions %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-black/40 border-b border-dod-surface">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-text-secondary">Тип</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-text-secondary">ID</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-text-secondary">Сумма</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-text-secondary">Способ</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-text-secondary">Статус</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-text-secondary">Дата</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-dod-surface">
+          {% for txn in transactions %}
+          <tr class="hover:bg-black/20 transition-colors">
+            <!-- Type -->
+            <td class="px-4 py-4">
+              {% if txn.type == 'deposit' %}
+                <span class="inline-flex items-center gap-1 text-sm text-green-400">
+                  <span>📥</span>
+                  <span>Пополнение</span>
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1 text-sm text-orange-400">
+                  <span>📤</span>
+                  <span>Вывод</span>
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- ID -->
+            <td class="px-4 py-4">
+              <span class="text-sm text-white font-mono">{{ txn.id }}</span>
+            </td>
+
+            <!-- Amount -->
+            <td class="px-4 py-4">
+              <div class="text-sm text-white font-medium">
+                {{ txn.amount }} {{ txn.currency.code }}
+              </div>
+              {% if txn.type == 'deposit' and txn.object.amount_received and txn.object.amount_received != txn.amount %}
+              <div class="text-xs text-text-secondary">
+                Получено: {{ txn.object.amount_received }} {{ txn.currency.code }}
+              </div>
+              {% endif %}
+            </td>
+
+            <!-- Payment Method -->
+            <td class="px-4 py-4">
+              <div class="text-sm text-white">
+                {% if txn.provider %}{{ txn.provider }}{% endif %}
+                {% if txn.payment_method %}
+                  {% if txn.provider %}<br>{% endif %}
+                  <span class="text-xs text-text-secondary">{{ txn.payment_method }}</span>
+                {% endif %}
+              </div>
+            </td>
+
+            <!-- Status -->
+            <td class="px-4 py-4">
+              {% if txn.status == 'completed' %}
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-medium">
+                  <span>✓</span>
+                  <span>Завершена</span>
+                </span>
+              {% elif txn.status == 'processing' or txn.status == 'pending' %}
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-medium">
+                  <span>⏳</span>
+                  <span>Обработка</span>
+                </span>
+              {% elif txn.status == 'failed' %}
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-medium">
+                  <span>✗</span>
+                  <span>Ошибка</span>
+                </span>
+              {% elif txn.status == 'expired' %}
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-500/20 text-gray-400 text-xs font-medium">
+                  <span>⌛</span>
+                  <span>Истекла</span>
+                </span>
+              {% elif txn.status == 'cancelled' %}
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-500/20 text-gray-400 text-xs font-medium">
+                  <span>⊘</span>
+                  <span>Отменена</span>
+                </span>
+              {% elif txn.status == 'manual_review' or txn.status == 'pending_approval' %}
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-medium">
+                  <span>👁</span>
+                  <span>Проверка</span>
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-500/20 text-gray-400 text-xs font-medium">
+                  <span>{{ txn.status }}</span>
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- Date -->
+            <td class="px-4 py-4">
+              <div class="text-sm text-white">
+                {{ txn.created_at|date:"d.m.Y H:i" }}
+              </div>
+              {% if txn.completed_at %}
+              <div class="text-xs text-text-secondary">
+                Завершена: {{ txn.completed_at|date:"d.m.Y H:i" }}
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+      <p class="text-text-secondary text-sm">Нет транзакций</p>
+      <div class="mt-4 flex gap-4 justify-center">
+        <a href="{% url 'payments:deposit_page' %}" 
+           class="bg-accent hover:bg-accent/90 text-white text-sm px-6 py-2 rounded-lg transition-colors">
+          Пополнить
+        </a>
+        <a href="{% url 'payments:withdrawal_page' %}" 
+           class="bg-black/40 hover:bg-black/60 text-white text-sm px-6 py-2 rounded-lg transition-colors">
+          Вывести
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

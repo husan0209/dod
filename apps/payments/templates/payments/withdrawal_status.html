@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Статус вывода {{ withdrawal.request_id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-6 space-y-6">
+  <h1 class="text-2xl font-bold text-white mb-4">📤 Статус заявки на вывод</h1>
+
+  <!-- Withdrawal Status Card -->
+  <div class="bg-dod-surface/70 rounded-2xl p-6 space-y-4">
+    <!-- Status Badge -->
+    <div class="flex items-center justify-between pb-4 border-b border-dod-surface">
+      <span class="text-sm text-text-secondary">Статус</span>
+      <span class="px-3 py-1 rounded-full text-sm font-medium
+        {% if withdrawal.status == 'completed' %}
+          bg-emerald-500/20 text-emerald-400
+        {% elif withdrawal.status == 'processing' or withdrawal.status == 'approved' or withdrawal.status == 'auto_approved' %}
+          bg-blue-500/20 text-blue-400
+        {% elif withdrawal.status == 'pending' or withdrawal.status == 'manual_review' %}
+          bg-yellow-500/20 text-yellow-400
+        {% elif withdrawal.status == 'rejected' or withdrawal.status == 'cancelled' %}
+          bg-red-500/20 text-red-400
+        {% else %}
+          bg-gray-500/20 text-gray-400
+        {% endif %}">
+        {{ withdrawal.get_status_display }}
+      </span>
+    </div>
+
+    <!-- Withdrawal Details -->
+    <div class="space-y-3 text-sm">
+      <div class="flex justify-between">
+        <span class="text-text-secondary">ID заявки</span>
+        <span class="text-white font-mono">{{ withdrawal.request_id }}</span>
+      </div>
+
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Сумма</span>
+        <span class="text-white font-semibold">{{ withdrawal.amount }} {{ withdrawal.currency.code }}</span>
+      </div>
+
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Комиссия</span>
+        <span class="text-white">{{ withdrawal.fee_amount }} {{ withdrawal.currency.code }}</span>
+      </div>
+
+      <div class="flex justify-between pb-3 border-b border-dod-surface">
+        <span class="text-text-secondary">К получению</span>
+        <span class="text-white font-semibold">{{ withdrawal.net_amount }} {{ withdrawal.currency.code }}</span>
+      </div>
+
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Способ вывода</span>
+        <span class="text-white">{{ withdrawal.get_payment_method_display }}</span>
+      </div>
+
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Уровень риска</span>
+        <span class="text-white">{{ withdrawal.get_risk_level_display }}</span>
+      </div>
+
+      {% if withdrawal.risk_factors %}
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Факторы риска</span>
+        <span class="text-white text-xs">{{ withdrawal.risk_factors|length }} обнаружено</span>
+      </div>
+      {% endif %}
+
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Создана</span>
+        <span class="text-white">{{ withdrawal.created_at|date:"d.m.Y H:i" }}</span>
+      </div>
+
+      {% if withdrawal.completed_at %}
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Завершена</span>
+        <span class="text-white">{{ withdrawal.completed_at|date:"d.m.Y H:i" }}</span>
+      </div>
+      {% endif %}
+
+      {% if withdrawal.expires_at and withdrawal.status in 'pending,manual_review' %}
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Истекает</span>
+        <span class="text-white">{{ withdrawal.expires_at|date:"d.m.Y H:i" }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Payout Information -->
+    {% if payout %}
+    <div class="pt-4 border-t border-dod-surface space-y-3 text-sm">
+      <h3 class="text-sm font-medium text-white mb-2">Информация о выплате</h3>
+      
+      <div class="flex justify-between">
+        <span class="text-text-secondary">ID выплаты</span>
+        <span class="text-white font-mono">{{ payout.payout_id }}</span>
+      </div>
+
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Провайдер</span>
+        <span class="text-white">{{ payout.provider.name }}</span>
+      </div>
+
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Статус выплаты</span>
+        <span class="px-2 py-1 rounded text-xs
+          {% if payout.status == 'completed' %}
+            bg-emerald-500/20 text-emerald-400
+          {% elif payout.status == 'processing' or payout.status == 'sent' %}
+            bg-blue-500/20 text-blue-400
+          {% elif payout.status == 'failed' %}
+            bg-red-500/20 text-red-400
+          {% else %}
+            bg-gray-500/20 text-gray-400
+          {% endif %}">
+          {{ payout.get_status_display }}
+        </span>
+      </div>
+
+      {% if payout.provider_payout_id %}
+      <div class="flex justify-between">
+        <span class="text-text-secondary">ID провайдера</span>
+        <span class="text-white font-mono text-xs">{{ payout.provider_payout_id }}</span>
+      </div>
+      {% endif %}
+
+      {% if payout.error_message %}
+      <div class="bg-red-500/10 border border-red-500/40 rounded-lg p-3 mt-2">
+        <p class="text-xs text-red-200">{{ payout.error_message }}</p>
+      </div>
+      {% endif %}
+
+      {% if payout.retry_count > 0 %}
+      <div class="flex justify-between">
+        <span class="text-text-secondary">Попыток</span>
+        <span class="text-white">{{ payout.retry_count }} / {{ payout.max_retries }}</span>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Review Information -->
+    {% if withdrawal.status == 'manual_review' %}
+    <div class="bg-yellow-500/10 border border-yellow-500/40 rounded-lg p-4 mt-4">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">⏳</span>
+        <div>
+          <h3 class="text-sm font-medium text-yellow-200 mb-1">Ручная проверка</h3>
+          <p class="text-xs text-yellow-200/80">
+            Ваша заявка отправлена на ручную проверку. Это может занять до 24 часов.
+            Мы уведомим вас, когда проверка будет завершена.
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if withdrawal.status == 'rejected' %}
+    <div class="bg-red-500/10 border border-red-500/40 rounded-lg p-4 mt-4">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">❌</span>
+        <div>
+          <h3 class="text-sm font-medium text-red-200 mb-1">Заявка отклонена</h3>
+          {% if withdrawal.rejection_reason %}
+          <p class="text-xs text-red-200/80">Причина: {{ withdrawal.rejection_reason }}</p>
+          {% endif %}
+          {% if withdrawal.review_comment %}
+          <p class="text-xs text-red-200/80 mt-1">{{ withdrawal.review_comment }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if withdrawal.status == 'completed' %}
+    <div class="bg-emerald-500/10 border border-emerald-500/40 rounded-lg p-4 mt-4">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">✅</span>
+        <div>
+          <h3 class="text-sm font-medium text-emerald-200 mb-1">Выплата завершена</h3>
+          <p class="text-xs text-emerald-200/80">
+            Средства успешно отправлены на ваш счёт. Время зачисления зависит от платёжной системы.
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Actions -->
+  <div class="flex gap-3">
+    <a href="{% url 'payments:withdrawal_page' %}" 
+       class="flex-1 text-center bg-dod-surface/70 hover:bg-dod-surface text-white py-3 px-6 rounded-lg transition-colors">
+      Назад к выводу
+    </a>
+    
+    {% if withdrawal.status in 'pending,manual_review' %}
+    <a href="{% url 'wallet:transactions' %}" 
+       class="flex-1 text-center bg-accent hover:bg-accent/90 text-white py-3 px-6 rounded-lg transition-colors">
+      История транзакций
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Auto-refresh for pending statuses -->
+  {% if withdrawal.status in 'processing,approved,auto_approved' %}
+  <script>
+    // Auto-refresh every 10 seconds for processing withdrawals
+    setTimeout(function() {
+      location.reload();
+    }, 10000);
+  </script>
+  {% endif %}
+</div>
+{% endblock %}

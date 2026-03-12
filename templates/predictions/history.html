@@ -1,85 +1,156 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Trade History{% endblock %}
+{% block title %}История сделок | DOD Platform{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Trade History</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header -->
+    <div class="mb-12">
+        <h1 class="text-4xl font-bold font-outfit mb-3 text-white">
+            📜 История сделок
+        </h1>
+        <p class="text-text-secondary">Все ваши покупки и продажи акций</p>
+    </div>
 
-    {% if trades %}
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Market</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Side</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shares</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fee</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for trade in trades %}
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ trade.created_at|date:"M j, Y H:i" }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">
-                                {{ trade.market.question|truncatechars:40 }}
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="badge {% if trade.action == 'buy' %}badge-info{% else %}badge-warning{% endif %}">
-                                {{ trade.get_action_display }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="badge {% if trade.side == 'yes' %}badge-success{% else %}badge-error{% endif %}">
-                                {{ trade.get_side_display }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ trade.shares|floatformat:8 }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            ${{ trade.price|floatformat:4 }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            ${{ trade.total_cost|floatformat:2 }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            ${{ trade.fee_amount|floatformat:2 }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Filters -->
+    <div class="glass-card p-6 mb-8">
+        <form method="get" class="flex flex-col md:flex-row gap-4">
+            <!-- Search by Market -->
+            <input type="text" name="market" class="flex-1 input-premium py-3 px-4" placeholder="🔍 Поиск по маркету..." value="{{ request.GET.market }}">
+            
+            <!-- Filter by Action -->
+            <select name="action" class="input-premium py-3 px-4">
+                <option value="">-- Все действия --</option>
+                <option value="buy" {% if request.GET.action == 'buy' %}selected{% endif %}>Покупки</option>
+                <option value="sell" {% if request.GET.action == 'sell' %}selected{% endif %}>Продажи</option>
+            </select>
+
+            <!-- Filter by Side -->
+            <select name="side" class="input-premium py-3 px-4">
+                <option value="">-- Обе стороны --</option>
+                <option value="yes" {% if request.GET.side == 'yes' %}selected{% endif %}>YES</option>
+                <option value="no" {% if request.GET.side == 'no' %}selected{% endif %}>NO</option>
+            </select>
+
+            <button type="submit" class="btn-primary px-8 py-3 whitespace-nowrap">🔍 Поиск</button>
+            <a href="{% url 'predictions:history' %}" class="text-blue-400 hover:text-blue-300 py-3 flex items-center">Сброс</a>
+        </form>
+    </div>
+
+    <!-- Trades List -->
+    <div class="space-y-4">
+        {% for trade in trades %}
+        <div class="glass-card p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 hover:bg-white/5 transition-colors">
+            <!-- Left: Trade Info -->
+            <div class="flex-1">
+                <!-- Market Question -->
+                <a href="{% url 'predictions:market_detail' trade.market.id %}" class="text-lg font-bold text-white hover:text-blue-400 transition-colors">
+                    {{ trade.market.question|truncatechars:60 }}
+                </a>
+                
+                <!-- Action & Side -->
+                <div class="mt-2 flex items-center gap-3">
+                    {% if trade.action == 'buy' %}
+                    <span class="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold">
+                        🛒 BUY
+                    </span>
+                    {% else %}
+                    <span class="px-3 py-1 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-bold">
+                        💱 SELL
+                    </span>
+                    {% endif %}
+                    
+                    <span class="px-3 py-1 rounded-lg {% if trade.side == 'yes' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-rose-500/10 text-rose-400 border border-rose-500/20{% endif %} text-xs font-bold">
+                        {{ trade.side|upper }}
+                    </span>
+                    
+                    <span class="text-xs text-text-muted">{{ trade.created_at|date:'j M, H:i' }}</span>
+                </div>
+            </div>
+
+            <!-- Middle: Trade Details -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm text-center md:text-left">
+                <!-- Shares -->
+                <div>
+                    <div class="text-xs text-text-muted mb-1">SHARES</div>
+                    <div class="font-bold">{{ trade.shares|floatformat:4 }}</div>
+                </div>
+
+                <!-- Price -->
+                <div>
+                    <div class="text-xs text-text-muted mb-1">PRICE</div>
+                    <div class="font-bold">${{ trade.price|floatformat:4 }}</div>
+                </div>
+
+                <!-- Total Cost -->
+                <div>
+                    <div class="text-xs text-text-muted mb-1">TOTAL</div>
+                    <div class="font-bold">${{ trade.total_cost|floatformat:2 }}</div>
+                </div>
+
+                <!-- Fee -->
+                <div>
+                    <div class="text-xs text-text-muted mb-1">FEE</div>
+                    <div class="font-bold text-rose-400">${{ trade.fee_amount|floatformat:2 }}</div>
+                </div>
+            </div>
+
+            <!-- Right: P&L / Status -->
+            <div class="text-right">
+                {% if trade.action == 'sell' and trade.position.realized_pnl %}
+                <div class="text-2xl font-bold {% if trade.position.realized_pnl >= 0 %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                    {% if trade.position.realized_pnl >= 0 %}+{% endif %}${{ trade.position.realized_pnl|floatformat:2 }}
+                    <div class="text-xs text-text-muted font-normal">
+                        {% if trade.position.realized_pnl >= 0 %}+{% endif %}{{ trade.position.realized_pnl|floatformat:1 }}%
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-sm text-text-muted">
+                    {% if trade.action == 'buy' %}
+                    Открыто
+                    {% else %}
+                    Закрыто
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
         </div>
+        {% empty %}
+        <div class="glass-card p-12 text-center">
+            <div class="text-4xl mb-4 opacity-20">📋</div>
+            <p class="text-text-secondary mb-4">История сделок пуста</p>
+            <a href="{% url 'predictions:index' %}" class="btn-primary px-6 py-2">
+                → Начать торговлю
+            </a>
+        </div>
+        {% endfor %}
     </div>
 
     <!-- Pagination -->
     {% if is_paginated %}
-    <div class="flex justify-center mt-8">
-        <div class="btn-group">
+    <div class="flex justify-center mt-16">
+        <nav class="flex space-x-2 bg-dod-surface/50 p-1.5 rounded-2xl border border-white/5">
             {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="btn">« Previous</a>
+            <a href="?page=1" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
             {% endif %}
-            <span class="btn">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
-            {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="btn">Next »</a>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
 
-    {% else %}
-    <div class="bg-white p-8 rounded-lg shadow text-center">
-        <p class="text-gray-600">No trades found</p>
+            <span class="px-6 flex items-center text-sm font-bold text-white">
+                {{ page_obj.number }} / {{ paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+            {% endif %}
+        </nav>
     </div>
     {% endif %}
 </div>

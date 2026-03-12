@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\admin.py
+# hypothesis_version: 6.151.9
+
+['amount', 'api_key', 'api_secret', 'auto_payout_enabled', 'cancel_payout', 'cancelled', 'code', 'completed', 'created_at', 'currency', 'deposit_enabled', 'details', 'event_type', 'fee_percent', 'is_active', 'is_default', 'is_deposit_enabled', 'is_processed', 'is_valid_signature', 'is_verified', 'mark_cancelled', 'mark_completed', 'mark_refunded', 'max_amount', 'min_amount', 'name', 'order_id', 'payment_details', 'payout_id', 'processing', 'processing_result', 'provider', 'provider_order_id', 'provider_response', 'refunded', 'related_order_id', 'retry_count', 'retry_send', 'status', 'transaction', 'type', 'updated_at', 'user', 'user__email', 'webhook_secret', 'withdrawal_enabled', 'Вернуть средства', 'Отменить', 'Отменить и вернуть', 'Повторить отправку', 'Ручное подтверждение']

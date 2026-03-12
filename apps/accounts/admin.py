@@ -8,6 +8,9 @@ from .models import (
     EmailVerification,
     PhoneVerification,
     BackupCode,
+    LinkedAccount,
+    Notification,
+    AdminActionLog,
 )
 
 
@@ -80,3 +83,30 @@ class BackupCodeAdmin(admin.ModelAdmin):
     list_filter = ('is_used',)
     search_fields = ('user__email',)
     readonly_fields = ('user', 'code', 'is_used', 'created_at', 'used_at')
+
+@admin.register(LinkedAccount)
+class LinkedAccountAdmin(admin.ModelAdmin):
+    list_display = ('user', 'provider', 'provider_id', 'is_primary', 'linked_at')
+    list_filter = ('provider', 'is_primary')
+    search_fields = ('user__email', 'provider_id', 'provider_email', 'provider_username')
+    readonly_fields = ('user', 'provider', 'provider_id', 'provider_email', 'provider_username', 'provider_avatar', 'linked_at')
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'notification_type', 'title', 'is_read', 'created_at')
+    list_filter = ('notification_type', 'is_read', 'created_at')
+    search_fields = ('user__email', 'title', 'message')
+    readonly_fields = ('user', 'notification_type', 'title', 'message', 'icon', 'link', 'is_read', 'read_at', 'created_at')
+
+
+@admin.register(AdminActionLog)
+class AdminActionLogAdmin(admin.ModelAdmin):
+    list_display = ('admin_user', 'action_type', 'target_user', 'module', 'is_successful', 'created_at')
+    list_filter = ('action_type', 'module', 'is_successful', 'created_at')
+    search_fields = ('admin_user__email', 'target_user__email', 'action_type', 'description')
+    readonly_fields = (
+        'admin_user', 'action_type', 'target_user', 'description', 'details', 'ip_address',
+        'user_agent', 'module', 'action_category', 'data_before', 'data_after',
+        'is_successful', 'error_message', 'duration_ms', 'created_at'
+    )

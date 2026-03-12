@@ -4,10 +4,11 @@ from decimal import Decimal
 from django.db.models import Q, Count, Sum
 from django.utils import timezone
 
-from ..models import Market, Category, Outcome, AMMPool
+from ..models import PredictionMarket, MarketCategory, PredictionSettings, PriceHistory
 
 
 def generate_id(prefix):
+    """Генерировать уникальный ID."""
     timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
     random6 = ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=6))
     return f"{prefix}-{timestamp}-{random6}"
@@ -64,7 +65,7 @@ class MarketService:
             resolution_source=resolution_source,
             tags=tags or [],
             created_by=created_by,
-            status='active',  # Assuming created by moderator
+            status='active',
             close_date=close_date,
             resolution_date=resolution_date,
             yes_pool=yes_pool,
@@ -77,11 +78,17 @@ class MarketService:
         )
 
         # Обновить category.markets_count
-        category.markets_count = Market.objects.filter(category=category).count()
+        category.markets_count = PredictionMarket.objects.filter(category=category).count()
         category.save()
 
         # Записать начальную PriceHistory
-        # TODO: update for new PriceHistory model
+        PriceHistory.objects.create(
+            market=market,
+            yes_price=yes_price,
+            no_price=no_price,
+            volume=Decimal(str(initial_liquidity)),
+            source='creation'
+        )
 
         return market
 
@@ -90,9 +97,9 @@ class MarketService:
         """
         Трендовые маркеты.
         """
-        return Market.objects.filter(
+        return PredictionMarket.objects.filter(
             status='active'
-        ).order_by('-total_volume')[:limit]
+        ).order_by('-volume_usd')[:limit]
 
     @staticmethod
     def get_closing_soon(limit=10):
@@ -100,11 +107,11 @@ class MarketService:
         Маркеты которые скоро закрываются.
         """
         soon = timezone.now() + timezone.timedelta(hours=48)
-        return Market.objects.filter(
+        return PredictionMarket.objects.filter(
             status='active',
-            closes_at__lte=soon,
-            closes_at__gt=timezone.now()
-        ).order_by('closes_at')[:limit]
+            close_date__lte=soon,
+            close_date__gt=timezone.now()
+        ).order_by('close_date')[:limit]
 
     @staticmethod
     def get_recently_resolved(limit=10):
@@ -112,7 +119,7 @@ class MarketService:
         Недавно разрешённые.
         """
         week_ago = timezone.now() - timezone.timedelta(days=7)
-        return Market.objects.filter(
+        return PredictionMarket.objects.filter(
             status='resolved',
             resolved_at__gte=week_ago
         ).order_by('-resolved_at')[:limit]
@@ -122,13 +129,13 @@ class MarketService:
         """
         Поиск по вопросу, тегам, описанию.
         """
-        queryset = Market.objects.all()
+        queryset = PredictionMarket.objects.all()
 
         if query:
             queryset = queryset.filter(
-                Q(title__icontains=query) |
+                Q(question__icontains=query) |
                 Q(description__icontains=query) |
-                Q(title_en__icontains=query) |
+                Q(question_en__icontains=query) |
                 Q(description_en__icontains=query) |
                 Q(tags__icontains=query)
             )
@@ -146,15 +153,42 @@ class MarketService:
         """
         Закрыть просроченные маркеты.
         """
-        expired = Market.objects.filter(
+        now = timezone.now()
+        expired = PredictionMarket.objects.filter(
             status='active',
-            closes_at__lte=timezone.now()
-        )
+            close_date__lte=now
+        ).update(status='pending_resolution')
 
-        for market in expired:
-            market.status = 'closed'
-            market.save()
-            # Уведомить модераторов (placeholder)
-            # notify_moderators(f"Market {market.title} pending resolution")
+        return expired
 
-        return expired.count()
+    @staticmethod
+    def get_market_stats(market_id):
+        """
+        Получить статистику маркета.
+        """
+        try:
+            market = PredictionMarket.objects.get(id=market_id)
+        except PredictionMarket.DoesNotExist:
+            return None
+
+        from ..models import Position, Trade, MarketComment
+        
+        positions_count = Position.objects.filter(market=market, shares__gt=0).count()
+        traders_count = Position.objects.filter(market=market, shares__gt=0).values('user').distinct().count()
+        trade_count = Trade.objects.filter(market=market).count()
+        comments_count = MarketComment.objects.filter(market=market, is_deleted=False).count()
+
+        return {
+            "market_id": str(market.id),
+            "question": market.question,
+            "status": market.status,
+            "volume_usd": float(market.volume_usd),
+            "positions_count": positions_count,
+            "traders_count": traders_count,
+            "trade_count": trade_count,
+            "comments_count": comments_count,
+            "yes_price": float(market.yes_price),
+            "no_price": float(market.no_price),
+            "created_at": market.created_at.isoformat(),
+            "close_date": market.close_date.isoformat()
+        }

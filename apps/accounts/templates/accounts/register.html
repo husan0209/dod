@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Register" %} | DOD{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-group {
+        @apply space-y-2;
+    }
+    
+    .form-label {
+        @apply block text-sm font-medium text-slate-200 ml-0.5;
+    }
+    
+    .password-strength {
+        @apply h-1 bg-slate-700 rounded-full overflow-hidden mt-2;
+    }
+    
+    .password-strength-bar {
+        @apply h-full rounded-full transition-all duration-300;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md">
+        <div class="card mb-6">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-primary-600 rounded-lg mb-4">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-white mb-1">{% trans "Create Account" %}</h1>
+                <p class="text-slate-400">{% trans "Join our community today" %}</p>
+            </div>
+            
+            <form method="post" class="space-y-5" novalidate>
+                {% csrf_token %}
+                
+                <!-- Non-field errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                        {% trans "Email Address" %}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="email" 
+                        name="{{ form.email.name }}" 
+                        id="{{ form.email.id_for_label }}"
+                        class="form-input"
+                        placeholder="you@example.com"
+                        required>
+                    {% if form.email.errors %}
+                        <p class="text-sm text-red-400">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                        {% trans "Username" %}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                        name="{{ form.username.name }}" 
+                        id="{{ form.username.id_for_label }}"
+                        class="form-input"
+                        placeholder="john_doe"
+                        minlength="3"
+                        maxlength="30"
+                        required>
+                    <p class="text-xs text-slate-500 mt-1">{% trans "3-30 characters: letters, numbers, underscore, dot" %}</p>
+                    {% if form.username.errors %}
+                        <p class="text-sm text-red-400">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="{{ form.password1.id_for_label }}" class="form-label">
+                        {% trans "Password" %}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="password" 
+                        name="{{ form.password1.name }}" 
+                        id="{{ form.password1.id_for_label }}"
+                        class="form-input"
+                        placeholder="••••••••"
+                        minlength="8"
+                        required
+                        x-data
+                        @input="
+                            const strength = $el.value.length;
+                            const hasUpper = /[A-Z]/.test($el.value);
+                            const hasLower = /[a-z]/.test($el.value);
+                            const hasNumber = /[0-9]/.test($el.value);
+                            const score = strength + (hasUpper ? 1 : 0) + (hasLower ? 1 : 0) + (hasNumber ? 1 : 0);
+                            const bar = $el.parentElement.querySelector('.password-strength-bar');
+                            const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500'];
+                            bar.className = 'password-strength-bar ' + colors[Math.min(Math.floor(score / 2), 4)];
+                            bar.style.width = Math.min((score / 10) * 100, 100) + '%';
+                        ">
+                    <div class="password-strength">
+                        <div class="password-strength-bar bg-red-500" style="width: 0%"></div>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">{% trans "Min 8 characters: uppercase, lowercase, number" %}</p>
+                    {% if form.password1.errors %}
+                        <p class="text-sm text-red-400">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Confirm Password Field -->
+                <div class="form-group">
+                    <label for="{{ form.password2.id_for_label }}" class="form-label">
+                        {% trans "Confirm Password" %}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="password" 
+                        name="{{ form.password2.name }}" 
+                        id="{{ form.password2.id_for_label }}"
+                        class="form-input"
+                        placeholder="••••••••"
+                        required>
+                    {% if form.password2.errors %}
+                        <p class="text-sm text-red-400">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Phone Field (Optional) -->
+                <div class="form-group">
+                    <label for="{{ form.phone.id_for_label }}" class="form-label">
+                        {% trans "Phone Number" %}
+                        <span class="text-slate-500">({% trans "optional" %})</span>
+                    </label>
+                    <input type="tel" 
+                        name="{{ form.phone.name }}" 
+                        id="{{ form.phone.id_for_label }}"
+                        class="form-input"
+                        placeholder="+7 (999) 999-99-99">
+                    {% if form.phone.errors %}
+                        <p class="text-sm text-red-400">{{ form.phone.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Language Field (Optional) -->
+                <div class="form-group">
+                    <label for="{{ form.language.id_for_label }}" class="form-label">
+                        {% trans "Language" %}
+                    </label>
+                    <select name="{{ form.language.name }}" id="{{ form.language.id_for_label }}" class="form-select">
+                        {% for value, label in form.language.field.choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Terms and Conditions -->
+                <div class="alert alert-info bg-primary-900/20 border-primary-800">
+                    <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div class="text-xs">
+                        <p class="font-medium mb-1">{% trans "Before you register" %}</p>
+                        <p>{% trans "By registering you agree to our Terms of Service and Privacy Policy. Password must be at least 8 characters long." %}</p>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-full py-3 font-semibold">
+                    {% trans "Create Account" %}
+                </button>
+            </form>
+        </div>
+        
+        <!-- Footer Link -->
+        <div class="text-center">
+            <p class="text-slate-400">
+                {% trans "Already have an account?" %}
+                <a href="{% url 'accounts:login' %}" class="text-primary-400 font-medium hover:text-primary-300">
+                    {% trans "Sign in" %}
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

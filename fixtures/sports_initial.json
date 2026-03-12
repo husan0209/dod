@@ -1,0 +1,314 @@
+[
+  {
+    "model": "sports.sport",
+    "pk": 1,
+    "fields": {
+      "name": "Футбол",
+      "name_en": "Football",
+      "slug": "football",
+      "icon": "⚽",
+      "sort_order": 1,
+      "is_active": true,
+      "is_popular": true,
+      "external_id": null
+    }
+  },
+  {
+    "model": "sports.sport",
+    "pk": 2,
+    "fields": {
+      "name": "Баскетбол",
+      "name_en": "Basketball",
+      "slug": "basketball",
+      "icon": "🏀",
+      "sort_order": 2,
+      "is_active": true,
+      "is_popular": true,
+      "external_id": null
+    }
+  },
+  {
+    "model": "sports.sport",
+    "pk": 3,
+    "fields": {
+      "name": "Теннис",
+      "name_en": "Tennis",
+      "slug": "tennis",
+      "icon": "🎾",
+      "sort_order": 3,
+      "is_active": true,
+      "is_popular": true,
+      "external_id": null
+    }
+  },
+  {
+    "model": "sports.sport",
+    "pk": 4,
+    "fields": {
+      "name": "Хоккей",
+      "name_en": "Hockey",
+      "slug": "hockey",
+      "icon": "🏒",
+      "sort_order": 4,
+      "is_active": true,
+      "is_popular": false,
+      "external_id": null
+    }
+  },
+  {
+    "model": "sports.sport",
+    "pk": 5,
+    "fields": {
+      "name": "MMA/UFC",
+      "name_en": "MMA/UFC",
+      "slug": "mma",
+      "icon": "🥊",
+      "sort_order": 5,
+      "is_active": true,
+      "is_popular": true,
+      "external_id": null
+    }
+  },
+  {
+    "model": "sports.sport",
+    "pk": 6,
+    "fields": {
+      "name": "Киберспорт",
+      "name_en": "Esports",
+      "slug": "esports",
+      "icon": "🎮",
+      "sort_order": 6,
+      "is_active": true,
+      "is_popular": true,
+      "external_id": null
+    }
+  },
+  {
+    "model": "sports.sport",
+    "pk": 7,
+    "fields": {
+      "name": "Волейбол",
+      "name_en": "Volleyball",
+      "slug": "volleyball",
+      "icon": "🏐",
+      "sort_order": 7,
+      "is_active": true,
+      "is_popular": false,
+      "external_id": null
+    }
+  },
+  {
+    "model": "sports.sport",
+    "pk": 8,
+    "fields": {
+      "name": "Бокс",
+      "name_en": "Boxing",
+      "slug": "boxing",
+      "icon": "🥊",
+      "sort_order": 8,
+      "is_active": true,
+      "is_popular": false,
+      "external_id": null
+    }
+  },
+  {
+    "model": "sports.country",
+    "pk": 1,
+    "fields": {
+      "name": "Англия",
+      "name_en": "England",
+      "code": "GB",
+      "flag": "🇬🇧",
+      "sort_order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "sports.country",
+    "pk": 2,
+    "fields": {
+      "name": "Испания",
+      "name_en": "Spain",
+      "code": "ES",
+      "flag": "🇪🇸",
+      "sort_order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "sports.country",
+    "pk": 3,
+    "fields": {
+      "name": "Германия",
+      "name_en": "Germany",
+      "code": "DE",
+      "flag": "🇩🇪",
+      "sort_order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "sports.country",
+    "pk": 4,
+    "fields": {
+      "name": "Франция",
+      "name_en": "France",
+      "code": "FR",
+      "flag": "🇫🇷",
+      "sort_order": 4,
+      "is_active": true
+    }
+  },
+  {
+    "model": "sports.country",
+    "pk": 5,
+    "fields": {
+      "name": "Италия",
+      "name_en": "Italy",
+      "code": "IT",
+      "flag": "🇮🇹",
+      "sort_order": 5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "sports.markettype",
+    "pk": 1,
+    "fields": {
+      "code": "1x2",
+      "name": "Исход матча",
+      "name_en": "Match Result (1X2)",
+      "description": "Выберите победителя или ничью",
+      "sport": null,
+      "has_parameter": false,
+      "sort_order": 1,
+      "is_active": true,
+      "is_popular": true,
+      "outcomes_template": [
+        {"code": "home", "name": "П1", "name_en": "Home"},
+        {"code": "draw", "name": "Ничья", "name_en": "Draw"},
+        {"code": "away", "name": "П2", "name_en": "Away"}
+      ]
+    }
+  },
+  {
+    "model": "sports.markettype",
+    "pk": 2,
+    "fields": {
+      "code": "12",
+      "name": "Победитель",
+      "name_en": "Winner (12)",
+      "description": "Кто выиграет (без ничьи)",
+      "sport": null,
+      "has_parameter": false,
+      "sort_order": 2,
+      "is_active": true,
+      "is_popular": false,
+      "outcomes_template": [
+        {"code": "home", "name": "Команда 1", "name_en": "Team 1"},
+        {"code": "away", "name": "Команда 2", "name_en": "Team 2"}
+      ]
+    }
+  },
+  {
+    "model": "sports.markettype",
+    "pk": 3,
+    "fields": {
+      "code": "total",
+      "name": "Тотал",
+      "name_en": "Total Goals",
+      "description": "Сумма голов (больше/меньше)",
+      "sport": null,
+      "has_parameter": true,
+      "sort_order": 3,
+      "is_active": true,
+      "is_popular": true,
+      "outcomes_template": [
+        {"code": "over", "name": "Больше {param}", "name_en": "Over {param}"},
+        {"code": "under", "name": "Меньше {param}", "name_en": "Under {param}"}
+      ]
+    }
+  },
+  {
+    "model": "sports.markettype",
+    "pk": 4,
+    "fields": {
+      "code": "handicap",
+      "name": "Фора",
+      "name_en": "Handicap",
+      "description": "Фора на победу",
+      "sport": null,
+      "has_parameter": true,
+      "sort_order": 4,
+      "is_active": true,
+      "is_popular": true,
+      "outcomes_template": [
+        {"code": "home", "name": "Ф1 ({param})", "name_en": "H1 ({param})"},
+        {"code": "away", "name": "Ф2 ({param})", "name_en": "H2 ({param})"}
+      ]
+    }
+  },
+  {
+    "model": "sports.markettype",
+    "pk": 5,
+    "fields": {
+      "code": "both_to_score",
+      "name": "Обе забьют",
+      "name_en": "Both to Score",
+      "description": "Обе команды забьют гол",
+      "sport": null,
+      "has_parameter": false,
+      "sort_order": 5,
+      "is_active": true,
+      "is_popular": true,
+      "outcomes_template": [
+        {"code": "yes", "name": "Да", "name_en": "Yes"},
+        {"code": "no", "name": "Нет", "name_en": "No"}
+      ]
+    }
+  },
+  {
+    "model": "sports.markettype",
+    "pk": 6,
+    "fields": {
+      "code": "double_chance",
+      "name": "Двойной шанс",
+      "name_en": "Double Chance",
+      "description": "1X, 12 или X2",
+      "sport": null,
+      "has_parameter": false,
+      "sort_order": 6,
+      "is_active": true,
+      "is_popular": false,
+      "outcomes_template": [
+        {"code": "1x", "name": "1X", "name_en": "1X"},
+        {"code": "12", "name": "12", "name_en": "12"},
+        {"code": "x2", "name": "X2", "name_en": "X2"}
+      ]
+    }
+  },
+  {
+    "model": "sports.markettype",
+    "pk": 7,
+    "fields": {
+      "code": "exact_score",
+      "name": "Точный счёт",
+      "name_en": "Exact Score",
+      "description": "Угадайте точный счёт",
+      "sport": null,
+      "has_parameter": false,
+      "sort_order": 7,
+      "is_active": true,
+      "is_popular": false,
+      "outcomes_template": [
+        {"code": "0-0", "name": "0:0"},
+        {"code": "1-0", "name": "1:0"},
+        {"code": "2-0", "name": "2:0"},
+        {"code": "0-1", "name": "0:1"},
+        {"code": "1-1", "name": "1:1"},
+        {"code": "0-2", "name": "0:2"},
+        {"code": "other", "name": "Другой"}
+      ]
+    }
+  }
+]

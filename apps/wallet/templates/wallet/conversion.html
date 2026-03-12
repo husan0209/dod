@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load wallet_tags %}
+
+{% block title %}Конвертация валют{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-6 space-y-6">
+  <h1 class="text-2xl font-bold text-white mb-4">🔄 Конвертация валют</h1>
+
+  {% if error %}
+    <div class="rounded-lg bg-red-500/10 border border-red-500/40 px-4 py-3 text-sm text-red-200">
+      {{ error }}
+    </div>
+  {% endif %}
+  {% if success %}
+    <div class="rounded-lg bg-emerald-500/10 border border-emerald-500/40 px-4 py-3 text-sm text-emerald-200">
+      {{ success }}
+    </div>
+  {% endif %}
+
+  <form method="post" class="space-y-6 bg-dod-surface/70 rounded-2xl p-5"
+        hx-get="{% url 'wallet:api_conversion_preview' %}"
+        hx-target="#conversion-preview"
+        hx-trigger="change, keyup delay:400ms"
+        hx-include="[name='from_currency'], [name='to_currency'], [name='amount']">
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+      <div>
+        <label class="block text-sm text-text-secondary mb-1">Из</label>
+        <select name="from_currency" class="w-full bg-black/40 border border-dod-surface rounded-lg px-3 py-2 text-sm text-white">
+          {% for b in balances %}
+            <option value="{{ b.currency }}"{% if b.currency == from_code %} selected{% endif %}>
+              {{ b.currency }} ({{ b.available }})
+            </option>
+          {% endfor %}
+        </select>
+        <p class="mt-1 text-xs text-text-secondary">
+          Доступно: {{ wallet.get_balance(from_code) }} {{ from_code }}
+        </p>
+      </div>
+      <div>
+        <label class="block text-sm text-text-secondary mb-1">В</label>
+        <select name="to_currency" class="w-full bg-black/40 border border-dod-surface rounded-lg px-3 py-2 text-sm text-white">
+          {% for b in balances %}
+            <option value="{{ b.currency }}"{% if b.currency == to_code %} selected{% endif %}>
+              {{ b.currency }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm text-text-secondary mb-1">Сумма</label>
+      <input
+        type="number"
+        step="0.00000001"
+        min="0"
+        name="amount"
+        class="w-full bg-black/40 border border-dod-surface rounded-lg px-3 py-2 text-sm text-white"
+      />
+    </div>
+
+    <div id="conversion-preview">
+      {% if preview %}
+        {% include "wallet/components/conversion_preview.html" with preview=preview %}
+      {% endif %}
+    </div>
+
+    <div class="border-t border-dod-surface pt-4">
+      <button type="submit" class="btn-premium w-full text-sm">
+        Конвертировать
+      </button>
+      <p class="mt-2 text-xs text-text-secondary">
+        Курс основан на внутренних значениях <code>rate_to_usd</code> и может отличаться от рыночного.
+      </p>
+    </div>
+  </form>
+</div>
+{% endblock %}
+

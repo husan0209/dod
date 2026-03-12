@@ -1,136 +1,176 @@
 {% extends 'dashboard/base.html' %}
+{% load static %}
 
-{% block title %}Транзакции{% endblock %}
-{% block page_title %}💰 Все транзакции{% endblock %}
+{% block title %}Журнал транзакций | DOD Admin{% endblock %}
+{% block page_title %}Финансовые операции{% endblock %}
+
+{% block page_actions %}
+<div class="flex space-x-3">
+    <button onclick="exportCSV()"
+        class="btn-premium px-4 py-2 text-xs bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20 shadow-none">
+        📥 CSV
+    </button>
+    <button onclick="exportExcel()"
+        class="btn-premium px-4 py-2 text-xs bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20 shadow-none">
+        📊 Excel
+    </button>
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <!-- Filters -->
-        <div class="card mb-3">
-            <div class="card-body">
-                <form method="get" class="row g-3">
-                    <div class="col-md-2">
-                        <select class="form-select" name="type">
-                            <option value="">Все типы</option>
-                            <option value="deposit">Депозиты</option>
-                            <option value="withdrawal">Выводы</option>
-                            <option value="bet">Ставки</option>
-                            <option value="win">Выигрыши</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <select class="form-select" name="status">
-                            <option value="">Все статусы</option>
-                            <option value="pending">Ожидают</option>
-                            <option value="completed">Завершены</option>
-                            <option value="failed">Провалены</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" name="search" placeholder="Поиск по ID или email">
-                    </div>
-                    <div class="col-md-2">
-                        <input type="date" class="form-control" name="date_from">
-                    </div>
-                    <div class="col-md-2">
-                        <input type="date" class="form-control" name="date_to">
-                    </div>
-                    <div class="col-md-1">
-                        <button type="submit" class="btn btn-primary">Фильтр</button>
-                    </div>
-                </form>
+<div class="space-y-6">
+    <!-- Filters -->
+    <div class="glass-card p-6">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Тип</label>
+                <select name="type"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                    <option value="">Все типы</option>
+                    <option value="deposit">Депозиты</option>
+                    <option value="withdrawal">Выводы</option>
+                    <option value="bet">Ставки</option>
+                    <option value="win">Выигрыши</option>
+                </select>
             </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="mb-3">
-            <button class="btn btn-success" onclick="exportCSV()">📥 Экспорт CSV</button>
-            <button class="btn btn-success" onclick="exportExcel()">📥 Экспорт Excel</button>
-        </div>
-
-        <!-- Transactions Table -->
-        <div class="card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-dark table-striped">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Пользователь</th>
-                                <th>Тип</th>
-                                <th>Сумма</th>
-                                <th>Статус</th>
-                                <th>Дата</th>
-                                <th>Детали</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for transaction in transactions %}
-                            <tr>
-                                <td>{{ transaction.id }}</td>
-                                <td>
-                                    {% if transaction.target_user %}
-                                    {{ transaction.target_user.username }}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if transaction.type == 'deposit' %}
-                                        Депозит
-                                    {% elif transaction.type == 'withdrawal' %}
-                                        Вывод
-                                    {% elif transaction.type == 'bet' %}
-                                        Ставка
-                                    {% elif transaction.type == 'win' %}
-                                        Выигрыш
-                                    {% else %}
-                                        {{ transaction.type }}
-                                    {% endif %}
-                                </td>
-                                <td class="{% if transaction.amount_usd >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                    {% if transaction.amount_usd >= 0 %}+{% endif %}${{ transaction.amount_usd|floatformat:2 }}
-                                </td>
-                                <td>
-                                    {% if transaction.status == 'completed' %}
-                                        ✅ Завершена
-                                    {% elif transaction.status == 'pending' %}
-                                        ⏳ Ожидает
-                                    {% elif transaction.status == 'failed' %}
-                                        ❌ Провалена
-                                    {% else %}
-                                        {{ transaction.status }}
-                                    {% endif %}
-                                </td>
-                                <td>{{ transaction.created_at|date:"d.m.Y H:i" }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-info" onclick="viewDetails({{ transaction.id }})">👁️ Детали</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Статус</label>
+                <select name="status"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                    <option value="">Все статусы</option>
+                    <option value="pending">Ожидают</option>
+                    <option value="completed">Завершены</option>
+                    <option value="failed">Провалены</option>
+                </select>
+            </div>
+            <div class="lg:col-span-2 space-y-1">
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Поиск</label>
+                <div class="relative">
+                    <svg class="absolute left-3 top-2.5 w-4 h-4 text-text-muted" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" name="search" placeholder="ID, email, хеш..."
+                        class="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
                 </div>
             </div>
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Период</label>
+                <input type="date" name="date_from"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+            </div>
+            <div class="flex items-end">
+                <button type="submit"
+                    class="w-full btn-premium py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 shadow-blue-500/20">Применить</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="glass-card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-white/5 bg-white/[0.02]">
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">ID</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">
+                            Пользователь</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Информация
+                        </th>
+                        <th
+                            class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest text-right">
+                            Сумма (USD)</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Статус
+                        </th>
+                        <th
+                            class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest text-right">
+                            Действия</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    {% for transaction in transactions %}
+                    <tr class="hover:bg-white/[0.02] transition-colors group">
+                        <td class="px-6 py-4">
+                            <span class="text-xs font-mono text-text-muted">#{{ transaction.id }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-xs font-bold mr-3 border border-white/5 text-text-secondary">
+                                    {{ transaction.target_user.username|slice:":1"|upper|default:"?" }}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-white">{{
+                                        transaction.target_user.username|default:"System" }}</div>
+                                    <div class="text-[10px] text-text-muted tracking-tighter">{{
+                                        transaction.target_user.email|default:"internal@system" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs font-medium text-white">
+                                    {% if transaction.type == 'deposit' %}Депозит
+                                    {% elif transaction.type == 'withdrawal' %}Вывод
+                                    {% elif transaction.type == 'bet' %}Ставка
+                                    {% elif transaction.type == 'win' %}Выигрыш
+                                    {% else %}{{ transaction.type|capfirst }}{% endif %}
+                                </span>
+                                <span class="text-[10px] text-text-muted">• {{ transaction.created_at|date:"d.m.Y H:i"
+                                    }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div
+                                class="text-sm font-bold font-outfit {% if transaction.amount_usd >= 0 %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                                {% if transaction.amount_usd >= 0 %}+{% endif %}${{ transaction.amount_usd|floatformat:2
+                                }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if transaction.status == 'completed' %}
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">Completed</span>
+                            {% elif transaction.status == 'pending' %}
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-widest">Pending</span>
+                            {% elif transaction.status == 'failed' %}
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-widest">Failed</span>
+                            {% else %}
+                            <span class="text-xs text-text-muted">{{ transaction.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="viewDetails({{ transaction.id }})"
+                                class="p-2 text-text-muted hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                    </path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-text-muted text-sm italic">
+                            Транзакции не найдены по вашему запросу.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <script>
-function exportCSV() {
-    // Implement CSV export
-    alert('CSV export not implemented yet');
-}
-
-function exportExcel() {
-    // Implement Excel export
-    alert('Excel export not implemented yet');
-}
-
-function viewDetails(id) {
-    // Implement details view
-    alert('Details view not implemented yet');
-}
+    function exportCSV() { alert('Экспорт в CSV готовится...'); }
+    function exportExcel() { alert('Экспорт в Excel готовится...'); }
+    function viewDetails(id) { alert('Детали транзакции #' + id + ' загружаются...'); }
 </script>
 {% endblock %}

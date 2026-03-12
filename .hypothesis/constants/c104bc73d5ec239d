@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\wallet\urls.py
+# hypothesis_version: 6.151.9
+
+['api/balances/', 'api/navbar-balance/', 'api/withdrawal-fee/', 'api_balances', 'api_navbar_balance', 'api_primary_currency', 'api_withdrawal_fee', 'convert', 'convert/', 'deposit', 'deposit/', 'kyc/', 'kyc/form/', 'kyc_form', 'kyc_start', 'overview', 'transaction_detail', 'transactions', 'transactions/', 'wallet', 'withdraw', 'withdraw/', 'withdrawal_status']

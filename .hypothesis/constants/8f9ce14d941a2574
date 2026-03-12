@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\referral\admin.py
+# hypothesis_version: 6.151.9
+
+['amount', 'balance', 'clicks', 'commission_period', 'commission_type', 'created_at', 'icon', 'ip_address', 'is_active', 'is_partner_active', 'is_qualified', 'is_suspended', 'is_suspicious', 'is_unique', 'level', 'level2_enabled', 'min_monthly_ggr', 'min_referrals', 'name', 'name_en', 'net_amount', 'partner', 'partner__email', 'payout', 'payout_method', 'period_end', 'period_start', 'processed_by', 'promo_link', 'promo_link__slug', 'referral', 'referral__email', 'registered_at', 'registrations', 'slug', 'sort_order', 'status', 'tier', 'total_deposits', 'total_earned', 'total_ggr', 'total_referrals', 'user', 'user__email', 'user__username', 'user_registered']

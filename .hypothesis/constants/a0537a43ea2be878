@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\support\forms.py
+# hypothesis_version: 6.151.9
+
+['answer', 'category', 'class', 'description', 'form-control', 'keywords', 'placeholder', 'question', 'rows', 'subject', 'Введите ваш ответ...', 'Причина эскалации']

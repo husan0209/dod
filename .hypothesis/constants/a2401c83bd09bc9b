@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\providers\rukassa.py
+# hypothesis_version: 6.151.9
+
+['0', 'CANCEL', 'FAIL', 'PAID', 'WAIT', 'amount', 'cancelled', 'completed', 'currency', 'deposit_completed', 'deposit_update', 'event_type', 'failed', 'id', 'in_amount', 'merchant_id', 'method', 'order_id', 'payment_url', 'pending', 'processing', 'provider_order_id', 'provider_payout_id', 'raw_data', 'raw_response', 'sign', 'status', 'utf-8', 'webhook_secret']

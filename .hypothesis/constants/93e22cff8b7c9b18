@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\miniapp\services\auth_service.py
+# hypothesis_version: 6.151.9
+
+[b'WebAppData', 3600, '&', '=', 'android', 'auth_date', 'auth_hash', 'en', 'existing', 'first_name', 'hash', 'id', 'initData пуста', 'is_premium', 'language_code', 'last_name', 'new', 'photo_url', 'query_id', 'ru', 'telegram', 'telegram_profile', 'user', 'username', '{}', 'Аккаунт не найден', 'Неверный пароль']

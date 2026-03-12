@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\predictions\urls.py
+# hypothesis_version: 6.151.9
+
+['add_comment', 'chart_data', 'create/', 'create_market', 'history', 'history/', 'index', 'leaderboard', 'leaderboard/', 'market/<uuid:pk>/', 'market_detail', 'portfolio', 'portfolio/', 'predictions', 'preview_buy', 'preview_sell', 'trade']

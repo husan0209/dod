@@ -1,123 +1,104 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}{{ market.question }}{% endblock %}
+{% block title %}{{ market.question }} | DOD Platform{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <!-- Breadcrumb -->
-    <div class="mb-4">
-        <a href="{% url 'predictions:index' %}" class="text-blue-600 hover:text-blue-800">Prediction Market</a>
-        > {{ market.category.name }} > {{ market.question|truncatechars:50 }}
-    </div>
+    <nav class="flex items-center space-x-2 text-xs text-text-muted mb-8 overflow-x-auto whitespace-nowrap pb-2">
+        <a href="{% url 'predictions:index' %}" class="hover:text-blue-400 transition-colors">Рынок предсказаний</a>
+        <span>/</span>
+        <span class="text-text-secondary">{{ market.category.name }}</span>
+        <span>/</span>
+        <span class="text-white font-medium">{{ market.question|truncatechars:40 }}</span>
+    </nav>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Main Content -->
-        <div class="lg:col-span-2">
-            <!-- Question -->
-            <h1 class="text-2xl font-bold mb-4">{{ market.question }}</h1>
-
-            <!-- Description -->
-            <div class="bg-white p-4 rounded-lg shadow mb-6">
-                <p class="text-gray-700">{{ market.description }}</p>
+        <!-- Main Column -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Market Header -->
+            <div class="glass-card p-8">
+                <div class="flex items-center space-x-3 mb-6">
+                    <span class="badge-premium badge-blue">{{ market.category.name }}</span>
+                    {% if market.is_featured %}<span
+                        class="badge-premium bg-amber-500/10 text-amber-500 border-amber-500/20">Featured</span>{% endif
+                    %}
+                </div>
+                <h1 class="text-3xl font-bold font-outfit mb-6 text-white leading-tight">
+                    {{ market.question }}
+                </h1>
+                <div class="text-text-secondary text-sm leading-relaxed prose prose-invert max-w-none">
+                    {{ market.description|linebreaks }}
+                </div>
                 {% if market.source_url %}
-                <p class="mt-2"><strong>Source:</strong> <a href="{{ market.source_url }}" class="text-blue-600">{{ market.source_url }}</a></p>
+                <div class="mt-6 pt-6 border-t border-white/5 flex items-center text-xs">
+                    <span class="text-text-muted mr-2">Источник:</span>
+                    <a href="{{ market.source_url }}" target="_blank"
+                        class="text-blue-400 hover:text-blue-300 flex items-center">
+                        {{ market.source_url|truncatechars:60 }}
+                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                    </a>
+                </div>
                 {% endif %}
             </div>
 
-            <!-- Chart -->
-            <div class="bg-white p-4 rounded-lg shadow mb-6">
-                <h2 class="text-xl font-bold mb-4">Price Chart</h2>
-                <div class="flex gap-2 mb-4">
-                    <button class="btn btn-sm" onclick="changePeriod('1d')">1D</button>
-                    <button class="btn btn-sm" onclick="changePeriod('7d')">7D</button>
-                    <button class="btn btn-sm" onclick="changePeriod('1M')">1M</button>
-                    <button class="btn btn-sm" onclick="changePeriod('3M')">3M</button>
+            <!-- Price Chart Section -->
+            <div class="glass-card p-8">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-xl font-bold font-outfit">История цены</h2>
+                    <div class="flex bg-dod-surface/50 p-1 rounded-xl border border-white/5 space-x-1">
+                        {% for period in "1d,7d,1m,3m"|split:"," %}
+                        <button onclick="changePeriod('{{ period }}')" id="btn-{{ period }}"
+                            class="period-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:text-white">
+                            {{ period|upper }}
+                        </button>
+                        {% endfor %}
+                    </div>
                 </div>
-                <canvas id="priceChart" width="400" height="200"></canvas>
+                <div class="h-[300px] w-full relative">
+                    <canvas id="priceChart"></canvas>
+                </div>
             </div>
 
-            <!-- Trading Form -->
-            <div class="bg-white p-4 rounded-lg shadow mb-6">
-                <h2 class="text-xl font-bold mb-4">Trade</h2>
-                <div class="tabs tabs-boxed mb-4">
-                    <a class="tab tab-active" id="buy-tab">Buy</a>
-                    <a class="tab" id="sell-tab">Sell</a>
-                </div>
-                
-                <form id="trade-form" hx-post="{% url 'predictions:trade' market.id %}" hx-target="#trade-result">
+            <!-- Comments Section -->
+            <div class="glass-card p-8">
+                <h2 class="text-xl font-bold font-outfit mb-8 flex items-center">
+                    Комментарии
+                    <span class="ml-3 px-2 py-0.5 bg-white/5 rounded-md text-xs font-medium text-text-muted">{{
+                        market.comments_count }}</span>
+                </h2>
+
+                {% if user.is_authenticated %}
+                <form hx-post="{% url 'predictions:add_comment' market.id %}" hx-target="#comments-list"
+                    hx-swap="afterbegin" class="mb-10">
                     {% csrf_token %}
-                    <input type="hidden" name="action" value="buy">
-                    <input type="hidden" name="currency" value="USD">
-                    
-                    <div class="form-control mb-4">
-                        <label class="label">Side</label>
-                        <div class="flex gap-4">
-                            <label class="cursor-pointer">
-                                <input type="radio" name="side" value="yes" checked class="radio">
-                                <span class="ml-2">🟢 YES (${{ market.yes_price|floatformat:4 }})</span>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="side" value="no" class="radio">
-                                <span class="ml-2">🔴 NO (${{ market.no_price|floatformat:4 }})</span>
-                            </label>
+                    <div class="relative group">
+                        <textarea name="text"
+                            class="input-premium w-full min-h-[100px] py-4 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                            placeholder="Поделитесь своим мнением..." required></textarea>
+                        <div class="absolute bottom-4 right-4">
+                            <button type="submit" class="btn-premium px-6 py-2 text-xs">Отправить</button>
                         </div>
                     </div>
-                    
-                    <div class="form-control mb-4">
-                        <label class="label">Amount (USD)</label>
-                        <input type="number" name="amount" step="0.01" class="input input-bordered" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Buy</button>
                 </form>
-                
-                <div id="trade-result" class="mt-4"></div>
-            </div>
-
-            <!-- Recent Trades -->
-            <div class="bg-white p-4 rounded-lg shadow mb-6">
-                <h2 class="text-xl font-bold mb-4">Recent Trades</h2>
-                <div class="overflow-x-auto">
-                    <table class="table table-zebra w-full">
-                        <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>User</th>
-                                <th>Action</th>
-                                <th>Side</th>
-                                <th>Amount</th>
-                                <th>Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for trade in recent_trades %}
-                            <tr>
-                                <td>{{ trade.created_at|date:"H:i" }}</td>
-                                <td>{{ trade.user.username|truncatechars:10 }}</td>
-                                <td>{{ trade.get_action_display }}</td>
-                                <td>{{ trade.get_side_display }}</td>
-                                <td>${{ trade.total_cost|floatformat:2 }}</td>
-                                <td>${{ trade.price|floatformat:4 }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                {% else %}
+                <div class="bg-blue-500/5 border border-blue-500/10 rounded-2xl p-6 text-center mb-10">
+                    <p class="text-sm text-text-secondary">
+                        <a href="{% url 'accounts:login' %}"
+                            class="text-blue-400 font-bold hover:underline">Войдите</a>, чтобы оставить комментарий
+                    </p>
                 </div>
-            </div>
-
-            <!-- Comments -->
-            <div class="bg-white p-4 rounded-lg shadow">
-                <h2 class="text-xl font-bold mb-4">Comments ({{ market.comments_count }})</h2>
-                
-                {% if user.is_authenticated %}
-                <form hx-post="{% url 'predictions:add_comment' market.id %}" hx-target="#comments-list" hx-swap="afterbegin">
-                    {% csrf_token %}
-                    <textarea name="text" class="textarea textarea-bordered w-full mb-2" placeholder="Add a comment..." required></textarea>
-                    <button type="submit" class="btn btn-primary">Post Comment</button>
-                </form>
                 {% endif %}
-                
-                <div id="comments-list" class="mt-4 space-y-4">
+
+                <div id="comments-list" class="space-y-6">
                     {% for comment in comments %}
                     {% include 'predictions/components/comment.html' with comment=comment %}
                     {% endfor %}
@@ -125,131 +106,246 @@
             </div>
         </div>
 
-        <!-- Sidebar -->
-        <div class="lg:col-span-1">
-            <!-- Market Stats -->
-            <div class="bg-white p-4 rounded-lg shadow mb-6">
-                <h3 class="text-lg font-bold mb-4">Market Stats</h3>
-                <div class="space-y-2">
-                    <div class="flex justify-between">
-                        <span>Volume 24h:</span>
-                        <span>${{ market.volume_24h_usd|floatformat:0 }}</span>
+        <!-- Sidebar Column -->
+        <div class="space-y-8">
+            <!-- Trade Execution Card -->
+            <div class="glass-card overflow-hidden">
+                <div class="bg-dod-accent/10 border-b border-white/5 p-6">
+                    <h2 class="text-lg font-bold font-outfit text-white">Разместить ставку</h2>
+                </div>
+
+                <div class="p-6">
+                    <!-- Action Toggle -->
+                    <div class="flex bg-dod-bg/50 p-1 rounded-xl border border-white/5 mb-6">
+                        <button id="buy-tab"
+                            class="flex-1 py-2 rounded-lg text-sm font-bold transition-all bg-dod-accent text-white shadow-lg">Купить</button>
+                        <button id="sell-tab"
+                            class="flex-1 py-2 rounded-lg text-sm font-bold transition-all text-text-secondary hover:text-white">Продать</button>
                     </div>
-                    <div class="flex justify-between">
-                        <span>Total Volume:</span>
-                        <span>${{ market.volume_usd|floatformat:0 }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Unique Traders:</span>
-                        <span>{{ market.unique_traders }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>YES Holders:</span>
-                        <span>{{ market.yes_holders }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>NO Holders:</span>
-                        <span>{{ market.no_holders }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Liquidity:</span>
-                        <span>${{ market.liquidity_usd|floatformat:0 }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Close Date:</span>
-                        <span>{{ market.close_date|date:"M j, Y H:i" }}</span>
-                    </div>
+
+                    <form id="trade-form" hx-post="{% url 'predictions:trade' market.id %}" hx-target="#trade-result">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="buy">
+
+                        <!-- Side Selector -->
+                        <div class="space-y-3 mb-6">
+                            <label class="relative block cursor-pointer group">
+                                <input type="radio" name="side" value="yes" checked class="peer sr-only">
+                                <div
+                                    class="p-4 rounded-2xl border border-white/5 bg-emerald-500/5 peer-checked:border-emerald-500/50 peer-checked:bg-emerald-500/10 transition-all hover:bg-emerald-500/10">
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-2 h-2 rounded-full bg-emerald-500 mr-3"></div>
+                                            <span
+                                                class="text-sm font-bold text-white uppercase tracking-wider">ДА</span>
+                                        </div>
+                                        <span class="text-lg font-bold text-emerald-400">${{
+                                            market.yes_price|floatformat:2 }}</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="relative block cursor-pointer group">
+                                <input type="radio" name="side" value="no" class="peer sr-only">
+                                <div
+                                    class="p-4 rounded-2xl border border-white/5 bg-rose-500/5 peer-checked:border-rose-500/50 peer-checked:bg-rose-500/10 transition-all hover:bg-rose-500/10">
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-2 h-2 rounded-full bg-rose-500 mr-3"></div>
+                                            <span
+                                                class="text-sm font-bold text-white uppercase tracking-wider">НЕТ</span>
+                                        </div>
+                                        <span class="text-lg font-bold text-rose-400">${{ market.no_price|floatformat:2
+                                            }}</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Amount Input -->
+                        <div class="mb-6">
+                            <div class="flex justify-between mb-2">
+                                <label class="text-xs font-bold text-text-muted uppercase tracking-wider">Сумма
+                                    (USD)</label>
+                                <span class="text-xs text-text-muted">Баланс: <span class="text-white">${{
+                                        user.balance|default:"0.00" }}</span></span>
+                            </div>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-4 inset-y-0 flex items-center text-text-muted font-medium">$</span>
+                                <input type="number" name="amount" step="1"
+                                    class="input-premium w-full pl-8 text-lg font-bold" placeholder="0" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-premium w-full py-4 text-base font-bold shadow-xl">Разместить
+                            ордер</button>
+                    </form>
+
+                    <div id="trade-result" class="mt-4"></div>
                 </div>
             </div>
 
-            <!-- User Position -->
-            {% if user.is_authenticated %}
-            <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-bold mb-4">Your Position</h3>
-                {% if position_yes or position_no %}
-                {% if position_yes %}
-                <div class="mb-4">
-                    <div class="flex justify-between">
-                        <span>🟢 YES Shares:</span>
-                        <span>{{ position_yes.shares|floatformat:8 }}</span>
+            <!-- Market Stats Card -->
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-bold font-outfit mb-6 flex items-center">
+                    <svg class="w-5 h-5 mr-3 text-dod-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                        </path>
+                    </svg>
+                    Статистика
+                </h3>
+                <div class="space-y-4">
+                    {% with stats=market %}
+                    <div class="flex justify-between items-center py-3 border-b border-white/5">
+                        <span class="text-sm text-text-secondary">Объем 24ч</span>
+                        <span class="text-sm font-bold text-white">${{ stats.volume_24h_usd|floatformat:0 }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span>Invested:</span>
-                        <span>${{ position_yes.total_invested|floatformat:2 }}</span>
+                    <div class="flex justify-between items-center py-3 border-b border-white/5">
+                        <span class="text-sm text-text-secondary">Всего сделок</span>
+                        <span class="text-sm font-bold text-white">{{ stats.unique_traders }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span>Current Value:</span>
-                        <span>${{ position_yes.current_value|floatformat:2 }}</span>
+                    <div class="flex justify-between items-center py-3 border-b border-white/5">
+                        <span class="text-sm text-text-secondary">Ликвидность</span>
+                        <span class="text-sm font-bold text-white">${{ stats.liquidity_usd|floatformat:0 }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span>PnL:</span>
-                        <span class="{% if position_yes.total_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                            ${{ position_yes.total_pnl|floatformat:2 }} ({{ position_yes.pnl_percent|floatformat:1 }}%)
-                        </span>
+                    <div class="flex justify-between items-center py-3">
+                        <span class="text-sm text-text-secondary">Закрывается</span>
+                        <span class="text-sm font-bold text-blue-400">{{ stats.close_date|date:"j M, Y" }}</span>
                     </div>
+                    {% endwith %}
                 </div>
-                {% endif %}
-                {% if position_no %}
-                <div>
-                    <div class="flex justify-between">
-                        <span>🔴 NO Shares:</span>
-                        <span>{{ position_no.shares|floatformat:8 }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Invested:</span>
-                        <span>${{ position_no.total_invested|floatformat:2 }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Current Value:</span>
-                        <span>${{ position_no.current_value|floatformat:2 }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>PnL:</span>
-                        <span class="{% if position_no.total_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                            ${{ position_no.total_pnl|floatformat:2 }} ({{ position_no.pnl_percent|floatformat:1 }}%)
-                        </span>
-                    </div>
-                </div>
-                {% endif %}
-                {% else %}
-                <p class="text-gray-600">No position in this market</p>
-                {% endif %}
             </div>
-            {% endif %}
+
+            <!-- Recent Activity Card -->
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-bold font-outfit mb-6">Активность</h3>
+                <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 hide-scrollbar">
+                    {% for trade in recent_trades %}
+                    <div class="flex items-center space-x-3 text-xs py-3 border-b border-white/5 last:border-0">
+                        <div
+                            class="w-8 h-8 rounded-full bg-dod-surface flex items-center justify-center font-bold text-text-secondary">
+                            {{ trade.user.username|first|upper }}
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-white font-medium">{{ trade.user.username }}</span>
+                                <span class="text-text-muted">{{ trade.created_at|date:"H:i" }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span
+                                    class="{% if trade.side == 'yes' %}text-emerald-400{% else %}text-rose-400{% endif %} font-bold mr-2 uppercase">
+                                    {{ trade.get_side_display }}
+                                </span>
+                                <span class="text-text-secondary">${{ trade.total_cost|floatformat:2 }} @ ${{
+                                    trade.price|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+<style>
+    .period-btn.active {
+        background: var(--accent-primary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .period-btn {
+        color: var(--text-secondary);
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+
 <script>
-let currentPeriod = '7d';
+    let chart;
+    let currentPeriod = '7d';
 
-function changePeriod(period) {
-    currentPeriod = period;
-    loadChart();
-}
+    function changePeriod(period) {
+        document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btn-' + period).classList.add('active');
+        currentPeriod = period;
+        loadChart();
+    }
 
-function loadChart() {
-    fetch(`{% url 'predictions:chart_data' market.id %}?period=${currentPeriod}`)
-        .then(response => response.json())
-        .then(data => {
-            // Update chart with data
-            console.log(data);
-        });
-}
+    function loadChart() {
+        const ctx = document.getElementById('priceChart').getContext('2d');
 
-document.addEventListener('DOMContentLoaded', loadChart);
+        fetch(`{% url 'predictions:chart_data' market.id %}?period=${currentPeriod}`)
+            .then(response => response.json())
+            .then(data => {
+                if (chart) chart.destroy();
 
-// HTMX setup for trade form
-document.getElementById('buy-tab').addEventListener('click', function() {
-    document.querySelector('input[name=action]').value = 'buy';
-    this.classList.add('tab-active');
-    document.getElementById('sell-tab').classList.remove('tab-active');
-});
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Цена YES',
+                            data: data.prices,
+                            borderColor: '#3b82f6',
+                            backgroundColor: (context) => {
+                                const bg = ctx.createLinearGradient(0, 0, 0, 400);
+                                bg.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+                                bg.addColorStop(1, 'rgba(59, 130, 246, 0)');
+                                return bg;
+                            },
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+                            y: {
+                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 10 },
+                                    callback: value => '$' + value.toFixed(2)
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+    }
 
-document.getElementById('sell-tab').addEventListener('click', function() {
-    document.querySelector('input[name=action]').value = 'sell';
-    this.classList.add('tab-active');
-    document.getElementById('buy-tab').classList.remove('tab-active');
-});
+    document.addEventListener('DOMContentLoaded', () => {
+        changePeriod('7d');
+    });
+
+    // Tab switching
+    document.getElementById('buy-tab').addEventListener('click', function () {
+        document.querySelector('input[name=action]').value = 'buy';
+        this.className = 'flex-1 py-2 rounded-lg text-sm font-bold transition-all bg-dod-accent text-white shadow-lg';
+        document.getElementById('sell-tab').className = 'flex-1 py-2 rounded-lg text-sm font-bold transition-all text-text-secondary hover:text-white';
+    });
+
+    document.getElementById('sell-tab').addEventListener('click', function () {
+        document.querySelector('input[name=action]').value = 'sell';
+        this.className = 'flex-1 py-2 rounded-lg text-sm font-bold transition-all bg-dod-accent text-white shadow-lg';
+        document.getElementById('buy-tab').className = 'flex-1 py-2 rounded-lg text-sm font-bold transition-all text-text-secondary hover:text-white';
+    });
 </script>
 {% endblock %}

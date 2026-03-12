@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Начало KYC{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-6 space-y-4">
+  <h1 class="text-2xl font-bold text-white mb-4">🪪 Верификация личности (KYC)</h1>
+
+  <div class="bg-dod-surface/70 rounded-2xl p-5 text-sm space-y-3">
+    <p>
+      Для вывода сумм более $1,000 необходимо подтвердить вашу личность.
+    </p>
+    <ul class="list-disc list-inside text-text-secondary text-xs space-y-1">
+      <li>Фото документа (паспорт, ID-карта или водительское)</li>
+      <li>Селфи с документом в руке</li>
+      <li>Точные данные как в документе</li>
+    </ul>
+    <a href="{% url 'wallet:kyc_form' %}" class="btn-premium mt-3 inline-flex text-sm">
+      Начать верификацию →
+    </a>
+  </div>
+</div>
+{% endblock %}
+

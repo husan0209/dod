@@ -1,99 +1,159 @@
 {% extends 'dashboard/base.html' %}
+{% load static %}
 
-{% block title %}Очередь выводов{% endblock %}
-{% block page_title %}💰 Очередь выводов{% endblock %}
+{% block title %}Очередь выплат | DOD Admin{% endblock %}
+{% block page_title %}Управление выплатами{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <!-- Filters -->
-        <div class="card mb-3">
-            <div class="card-body">
-                <form method="get" class="row g-3">
-                    <div class="col-md-3">
-                        <select class="form-select" name="status">
-                            <option value="">Все статусы</option>
-                            <option value="pending">Ожидают</option>
-                            <option value="suspicious">Подозрительные</option>
-                            <option value="large">Крупные</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" name="search" placeholder="Поиск по ID или email">
-                    </div>
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary">Фильтр</button>
-                    </div>
-                </form>
+<div class="space-y-6">
+    <!-- Filters Header -->
+    <div class="glass-card p-6">
+        <form method="get" class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Статическая
+                        фильтрация</label>
+                    <select name="status"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                        <option value="">Все статусы</option>
+                        <option value="pending">Ожидают</option>
+                        <option value="suspicious">Подозрительные</option>
+                        <option value="large">Крупные</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">ID пользователя
+                        или Email</label>
+                    <input type="text" name="search" placeholder="Поиск по реквизитам..."
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                </div>
             </div>
-        </div>
+            <button type="submit"
+                class="btn-premium px-8 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 shadow-blue-500/20">Поиск</button>
+        </form>
+    </div>
 
-        <!-- Withdrawals -->
+    <!-- Withdrawals Queue -->
+    <div class="grid grid-cols-1 gap-4">
         {% for withdrawal in withdrawals %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h6>#W-{{ withdrawal.id }} | {{ withdrawal.user.username }} | ${{ withdrawal.amount|floatformat:2 }}</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <small>Метод: {{ withdrawal.method }}</small><br>
-                                <small>Trust: {{ withdrawal.user.trust_level }}</small><br>
-                                <small>KYC: {% if withdrawal.user.kyc_status == 'approved' %}✅{% else %}❌{% endif %}</small>
+        <div
+            class="glass-card p-6 border-l-4 transition-all hover:translate-x-1 {% if withdrawal.is_suspicious %}border-rose-500/50 bg-rose-500/[0.02]{% elif withdrawal.amount > 5000 %}border-amber-500/50 bg-amber-500/[0.02]{% else %}border-blue-500/50 hover:bg-white/[0.02]{% endif %}">
+            <div class="flex flex-col lg:flex-row justify-between gap-6">
+                <!-- User Info -->
+                <div class="flex-1 space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-lg font-bold text-white font-outfit">
+                            {{ withdrawal.user.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="text-base font-bold text-white">{{ withdrawal.user.username }}</h3>
+                                <span class="text-[10px] font-mono text-text-muted uppercase tracking-widest">#W-{{
+                                    withdrawal.id }}</span>
                             </div>
-                            <div class="col-md-6">
-                                <small>Депозит: $5k</small><br>
-                                <small>Ставки: 234</small><br>
-                                <small>GGR: $1.2k</small>
+                            <div class="flex items-center space-x-3 mt-1">
+                                <span
+                                    class="text-[10px] font-bold text-blue-400 uppercase tracking-widest bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">Trust:
+                                    {{ withdrawal.user.trust_level }}</span>
+                                {% if withdrawal.user.kyc_status == 'approved' %}
+                                <span
+                                    class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">KYC
+                                    Verified</span>
+                                {% else %}
+                                <span
+                                    class="text-[10px] font-bold text-rose-400 uppercase tracking-widest bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">KYC
+                                    Required</span>
+                                {% endif %}
                             </div>
                         </div>
-                        <small class="text-muted">⏱️ {{ withdrawal.created_at|timesince }} назад</small>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <div class="mb-2">
-                            {% if withdrawal.is_suspicious %}
-                            <span class="badge bg-danger">⚠️ Подозрительный</span>
-                            {% endif %}
-                            {% if withdrawal.amount > 5000 %}
-                            <span class="badge bg-warning">💰 Крупный</span>
-                            {% endif %}
+
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Метод</span>
+                            <div class="text-sm font-medium text-white">{{ withdrawal.method }}</div>
                         </div>
-                        <button class="btn btn-success btn-sm me-2" onclick="approveWithdrawal({{ withdrawal.id }})">✅ Одобрить</button>
-                        <button class="btn btn-danger btn-sm me-2" onclick="rejectWithdrawal({{ withdrawal.id }})">❌ Отклонить</button>
-                        <button class="btn btn-info btn-sm" onclick="viewUser({{ withdrawal.user.id }})">👤 Профиль</button>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Депозиты
+                                (Всего)</span>
+                            <div class="text-sm font-medium text-white">$5,000.00</div>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">GGR /
+                                Ставки</span>
+                            <div class="text-sm font-medium text-white">$1,240.00 / 234</div>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Создано</span>
+                            <div class="text-sm font-medium text-text-muted">⏱️ {{ withdrawal.created_at|timesince }}
+                                назад</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Card -->
+                <div
+                    class="w-full lg:w-72 flex flex-col justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-4">
+                    <div class="text-center">
+                        <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Сумма к
+                            выплате</div>
+                        <div class="text-2xl font-bold text-white font-outfit">${{ withdrawal.amount|floatformat:2 }}
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col space-y-2">
+                        <button onclick="approveWithdrawal({{ withdrawal.id }})"
+                            class="w-full btn-premium py-2 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-all shadow-emerald-500/20">Одобрить</button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="rejectWithdrawal({{ withdrawal.id }})"
+                                class="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl transition-all flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                            <button onclick="viewUser({{ withdrawal.user.id }})"
+                                class="p-2 bg-white/5 hover:bg-white/10 text-text-secondary border border-white/10 rounded-xl transition-all flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="alert alert-info">
-            {% if error %}
-            {{ error }}
-            {% else %}
-            Нет выводов в очереди.
-            {% endif %}
+        <div class="glass-card p-12 text-center">
+            <div
+                class="w-16 h-16 bg-blue-500/5 border border-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+                    </path>
+                </svg>
+            </div>
+            <h4 class="text-white font-bold mb-2">Очередь пуста</h4>
+            <p class="text-text-muted text-sm">{{ error|default:"Нет активных заявок на вывод средств на данный момент."
+                }}</p>
         </div>
         {% endfor %}
     </div>
 </div>
 
 <script>
-function approveWithdrawal(id) {
-    if (confirm('Одобрить вывод?')) {
-        // Implement approval
-        alert('Withdrawal approved');
+    function approveWithdrawal(id) {
+        if (confirm('Вы уверены, что хотите одобрить выплату #W-' + id + '?')) {
+            alert('Запрос на выплату #' + id + ' отправлен в обработку.');
+        }
     }
-}
-
-function rejectWithdrawal(id) {
-    if (confirm('Отклонить вывод?')) {
-        // Implement rejection
-        alert('Withdrawal rejected');
+    function rejectWithdrawal(id) {
+        if (confirm('Отклонить выплату #W-' + id + '?')) {
+            alert('Выплата отклонена.');
+        }
     }
-}
-
-function viewUser(userId) {
-    window.location.href = '{% url "dashboard:users" %}';
-}
+    function viewUser(userId) { window.location.href = '{% url "dashboard:users" %}'; }
 </script>
 {% endblock %}

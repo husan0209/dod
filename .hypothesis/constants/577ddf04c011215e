@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\games\mines.py
+# hypothesis_version: 6.151.9
+
+['0', '1.00', 'active', 'bet_amount', 'cell', 'currency_code', 'current_multiplier', 'field_size', 'is_mine_hit', 'mine', 'mines', 'mines_count', 'mines_positions', 'next_multiplier', 'revealed', 'Игра не активна', 'Клетка уже открыта']

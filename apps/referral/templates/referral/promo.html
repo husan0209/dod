@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Промо-ссылки - DOD{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">🔗 Промо-ссылки</h1>
+                <p class="text-slate-400">Отслеживайте клики и конверсии по источникам трафика</p>
+            </div>
+            <button onclick="showCreateModal()" class="mt-4 md:mt-0 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
+                ➕ Новая ссылка
+            </button>
+        </div>
+
+        <!-- Permissions Info -->
+        {% if user.partner_profile.tier.has_custom_links %}
+        <div class="bg-blue-900 border border-blue-700 rounded-lg p-4 mb-8">
+            <p class="text-blue-200"><strong>✅ Доступно:</strong> Можеыте создавать до {% if user.partner_profile.tier.slug == 'vip' %}неограниченного количества{% elif user.partner_profile.tier.slug == 'pro' %}50{% else %}10{% endif %} промо-ссылок</p>
+        </div>
+        {% endif %}
+
+        <!-- Promo Links Grid -->
+        {% if promo_links %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {% for promo in promo_links %}
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden hover:border-indigo-500 transition-colors">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-4">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h3 class="text-white font-bold text-lg">{{ promo.name }}</h3>
+                            <p class="text-indigo-100 text-sm mt-1">{{ promo.slug }}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            {% if promo.is_active %}
+                            <span class="inline-block px-2 py-1 bg-green-900 text-green-200 text-xs rounded font-semibold">✅ Активна</span>
+                            {% else %}
+                            <span class="inline-block px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded font-semibold">⛔ Отключена</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="p-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-700 rounded-lg p-3">
+                            <p class="text-slate-400 text-xs mb-1">Клики</p>
+                            <p class="text-white font-bold text-xl">{{ promo.clicks }}</p>
+                        </div>
+                        <div class="bg-slate-700 rounded-lg p-3">
+                            <p class="text-slate-400 text-xs mb-1">Регистрации</p>
+                            <p class="text-blue-400 font-bold text-xl">{{ promo.registrations }}</p>
+                        </div>
+                        <div class="bg-slate-700 rounded-lg p-3">
+                            <p class="text-slate-400 text-xs mb-1">Депозиты</p>
+                            <p class="text-green-400 font-bold text-xl">{{ promo.deposits }}</p>
+                        </div>
+                        <div class="bg-slate-700 rounded-lg p-3">
+                            <p class="text-slate-400 text-xs mb-1">Конверсия</p>
+                            <p class="text-purple-400 font-bold text-xl">{{ promo.conversion_rate|floatformat:1 }}%</p>
+                        </div>
+                    </div>
+
+                    <!-- Performance -->
+                    <div class="pt-3 border-t border-slate-700">
+                        <p class="text-slate-400 text-sm mb-2">📊 Производительность</p>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Сумма депозитов:</span>
+                                <span class="text-white font-semibold">${{ promo.total_deposit_amount|floatformat:2 }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Общий GGR:</span>
+                                <span class="text-purple-400 font-semibold">${{ promo.total_ggr|floatformat:2 }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Заработано:</span>
+                                <span class="text-green-400 font-semibold">${{ promo.total_earned|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- URL -->
+                    <div class="pt-3 border-t border-slate-700">
+                        <p class="text-slate-400 text-xs mb-2">🔗 Полная ссылка</p>
+                        <div class="flex gap-2">
+                            <input type="text" readonly value="{{ promo.get_full_url }}" class="flex-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-300 text-sm" onclick="this.select()">
+                            <button onclick="copyToClipboard('{{ promo.get_full_url }}')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors text-sm">
+                                📋
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- UTM -->
+                    {% if promo.utm_source or promo.utm_medium or promo.utm_campaign %}
+                    <div class="pt-3 border-t border-slate-700">
+                        <p class="text-slate-400 text-xs mb-2">🎯 UTM параметры</p>
+                        <div class="space-y-1 text-xs text-slate-400">
+                            {% if promo.utm_source %}<p>Source: <span class="text-white">{{ promo.utm_source }}</span></p>{% endif %}
+                            {% if promo.utm_medium %}<p>Medium: <span class="text-white">{{ promo.utm_medium }}</span></p>{% endif %}
+                            {% if promo.utm_campaign %}<p>Campaign: <span class="text-white">{{ promo.utm_campaign }}</span></p>{% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    <div class="pt-3 border-t border-slate-700 flex gap-2">
+                        <button onclick="editPromo('{{ promo.id }}')" class="flex-1 py-2 px-3 bg-blue-900 hover:bg-blue-800 text-blue-200 rounded text-sm font-semibold transition-colors">
+                            ✏️ Редактировать
+                        </button>
+                        <button onclick="deletePromo('{{ promo.id }}')" class="flex-1 py-2 px-3 bg-red-900 hover:bg-red-800 text-red-200 rounded text-sm font-semibold transition-colors">
+                            🗑️ Удалить
+                        </button>
+                    </div>
+
+                    <!-- QR Code -->
+                    <div class="pt-3 border-t border-slate-700 text-center">
+                        <button onclick="showQRCode('{{ promo.id }}', '{{ promo.name }}')" class="w-full py-2 px-3 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition-colors">
+                            📱 QR-код
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 text-center py-16 mb-8">
+            <p class="text-5xl mb-4">🔗</p>
+            <p class="text-white text-xl font-bold mb-2">Нет промо-ссылок</p>
+            <p class="text-slate-400 mb-6">Создайте первую ссылку для отслеживания трафика</p>
+            <button onclick="showCreateModal()" class="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
+                ➕ Создать ссылку
+            </button>
+        </div>
+        {% endif %}
+
+        <!-- Standard Link Section -->
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 p-8">
+            <h2 class="text-2xl font-bold text-white mb-6">📌 Ваша основная ссылка</h2>
+            <div class="bg-slate-700 rounded-lg p-6">
+                <p class="text-slate-400 text-sm mb-2">Используется по умолчанию для всех приглашений</p>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" readonly value="{% url 'referral-redirect' user.referral_code %}" class="flex-1 px-4 py-3 bg-slate-600 border border-slate-500 rounded-lg text-white font-semibold">
+                    <button onclick="copyToClipboard('{% url 'referral-redirect' user.referral_code %}')" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
+                        📋 Копировать
+                    </button>
+                </div>
+                <button onclick="shareLink('{% url 'referral-redirect' user.referral_code %}')" class="w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors">
+                    📤 Поделиться
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Modal -->
+<div id="promo-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-800 rounded-2xl border border-slate-700 max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-bold text-white mb-6">➕ Новая промо-ссылка</h2>
+
+        <form onsubmit="return handlePromoSubmit(event)">
+            <!-- Name -->
+            <div class="mb-4">
+                <label class="block text-white font-semibold mb-2">Название *</label>
+                <input 
+                    type="text" 
+                    id="promo-name"
+                    required 
+                    placeholder="Например: YouTube видео #3"
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                >
+            </div>
+
+            <!-- Slug -->
+            <div class="mb-4">
+                <label class="block text-white font-semibold mb-2">Slug (URL часть) *</label>
+                <input 
+                    type="text" 
+                    id="promo-slug"
+                    required 
+                    placeholder="youtube-video-3"
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                >
+                <p class="text-slate-400 text-sm mt-1">Ссылка: <span id="preview-url" class="text-indigo-400">dod.com/r/youtube-video-3</span></p>
+            </div>
+
+            <!-- UTM Source -->
+            <div class="mb-4">
+                <label class="block text-white font-semibold mb-2">UTM Source</label>
+                <input 
+                    type="text" 
+                    id="utm-source"
+                    placeholder="youtube, telegram, instagram"
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                >
+            </div>
+
+            <!-- UTM Medium -->
+            <div class="mb-4">
+                <label class="block text-white font-semibold mb-2">UTM Medium</label>
+                <input 
+                    type="text" 
+                    id="utm-medium"
+                    placeholder="video, link, story"
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                >
+            </div>
+
+            <!-- UTM Campaign -->
+            <div class="mb-6">
+                <label class="block text-white font-semibold mb-2">UTM Campaign</label>
+                <input 
+                    type="text" 
+                    id="utm-campaign"
+                    placeholder="summer2024, affiliate, contest"
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                >
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-3">
+                <button type="submit" class="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
+                    ✅ Создать
+                </button>
+                <button type="button" onclick="closeModal()" class="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors">
+                    ❌ Отмена
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function showCreateModal() {
+    document.getElementById('promo-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('promo-modal').classList.add('hidden');
+}
+
+document.getElementById('promo-slug')?.addEventListener('input', function(e) {
+    document.getElementById('preview-url').textContent = 'dod.com/r/' + this.value;
+});
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Скопировано в буфер обмена!');
+    });
+}
+
+function shareLink(url) {
+    if (navigator.share) {
+        navigator.share({ title: 'DOD - Партнёрская программа', url: url });
+    } else {
+        copyToClipboard(url);
+    }
+}
+
+function handlePromoSubmit(e) {
+    e.preventDefault();
+    // Form submission will be handled by Django view
+    document.querySelector('form').submit();
+}
+
+function editPromo(id) {
+    alert('Редактирование ещё не реализовано');
+}
+
+function deletePromo(id) {
+    if (confirm('Вы уверены?')) {
+        // Delete logic
+        alert('Удаление ещё не реализовано');
+    }
+}
+
+function showQRCode(id, name) {
+    alert('QR-коды ещё не реализованы');
+}
+</script>
+{% endblock %}

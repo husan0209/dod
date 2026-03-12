@@ -345,3 +345,54 @@ class AdminActionLog(models.Model):
             models.Index(fields=['action_type']),
         ]
 
+
+class TOTPDevice(models.Model):
+    """
+    Модель для хранения TOTP (Time-based One-Time Password) устройств пользователя.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='totp_devices')
+    name = models.CharField(max_length=50, default='TOTP')
+    secret = models.CharField(max_length=32)  # Base32 encoded secret
+    confirmed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'TOTP устройство'
+        verbose_name_plural = 'TOTP устройства'
+        ordering = ['-created_at']
+        unique_together = [['user', 'name']]
+        indexes = [
+            models.Index(fields=['user', 'confirmed']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.name}"
+
+
+class LinkedAccount(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='linked_accounts')
+    provider = models.CharField(
+        max_length=20,
+        choices=[('google', 'Google'), ('telegram', 'Telegram'), ('phone', 'Телефон')]
+    )
+    provider_id = models.CharField(max_length=255)
+    provider_email = models.EmailField(null=True, blank=True)
+    provider_username = models.CharField(max_length=255, null=True, blank=True)
+    provider_avatar = models.URLField(null=True, blank=True)
+    is_primary = models.BooleanField(default=False)
+    linked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Привязанный аккаунт'
+        verbose_name_plural = 'Привязанные аккаунты'
+        unique_together = [['provider', 'provider_id']]
+        ordering = ['-linked_at']
+        indexes = [
+            models.Index(fields=['user', 'provider']),
+            models.Index(fields=['provider', 'provider_id']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.provider}"

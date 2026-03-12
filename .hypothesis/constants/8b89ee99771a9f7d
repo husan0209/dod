@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\support\services\faq_service.py
+# hypothesis_version: 6.151.9
+
+['helpful_no', 'helpful_yes', 'views_count']

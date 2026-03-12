@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\games\roulette.py
+# hypothesis_version: 6.151.9
+
+['amount', 'bets', 'black', 'column_1', 'column_2', 'column_3', 'dozen_1', 'dozen_2', 'dozen_3', 'even', 'green', 'high', 'low', 'number', 'odd', 'payout', 'red', 'roulette', 'type', 'win_amount', 'winning_color', 'winning_number', 'won']

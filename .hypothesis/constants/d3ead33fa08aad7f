@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\providers\nowpayments.py
+# hypothesis_version: 6.151.9
+
+[',', '0', ':', 'actually_paid', 'amount', 'amount_received', 'completed', 'confirmed', 'confirming', 'currency', 'deposit_completed', 'deposit_update', 'event_type', 'expired', 'failed', 'finished', 'order_id', 'outcome_amount', 'pay_amount', 'pay_currency', 'payment_id', 'payment_status', 'payment_url', 'pending', 'price_amount', 'price_currency', 'processing', 'provider_order_id', 'provider_payout_id', 'raw_data', 'raw_response', 'refunded', 'sending', 'status', 'utf-8', 'waiting', 'webhook_secret', 'x-nowpayments-sig']

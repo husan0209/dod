@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\support\services\ticket_service.py
+# hypothesis_version: 6.151.9
+
+[200, '...', 'HTTP_USER_AGENT', 'avg_rating', 'bot', 'closed', 'complaint', 'critical', 'deposit', 'escalated', 'first_response_at', 'form', 'high', 'image/', 'low', 'medium', 'online', 'operator', 'operator_profile', 'rated_at', 'rating', 'rating_comment', 'resolved', 'security', 'status', 'status_changed', 'suggestion', 'system', 'ticket_created', 'ticket_reply', 'times_triggered', 'total_ratings', 'updated_at', 'user', 'verification', 'waiting_admin', 'waiting_user', 'withdrawal', 'Тикет ещё не решён', '💬', '📋']

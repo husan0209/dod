@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\sports\views.py
+# hypothesis_version: 6.151.9
+
+[400, 401, 500, '-created_at', '-is_popular', 'HTTP_USER_AGENT', 'REMOTE_ADDR', 'USD', '[]', 'actual_win', 'away_team', 'balance', 'bet', 'bet_id', 'bets', 'bets_count', 'cashed_out', 'cashout_info', 'code', 'currency', 'error', 'event', 'event_id', 'events', 'events_by_date', 'featured_events', 'financial_stats', 'home_team', 'id', 'is_bettable', 'items', 'items__event', 'items__market', 'items__outcome', 'league', 'leagues', 'live', 'lost', 'lost_bets', 'main_market', 'market_type', 'markets', 'markets_count', 'name', 'odd', 'open', 'outcome_id', 'outcomes', 'parameter', 'pending', 'pending_bets', 'prematch', 'scheduled', 'slug', 'sort_order', 'sport', 'sports', 'stake', 'start_time', 'stats', 'status', 'success', 'suspended', 'time_until_start', 'total_bets', 'total_stake', 'total_win', 'type', 'upcoming_events', 'user_bets', 'void', 'won', 'won_bets', 'Ошибка при валидации']

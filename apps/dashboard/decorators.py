@@ -29,14 +29,22 @@ def require_permission(module, action):
     def decorator(view_func):
         @functools.wraps(view_func)
         def wrapper(request, *args, **kwargs):
-            if not hasattr(request, 'admin_profile'):
-                return HttpResponseForbidden(_('No admin profile'))
+            # Get admin_profile from request or user
+            admin_profile = getattr(request, 'admin_profile', None)
+            if not admin_profile:
+                try:
+                    admin_profile = request.user.admin_profile
+                except Exception:
+                    return HttpResponseForbidden(_('No admin profile'))
+            
+            request.admin_profile = admin_profile
 
-            if not request.admin_profile.has_permission(module, action):
+            if not admin_profile.has_permission(module, action):
                 AdminActionLog.objects.create(
                     admin_user=request.user,
                     action_type='permission_denied',
                     module=module,
+                    action_category='permission',
                     description=f'Denied: {module}.{action}',
                     ip_address=get_client_ip(request),
                     is_successful=False,
@@ -62,10 +70,17 @@ def require_role_level(min_level):
     def decorator(view_func):
         @functools.wraps(view_func)
         def wrapper(request, *args, **kwargs):
-            if not hasattr(request, 'admin_profile'):
-                return HttpResponseForbidden()
+            # Get admin_profile from request or user
+            admin_profile = getattr(request, 'admin_profile', None)
+            if not admin_profile:
+                try:
+                    admin_profile = request.user.admin_profile
+                except Exception:
+                    return HttpResponseForbidden()
+            
+            request.admin_profile = admin_profile
 
-            if request.admin_profile.role.level < min_level:
+            if admin_profile.role.level < min_level:
                 return HttpResponseForbidden(
                     _('Insufficient access level')
                 )

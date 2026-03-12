@@ -259,6 +259,25 @@ def stats(request):
 
 
 @login_required
+def referral_detail(request, referral_id):
+    """Детали реферала."""
+    referral = get_object_or_404(Referral, id=referral_id, partner=request.user)
+    
+    # Комиссии с этого реферала
+    commissions = Commission.objects.filter(
+        partner=request.user,
+        referral=referral
+    ).order_by('-created_at')
+
+    context = {
+        'referral': referral,
+        'commissions': commissions,
+    }
+
+    return render(request, 'referral/referral_detail.html', context)
+
+
+@login_required
 def settings(request):
     """Настройки партнёра."""
     profile = request.user.partner_profile
@@ -289,3 +308,79 @@ def settings(request):
     }
 
     return render(request, 'referral/settings.html', context)
+
+
+# ===== API Endpoints =====
+
+@login_required
+def api_referral_stats(request):
+    """API: Статистика рефералов в формате JSON."""
+    profile = request.user.partner_profile
+    
+    return JsonResponse({
+        'balance': float(profile.balance),
+        'total_earned': float(profile.total_earned),
+        'total_withdrawn': float(profile.total_withdrawn),
+        'total_referrals': profile.total_referrals,
+        'active_referrals': profile.active_referrals,
+        'referrals_with_deposit': profile.referrals_with_deposit,
+        'monthly_ggr': float(profile.monthly_ggr),
+        'monthly_earned': float(profile.monthly_earned),
+        'tier': {
+            'name': profile.tier.name,
+            'icon': profile.tier.icon,
+        }
+    })
+
+
+@login_required
+def api_promo_links(request):
+    """API: Список промо-ссылок."""
+    promo_links = PromoLink.objects.filter(
+        partner=request.user
+    ).values(
+        'id', 'name', 'slug', 'clicks', 'registrations', 
+        'deposits', 'total_ggr', 'total_earned', 'conversion_rate'
+    )
+    
+    return JsonResponse({
+        'promo_links': list(promo_links)
+    })
+
+
+@login_required
+def api_referrals_data(request):
+    """API: Данные о рефералах для аналитики."""
+    level = request.GET.get('level', '1')
+    status = request.GET.get('status', '')
+    
+    referrals_query = Referral.objects.filter(
+        partner=request.user,
+        level=int(level)
+    )
+    
+    if status:
+        referrals_query = referrals_query.filter(status=status)
+    
+    data = referrals_query.values_list(
+        'referral__username',
+        'status',
+        'total_ggr',
+        'total_deposits',
+        'is_qualified',
+        'created_at'
+    )
+    
+    return JsonResponse({
+        'referrals': [
+            {
+                'username': d[0],
+                'status': d[1],
+                'ggr': float(d[2]),
+                'deposits': float(d[3]),
+                'qualified': d[4],
+                'registered': d[5].isoformat() if d[5] else None,
+            }
+            for d in data
+        ]
+    })

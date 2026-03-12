@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\wallet\forms.py
+# hypothesis_version: 6.151.9
+
+['address', 'country_of_issue', 'date', 'date_of_birth', 'document_back', 'document_front', 'document_number', 'document_type', 'expiry_date', 'full_name', 'rows', 'selfie_with_document', 'type']

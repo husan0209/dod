@@ -1,8 +1,6 @@
 import time
-import functools
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from apps.accounts.models import AdminActionLog
@@ -21,8 +19,10 @@ def get_client_ip(request):
 def extract_module(request_path):
     """Extract module name from request path"""
     path_parts = request_path.strip('/').split('/')
-    if len(path_parts) > 1 and path_parts[0] == 'admin-panel':
-        return path_parts[1] if len(path_parts) > 1 else 'dashboard'
+    if path_parts and path_parts[0] == 'admin-panel':
+        if len(path_parts) == 1:
+            return 'dashboard'
+        return path_parts[1] or 'dashboard'
     return 'unknown'
 
 
@@ -46,18 +46,25 @@ class AdminAccessMiddleware:
         if not request.path.startswith('/admin-panel/'):
             return self.get_response(request)
 
+        is_2fa_verification_path = request.path.rstrip('/') == '/admin-panel/verify-2fa'
+        is_dashboard_root = request.path.rstrip('/') == '/admin-panel'
+
         # 1. Authentication
         if not request.user.is_authenticated:
             return redirect('accounts:login')
 
-        # 2. Staff status
+        # 2. Staff status - allow non-staff users at dashboard root to be redirected by view
         if not request.user.is_staff:
+            # Allow non-staff users to access dashboard root - the view will redirect them
+            if is_dashboard_root:
+                return self.get_response(request)
+            # Block non-staff users from other admin paths
             return HttpResponseForbidden(_('Access denied'))
 
         # 3. AdminProfile exists
         try:
             admin_profile = request.user.admin_profile
-        except AttributeError:
+        except Exception:
             return HttpResponseForbidden(_('Admin profile not configured'))
 
         # 4. AdminProfile active
@@ -73,16 +80,12 @@ class AdminAccessMiddleware:
                     admin_user=request.user,
                     action_type='unauthorized_access',
                     module='security',
+                    action_category='access',
                     description=f'Access attempt from IP {ip} (not in whitelist)',
                     ip_address=ip,
                     is_successful=False,
                 )
                 return HttpResponseForbidden(_('Access from this IP is forbidden'))
-
-        # 6. 2FA for admin (always required)
-        if request.user.is_2fa_enabled:
-            if not request.session.get('admin_2fa_verified'):
-                return redirect('dashboard:verify-2fa')
 
         # Attach admin_profile to request
         request.admin_profile = admin_profile
@@ -111,7 +114,9 @@ class AdminActionLogMiddleware:
             AdminActionLog.objects.create(
                 admin_user=request.user,
                 action_type=f'{request.method} {request.path}',
+                action_category=request.method,
                 module=extract_module(request.path),
+                description=f'{request.method} {request.path}',
                 ip_address=get_client_ip(request),
                 duration_ms=duration,
                 is_successful=(200 <= response.status_code < 400),

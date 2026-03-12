@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\referral\services\commission_service.py
+# hypothesis_version: 6.151.9
+
+[100, '-sort_order', '/partners/', '/partners/payouts/', '0', 'Amount below minimum', 'Insufficient balance', 'USD', 'active', 'amount', 'balance', 'best_month_date', 'best_month_earnings', 'bet_amount', 'buy', 'cashout', 'completed', 'deposited', 'deposits', 'first_deposit', 'game_balance', 'ggr', 'lost', 'monthly_earned', 'monthly_ggr', 'new_tier', 'old_tier', 'partner_payout', 'partner_tier_changed', 'partner_tier_down', 'partner_tier_up', 'payout_amount', 'payout_completed', 'payout_rejected', 'referral', 'referral_commission', 'rejected', 'settled', 'sort_order', 'tier', 'tier_changed_at', 'total_amount', 'total_bets', 'total_cost', 'total_deposit_amount', 'total_earned', 'total_ggr', 'total_referral_ggr', 'total_winnings', 'user', 'win_amount', 'won', '❌', '❌ Выплата отклонена', '💰', '💰 Выплата одобрена!', '📉']

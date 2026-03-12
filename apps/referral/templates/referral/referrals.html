@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Мои рефералы - DOD{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-row-highlight {
+        transition: all 0.3s ease;
+    }
+
+    .table-row-highlight:hover {
+        background-color: rgba(99, 102, 241, 0.1);
+    }
+
+    .metric-badge {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .filter-toggle {
+        transition: all 0.3s ease;
+    }
+
+    .filter-toggle:hover {
+        background-color: rgba(99, 102, 241, 0.2);
+    }
+
+    .qualification-ring {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 14px;
+        font-weight: bold;
+        border: 2px solid;
+    }
+
+    .qualification-ring.qualified {
+        background-color: rgba(34, 197, 94, 0.1);
+        border-color: #22c55e;
+        color: #22c55e;
+    }
+
+    .qualification-ring.unqualified {
+        background-color: rgba(148, 163, 184, 0.1);
+        border-color: #94a3b8;
+        color: #94a3b8;
+    }
+
+    .badge-pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header with Navigation -->
+        <div class="mb-8 flex items-start justify-between">
+            <div>
+                <h1 class="text-4xl font-bold text-white mb-2 flex items-center gap-3">
+                    👥 Мои рефералы
+                    <span class="text-sm bg-indigo-900 text-indigo-200 px-3 py-1 rounded-full font-semibold">
+                        {{ total_count }}
+                    </span>
+                </h1>
+                <p class="text-slate-400">Управляйте и отслеживайте активность своих приглашённых пользователей</p>
+            </div>
+            <a href="{% url 'referral:promo' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Новая ссылка
+            </a>
+        </div>
+
+        <!-- Key Metrics with Progress -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <!-- Total Referrals -->
+            <div class="metric-badge bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl p-6 border border-blue-700 shadow-lg">
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <p class="text-blue-300 text-sm font-semibold">Всего рефералов</p>
+                        <p class="text-4xl font-bold text-white mt-2">{{ total_count }}</p>
+                    </div>
+                    <span class="text-3xl">👥</span>
+                </div>
+                <div class="pt-3 border-t border-blue-700">
+                    <p class="text-blue-300 text-xs">Все уровни</p>
+                </div>
+            </div>
+
+            <!-- Active Referrals -->
+            <div class="metric-badge bg-gradient-to-br from-green-900 to-emerald-900 rounded-xl p-6 border border-green-700 shadow-lg">
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <p class="text-green-300 text-sm font-semibold">Активные рефералы</p>
+                        <p class="text-4xl font-bold text-white mt-2">{{ active_count }}</p>
+                    </div>
+                    <span class="text-3xl">🟢</span>
+                </div>
+                <div class="pt-3 border-t border-green-700">
+                    <p class="text-green-300 text-xs">
+                        {% if total_count %}
+                            {{ active_count|multiply:100|divide:total_count|floatformat:1 }}% активности
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Deposited Referrals -->
+            <div class="metric-badge bg-gradient-to-br from-purple-900 to-violet-900 rounded-xl p-6 border border-purple-700 shadow-lg">
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <p class="text-purple-300 text-sm font-semibold">С депозитом</p>
+                        <p class="text-4xl font-bold text-white mt-2">{{ deposited_count }}</p>
+                    </div>
+                    <span class="text-3xl">💳</span>
+                </div>
+                <div class="pt-3 border-t border-purple-700">
+                    <p class="text-purple-300 text-xs">
+                        {% if total_count %}
+                            {{ deposited_count|multiply:100|divide:total_count|floatformat:1 }}% конверсия
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Qualified Referrals -->
+            <div class="metric-badge bg-gradient-to-br from-orange-900 to-amber-900 rounded-xl p-6 border border-orange-700 shadow-lg">
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <p class="text-orange-300 text-sm font-semibold">Квалифицированы</p>
+                        <p class="text-4xl font-bold text-white mt-2">
+                            {% with qualified=referrals|length %}
+                                {{ qualified }}
+                            {% endwith %}
+                        </p>
+                    </div>
+                    <span class="text-3xl">✅</span>
+                </div>
+                <div class="pt-3 border-t border-orange-700">
+                    <p class="text-orange-300 text-xs">Комиссии активная</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Filters -->
+        <div class="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl p-6 border border-slate-700 mb-8 shadow-lg">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                    </svg>
+                    Фильтры и поиск
+                </h3>
+                {% if status_filter or level_filter or search %}
+                <a href="{% url 'referral:referrals' %}" class="text-sm text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Очистить
+                </a>
+                {% endif %}
+            </div>
+
+            <form method="get" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Search -->
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">🔍 Поиск</label>
+                    <input 
+                        type="text" 
+                        name="search" 
+                        value="{{ search }}"
+                        placeholder="Username, email..."
+                        class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-20 transition-all"
+                    >
+                </div>
+
+                <!-- Status Filter -->
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">📊 Статус</label>
+                    <select name="status" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-20 transition-all">
+                        <option value="">Все статусы</option>
+                        <option value="registered" {% if status_filter == 'registered' %}selected{% endif %}>📝 Зарегистрирован</option>
+                        <option value="deposited" {% if status_filter == 'deposited' %}selected{% endif %}>💳 С депозитом</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>🟢 Активный</option>
+                        <option value="churned" {% if status_filter == 'churned' %}selected{% endif %}>❌ Неактивный</option>
+                        <option value="fraud" {% if status_filter == 'fraud' %}selected{% endif %}>⚠️ Фрод</option>
+                    </select>
+                </div>
+
+                <!-- Level Filter -->
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">🌳 Уровень</label>
+                    <select name="level" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-20 transition-all">
+                        <option value="all">Все уровни</option>
+                        <option value="1" {% if level_filter == '1' %}selected{% endif %}>1️⃣ 1-й уровень</option>
+                        <option value="2" {% if level_filter == '2' %}selected{% endif %}>2️⃣ 2-й уровень</option>
+                    </select>
+                </div>
+
+                <!-- Qualification Filter -->
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">✅ Квалификация</label>
+                    <select name="qualified" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-20 transition-all">
+                        <option value="">Все</option>
+                        <option value="yes">✅ Квалифицированы</option>
+                        <option value="no">⏳ Не квалифицированы</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex items-end">
+                    <button type="submit" class="filter-toggle w-full px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        Применить
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Referrals Table with Enhanced Styling -->
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-lg">
+            {% if referrals %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-slate-700 to-slate-600 border-b border-slate-600">
+                            <th class="text-left py-4 px-6 text-slate-300 font-semibold text-sm">Пользователь</th>
+                            <th class="text-left py-4 px-6 text-slate-300 font-semibold text-sm hidden sm:table-cell">Присоединился</th>
+                            <th class="text-left py-4 px-6 text-slate-300 font-semibold text-sm hidden lg:table-cell">Статус</th>
+                            <th class="text-center py-4 px-6 text-slate-300 font-semibold text-sm hidden md:table-cell">Статус</th>
+                            <th class="text-right py-4 px-6 text-slate-300 font-semibold text-sm hidden md:table-cell">Депозиты</th>
+                            <th class="text-right py-4 px-6 text-slate-300 font-semibold text-sm">GGR</th>
+                            <th class="text-right py-4 px-6 text-slate-300 font-semibold text-sm">Комиссия</th>
+                            <th class="text-center py-4 px-6 text-slate-300 font-semibold text-sm">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700">
+                        {% for referral in referrals %}
+                        <tr class="table-row-highlight {% if referral.is_suspicious %}bg-red-900 bg-opacity-10{% endif %}">
+                            <!-- User Info -->
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="relative">
+                                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                            {{ referral.referral.username|first|upper }}
+                                        </div>
+                                        {% if referral.is_active %}
+                                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-800 badge-pulse"></div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-semibold hover:text-indigo-400 cursor-pointer">{{ referral.referral.username }}</p>
+                                        <p class="text-slate-400 text-xs mt-1">{{ referral.referral.email }}</p>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Joined Date -->
+                            <td class="py-4 px-6 hidden sm:table-cell">
+                                <p class="text-slate-300 text-sm font-mono">{{ referral.registered_at|date:"d.m.y" }}</p>
+                                <p class="text-slate-500 text-xs">{{ referral.registered_at|timesince }} назад</p>
+                            </td>
+
+                            <!-- Status Badge -->
+                            <td class="py-4 px-6 hidden lg:table-cell">
+                                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border
+                                    {% if referral.status == 'active' %}bg-green-900 text-greentext border-green-700
+                                    {% elif referral.status == 'deposited' %}bg-blue-900 text-blue-200 border-blue-700
+                                    {% elif referral.status == 'registered' %}bg-slate-700 text-slate-300 border-slate-600
+                                    {% elif referral.status == 'fraud' %}bg-red-900 text-red-200 border-red-700
+                                    {% else %}bg-amber-900 text-amber-200 border-amber-700{% endif %}">
+                                    <span class="inline-block w-2 h-2 rounded-full
+                                        {% if referral.status == 'active' %}bg-green-400
+                                        {% elif referral.status == 'deposited' %}bg-blue-400
+                                        {% elif referral.status == 'fraud' %}bg-red-400
+                                        {% else %}bg-slate-400{% endif %}"></span>
+                                    {{ referral.get_status_display|truncatewords:2 }}
+                                </span>
+                            </td>
+
+                            <!-- Qualification -->
+                            <td class="py-4 px-6 hidden md:table-cell text-center">
+                                <div class="qualification-ring {% if referral.is_qualified %}qualified {% else %}unqualified{% endif %}">
+                                    {% if referral.is_qualified %}✅{% else %}⏳{% endif %}
+                                </div>
+                            </td>
+
+                            <!-- Deposits -->
+                            <td class="py-4 px-6 hidden md:table-cell">
+                                <p class="text-white font-semibold">${{ referral.total_deposits|floatformat:2 }}</p>
+                                {% if referral.first_deposit_at %}
+                                <p class="text-slate-400 text-xs mt-1">{{ referral.first_deposit_at|date:"d.m.y" }}</p>
+                                {% else %}
+                                <p class="text-slate-500 text-xs italic mt-1">Нет</p>
+                                {% endif %}
+                            </td>
+
+                            <!-- GGR -->
+                            <td class="py-4 px-6 text-right">
+                                <p class="text-purple-400 font-bold text-sm">${{ referral.total_ggr|floatformat:2 }}</p>
+                                {% if referral.is_qualified %}
+                                <span class="inline-block mt-1 px-2 py-0.5 bg-green-900 text-green-200 text-xs rounded font-semibold">Активна</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Commission -->
+                            <td class="py-4 px-6 text-right">
+                                <p class="text-green-400 font-bold text-sm">${{ referral.total_commission_earned|floatformat:2 }}</p>
+                                {% if referral.total_commission_earned > 0 %}
+                                <p class="text-slate-400 text-xs mt-1">Заработано</p>
+                                {% endif %}
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="py-4 px-6">
+                                <div class="flex items-center justify-center gap-2">
+                                    <!-- View Details -->
+                                    <a href="{% url 'referral:referral_detail' referral.id %}" class="p-2 hover:bg-indigo-900 hover:bg-opacity-50 rounded-lg transition-colors" title="Подробно">
+                                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                    </a>
+
+                                    <!-- Suspicious Badge -->
+                                    {% if referral.is_suspicious %}
+                                    <button class="p-2 hover:bg-red-900 hover:bg-opacity-50 rounded-lg transition-colors" title="Подозрительный">
+                                        <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination or empty state info -->
+            {% else %}
+            <div class="text-center py-16">
+                <div class="text-5xl mb-4">🚫</div>
+                <p class="text-slate-300 text-lg font-semibold mb-2">Нет рефералов</p>
+                <p class="text-slate-400 mb-6 max-w-md mx-auto">
+                    {% if search or status_filter or level_filter %}
+                        По вашим критериям поиска не найдено результатов. Попробуйте очистить фильтры.
+                    {% else %}
+                        Начните приглашать друзей через реферальные ссылки, чтобы увидеть их здесь!
+                    {% endif %}
+                </p>
+                <a href="{% url 'referral:promo' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Создать реферальную ссылку
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Add table interactivity
+document.querySelectorAll('table tbody tr').forEach(row => {
+    row.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = 'rgba(99, 102, 241, 0.05)';
+    });
+    row.addEventListener('mouseleave', function() {
+        if (!this.classList.contains('bg-red-900')) {
+            this.style.backgroundColor = '';
+        }
+    });
+});
+
+// Add search input animation
+const searchInput = document.querySelector('input[name="search"]');
+if (searchInput) {
+    searchInput.addEventListener('focus', function() {
+        this.parentElement.querySelector('label').style.color = '#6366f1';
+    });
+    searchInput.addEventListener('blur', function() {
+        this.parentElement.querySelector('label').style.color = '#cbd5e1';
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load wallet_tags %}
+
+{% block title %}Статус вывода {{ withdrawal.request_id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-6 space-y-4">
+  <h1 class="text-2xl font-bold text-white mb-4">Статус заявки на вывод</h1>
+
+  <div class="bg-dod-surface/70 rounded-2xl p-5 space-y-2 text-sm">
+    <div class="flex justify-between">
+      <span class="text-text-secondary">ID заявки</span>
+      <span>{{ withdrawal.request_id }}</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-text-secondary">Статус</span>
+      <span>{{ withdrawal.get_status_display }}</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-text-secondary">Сумма</span>
+      <span>{{ withdrawal.amount }} {{ withdrawal.currency.code }}</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-text-secondary">Комиссия</span>
+      <span>{{ withdrawal.fee_amount }} {{ withdrawal.currency.code }}</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-text-secondary">К получению</span>
+      <span>{{ withdrawal.net_amount }} {{ withdrawal.currency.code }}</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-text-secondary">Создана</span>
+      <span>{{ withdrawal.created_at|date:"d.m.Y H:i" }}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

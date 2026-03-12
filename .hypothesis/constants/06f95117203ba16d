@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\services\payout_service.py
+# hypothesis_version: 6.151.9
+
+['cancelled', 'completed', 'completed_at', 'created', 'duplicate', 'failed', 'invalid_state', 'processing', 'provider_payout_id', 'provider_response', 'provider_status', 'raw_response', 'status', 'transaction', 'updated_at', 'Выплаты отключены']

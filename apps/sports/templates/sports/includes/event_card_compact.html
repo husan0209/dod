@@ -1,0 +1,268 @@
+{% load static %}
+
+<!-- Компактная карточка события для использования в списках -->
+<div class="event-card-compact">
+    <div class="event-card-header">
+        <div class="event-time">
+            <div class="event-date">{{ event.start_time|date:'d.m' }}</div>
+            <div class="event-time-value">{{ event.start_time|time:'H:i' }}</div>
+        </div>
+        <div class="event-league">{{ event.league.short_name }}</div>
+        <div class="event-status">
+            {% if event.status == 'prematch' %}
+            <span class="badge badge-info">Ставки открыты</span>
+            {% elif event.status == 'live' %}
+            <span class="badge badge-danger">🔴 LIVE</span>
+            {% elif event.status == 'finished' %}
+            <span class="badge badge-success">✓ Завершено</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="event-card-body">
+        <a href="{% url 'sports:event_detail' event.id %}" class="event-teams">
+            <div class="team-block">
+                <img src="{% if event.home_team.logo %}{{ event.home_team.logo.url }}{% else %}{% static 'images/team-placeholder.png' %}{% endif %}" 
+                     alt="{{ event.home_team.name }}" class="team-logo-sm">
+                <span class="team-name-sm">{{ event.home_team.short_name }}</span>
+            </div>
+
+            {% if event.status != 'prematch' and event.status != 'scheduled' %}
+            <div class="event-score-sm">
+                <strong>{{ event.home_score }}</strong>
+                <span>:</span>
+                <strong>{{ event.away_score }}</strong>
+            </div>
+            {% else %}
+            <div class="event-score-sm">—</div>
+            {% endif %}
+
+            <div class="team-block">
+                <span class="team-name-sm">{{ event.away_team.short_name }}</span>
+                <img src="{% if event.away_team.logo %}{{ event.away_team.logo.url }}{% else %}{% static 'images/team-placeholder.png' %}{% endif %}" 
+                     alt="{{ event.away_team.name }}" class="team-logo-sm">
+            </div>
+        </a>
+    </div>
+
+    {% if event.is_bettable and main_market %}
+    <div class="event-card-odds">
+        {% for outcome in main_market.outcomes.all|slice:":3" %}
+        <button class="odd-btn" onclick="addToBetSlip('{{ outcome.id }}', '{{ outcome.name }}', {{ outcome.odd }})">
+            <span class="odd-label">{{ outcome.name }}</span>
+            <span class="odd-value">{{ outcome.odd }}</span>
+        </button>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="event-card-stats">
+        <span class="stat-item">{{ event.bets_count }} ставок</span>
+        <span class="stat-item">${{ event.total_stake|floatformat:0 }}</span>
+    </div>
+</div>
+
+<style>
+.event-card-compact {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border-left: 4px solid #667eea;
+}
+
+.event-card-compact:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.event-card-header {
+    padding: 10px 12px;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+}
+
+.event-time {
+    text-align: center;
+}
+
+.event-date {
+    font-weight: 700;
+    font-size: 13px;
+    color: #2d3748;
+}
+
+.event-time-value {
+    font-size: 11px;
+    color: #666;
+}
+
+.event-league {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.event-status {
+    text-align: right;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.badge-info {
+    background: #0066cc;
+    color: white;
+}
+
+.badge-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.badge-success {
+    background: #28a745;
+    color: white;
+}
+
+.event-card-body {
+    padding: 12px;
+}
+
+.event-teams {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.team-block {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.team-logo-sm {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    background: #f0f0f0;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.team-name-sm {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.event-score-sm {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2d3748;
+    text-align: center;
+    min-width: 40px;
+}
+
+.event-card-odds {
+    padding: 10px 12px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.odd-btn {
+    padding: 8px 6px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.2s ease;
+}
+
+.odd-btn:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.odd-label {
+    display: block;
+    font-size: 10px;
+    color: #666;
+    margin-bottom: 2px;
+}
+
+.odd-value {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.event-card-stats {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #e0e0e0;
+    font-size: 11px;
+    color: #666;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+}
+
+@media (max-width: 576px) {
+    .event-card-compact {
+        border-left-width: 3px;
+    }
+
+    .event-card-header {
+        padding: 8px 10px;
+    }
+
+    .event-card-body {
+        padding: 10px;
+    }
+
+    .event-card-odds {
+        padding: 8px 10px;
+        gap: 4px;
+    }
+
+    .team-logo-sm {
+        width: 24px;
+        height: 24px;
+    }
+
+    .team-name-sm {
+        font-size: 12px;
+    }
+
+    .event-score-sm {
+        font-size: 14px;
+        min-width: 35px;
+    }
+}
+</style>

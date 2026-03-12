@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\dashboard\views\users.py
+# hypothesis_version: 6.151.9
+
+['-date_joined', 'active', 'inactive', 'kyc', 'kyc_filter', 'page', 'page_obj', 'registration_method', 'search', 'sort', 'sort_by', 'status', 'status_filter', 'trust', 'trust_filter', 'user', 'users', 'view']

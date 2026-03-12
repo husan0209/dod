@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\telegram_bot\services.py
+# hypothesis_version: 6.151.9
+
+[600, '-created_at', '-started_at', 'buy', 'callback_data', 'closed', 'in_progress', 'lost', 'new', 'open', 'partner_profile', 'reopened', 'resolved', 'security_block', 'security_confirm', 'text', 'url', 'waiting_admin', 'waiting_user', 'win', 'won', 'В работе', 'Заблокировать', 'Закрыт', 'Новый', 'Ожидание вас', 'Ожидание оператора', 'Ответить на сайте', 'Открыт', 'Переоткрыт', 'Решён', 'Это я', '⏳', '✅', '❌', '❌ Ставка проиграла', '🎉 Ставка выиграла!', '💵 Вывод одобрен', '📈', '📉']

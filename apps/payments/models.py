@@ -259,6 +259,157 @@ class SavedPaymentMethod(models.Model):
     def __str__(self) -> str:
         return f"{self.user_id}:{self.name}"
 
+    @staticmethod
+    def mask_card_number(card_number: str) -> str:
+        """
+        Mask card number to show only last 4 digits.
+
+        Args:
+            card_number: Full card number (e.g., "1234567890123456")
+
+        Returns:
+            Masked card number (e.g., "****3456")
+        """
+        if not card_number:
+            return ""
+
+        # Remove any spaces or dashes
+        clean_number = card_number.replace(" ", "").replace("-", "")
+
+        # Return only last 4 digits with asterisks
+        if len(clean_number) >= 4:
+            return "****" + clean_number[-4:]
+        return "****"
+
+    def encrypt_details(self) -> dict:
+        """
+        Encrypt sensitive fields in payment details using AES-256.
+
+        Note: card_number is NOT encrypted, only masked (per requirements 8.3).
+        Only CVV and other sensitive fields are encrypted.
+
+        Returns:
+            Encrypted details dictionary
+        """
+        from cryptography.fernet import Fernet
+        from django.conf import settings
+        import json
+        import base64
+        import hashlib
+
+        # Generate encryption key from Django SECRET_KEY
+        key = base64.urlsafe_b64encode(
+            hashlib.sha256(settings.SECRET_KEY.encode()).digest()
+        )
+        cipher = Fernet(key)
+
+        # Fields that need encryption based on payment type
+        # Note: card_number is excluded - it's masked, not encrypted
+        sensitive_fields = []
+        if self.type == "card":
+            sensitive_fields = ["cvv", "expiry"]  # card_number is masked, not encrypted
+        elif self.type == "ewallet":
+            sensitive_fields = ["account_number", "phone"]
+        # Crypto addresses are not encrypted (public information)
+
+        encrypted_details = self.details.copy()
+
+        for field in sensitive_fields:
+            if field in encrypted_details and encrypted_details[field]:
+                # Encrypt the field value
+                plaintext = str(encrypted_details[field]).encode()
+                encrypted_value = cipher.encrypt(plaintext)
+                encrypted_details[field] = base64.b64encode(encrypted_value).decode()
+
+        return encrypted_details
+
+    def decrypt_details(self) -> dict:
+        """
+        Decrypt sensitive fields in payment details.
+
+        Note: card_number is not decrypted (it's masked, not encrypted).
+
+        Returns:
+            Decrypted details dictionary
+        """
+        from cryptography.fernet import Fernet
+        from django.conf import settings
+        import json
+        import base64
+        import hashlib
+
+        # Generate encryption key from Django SECRET_KEY
+        key = base64.urlsafe_b64encode(
+            hashlib.sha256(settings.SECRET_KEY.encode()).digest()
+        )
+        cipher = Fernet(key)
+
+        # Fields that need decryption based on payment type
+        # Note: card_number is excluded - it's masked, not encrypted
+        sensitive_fields = []
+        if self.type == "card":
+            sensitive_fields = ["cvv", "expiry"]  # card_number is masked, not encrypted
+        elif self.type == "ewallet":
+            sensitive_fields = ["account_number", "phone"]
+
+        decrypted_details = self.details.copy()
+
+        for field in sensitive_fields:
+            if field in decrypted_details and decrypted_details[field]:
+                try:
+                    # Decrypt the field value
+                    encrypted_value = base64.b64decode(decrypted_details[field].encode())
+                    plaintext = cipher.decrypt(encrypted_value)
+                    decrypted_details[field] = plaintext.decode()
+                except Exception:
+                    # If decryption fails, field might not be encrypted
+                    pass
+
+        return decrypted_details
+
+    def save(self, *args, **kwargs):
+        """
+        Override save to auto-encrypt sensitive fields and mask card numbers.
+
+        Processing order:
+        1. Mask card numbers (only last 4 digits stored)
+        2. Encrypt other sensitive fields (CVV, expiry, etc.)
+        """
+        # Step 1: Mask card numbers before encryption
+        if self.type == "card" and "card_number" in self.details:
+            full_card_number = self.details["card_number"]
+            # Only mask if it's not already masked
+            if not full_card_number.startswith("****"):
+                self.details["card_number"] = self.mask_card_number(full_card_number)
+
+        # Step 2: Encrypt sensitive details (excluding card_number which is already masked)
+        # Note: We only encrypt if the details are not already encrypted
+        if self.type in ["card", "ewallet"]:
+            # Check if already encrypted by looking for base64 pattern in CVV
+            needs_encryption = True
+            if self.type == "card" and "cvv" in self.details:
+                # If CVV looks like base64, assume already encrypted
+                try:
+                    import base64
+                    base64.b64decode(self.details["cvv"])
+                    needs_encryption = False
+                except Exception:
+                    needs_encryption = True
+            elif self.type == "ewallet" and "account_number" in self.details:
+                # Check if account_number is encrypted
+                try:
+                    import base64
+                    base64.b64decode(self.details["account_number"])
+                    needs_encryption = False
+                except Exception:
+                    needs_encryption = True
+
+            if needs_encryption:
+                self.details = self.encrypt_details()
+
+        super().save(*args, **kwargs)
+
+
 
 class PaymentSettings(models.Model):
     singleton_id = models.IntegerField(default=1, unique=True, editable=False)

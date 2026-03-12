@@ -359,12 +359,60 @@ class Bet(models.Model):
         )
 
     def calculate_cashout_amount(self):
-        # Placeholder for cashout calculation
-        return 0
+        """
+        Рассчитать текущую сумму кэшаута.
+        Формула: base = stake
+        Для выигравших исходов: base *= odd_at_placement
+        Для ожидающих: base *= current_odd * CASHOUT_FACTOR
+        """
+        from django.db.models import Q
+        from decimal import Decimal
+        
+        if not self.is_cashout_available():
+            return Decimal('0.00')
+        
+        base = self.stake
+        settings = BetSettings.get_settings()
+        cashout_factor = Decimal('0.85')  # Коэффициент при кэшауте
+        
+        # Для каждого выигравшего исхода умножить на его коэффициент
+        for item in self.items.filter(result='won'):
+            base *= item.odd_at_placement
+        
+        # Для каждого ожидающего исхода умножить на текущий коэффициент с фактором
+        for item in self.items.filter(result='pending'):
+            current_odd = item.odd_current or item.odd_at_placement
+            base *= (current_odd * cashout_factor)
+        
+        # Применить маржу кэшаута
+        cashout = base * settings.cashout_margin
+        
+        # Проверить минимум
+        if cashout < settings.cashout_min_amount_usd:
+            return Decimal('0.00')
+        
+        return min(cashout, self.potential_win)
 
     def recalculate(self):
-        # Placeholder for recalculation
-        pass
+        """
+        Пересчитать статус ставки после расчёта одного из событий.
+        """
+        self.items_won = self.items.filter(result='won').count()
+        self.items_lost = self.items.filter(result='lost').count()
+        self.items_void = self.items.filter(result='void').count()
+        self.items_pending = self.items.filter(result='pending').count()
+        
+        # Если есть проигравшие исходы в экспрессе, вся ставка проиграла
+        if self.items_lost > 0 and self.bet_type in ('combo', 'system'):
+            self.status = 'lost'
+            self.actual_win = Decimal('0.00')
+            self.profit = -self.stake
+            self.cashout_available = False
+        
+        self.save(update_fields=[
+            'items_won', 'items_lost', 'items_void', 'items_pending',
+            'status', 'actual_win', 'profit', 'cashout_available'
+        ])
 
 
 class BetItem(models.Model):

@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\providers\__init__.py
+# hypothesis_version: 6.151.9
+
+['0', 'BasePaymentProvider', 'DepositResponse', 'DummyProvider', 'NOWPaymentsProvider', 'PROVIDER_REGISTRY', 'PayoutResponse', 'ProviderAPIError', 'RUkassaProvider', 'StatusResponse', 'USD', '__dict__', 'amount', 'api_base_url', 'api_key', 'api_secret', 'code', 'completed', 'currency', 'extra_settings', 'merchant_id', 'nowpayments', 'order_id', 'pending', 'processing', 'provider_order_id', 'provider_status', 'rukassa', 'status', 'unknown', 'webhook_secret']

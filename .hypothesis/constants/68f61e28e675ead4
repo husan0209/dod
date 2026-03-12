@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\utils\helpers.py
+# hypothesis_version: 6.151.9
+
+[',', '.', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR', 'Unknown', 'android', 'desktop', 'ipad', 'iphone', 'mobile', 'tablet']

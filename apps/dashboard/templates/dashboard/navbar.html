@@ -1,58 +1,95 @@
-<nav class="navbar navbar-dark bg-dark border-bottom">
-    <div class="container-fluid">
-        <button class="navbar-toggler d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+<nav
+    class="h-16 border-b border-white/5 bg-dod-bg/80 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+    <div class="flex items-center space-x-6">
+        <!-- Mobile Menu Toggle -->
+        <button class="lg:hidden p-2 text-text-muted hover:text-white transition-colors"
+            x-on:click="sidebarOpen = !sidebarOpen">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                </path>
+            </svg>
         </button>
-        
-        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="{% url 'dashboard:dashboard' %}">DOD Admin</a>
-        
-        <!-- Search -->
-        <div class="d-flex flex-grow-1 justify-content-center position-relative">
-            <div class="input-group">
-                <input class="form-control bg-secondary text-light border-secondary" 
-                       type="search" 
-                       name="q" 
-                       id="global-search"
-                       placeholder="Глобальный поиск..." 
-                       aria-label="Search"
-                       hx-get="{% url 'dashboard:global_search' %}"
-                       hx-trigger="keyup changed delay:300ms"
-                       hx-target="#search-results"
-                       hx-indicator="#search-indicator">
-                <button class="btn btn-outline-light" type="button" id="search-indicator" style="display:none;">
-                    <span class="spinner-border spinner-border-sm" role="status"></span>
-                </button>
-            </div>
-            <div id="search-results" class="dropdown-menu w-100 show" style="max-height: 400px; overflow-y: auto;"></div>
+
+        <a href="{% url 'dashboard:dashboard' %}" class="flex items-center">
+            <span class="text-xl font-bold font-outfit text-white tracking-tight">DOD <span
+                    class="text-blue-500">ADMIN</span></span>
+        </a>
+    </div>
+
+    <!-- Global Search -->
+    <div class="hidden md:flex flex-1 max-w-xl mx-8 relative group">
+        <div
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-muted group-focus-within:text-blue-500 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
         </div>
-        
-        <ul class="navbar-nav flex-row">
-            <!-- Notifications -->
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    🔔 <span class="badge bg-danger">3</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
-                    <li><a class="dropdown-item" href="#">Новые KYC заявки: 2</a></li>
-                    <li><a class="dropdown-item" href="#">Выводы на одобрение: 5</a></li>
-                    <li><a class="dropdown-item" href="#">SLA нарушены: 1</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">Все уведомления</a></li>
-                </ul>
-            </li>
-            
-            <!-- Profile -->
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    👤 {{ user.username }} ({{ admin_profile.role.name }})
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                    <li><a class="dropdown-item" href="#">Профиль</a></li>
-                    <li><a class="dropdown-item" href="#">Настройки</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Выход</a></li>
-                </ul>
-            </li>
-        </ul>
+        <input type="search" name="q" id="global-search" placeholder="Глобальный поиск по всем модулям..."
+            class="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 outline-none transition-all placeholder:text-text-muted"
+            hx-get="{% url 'dashboard:global_search' %}" hx-trigger="keyup changed delay:300ms"
+            hx-target="#search-results" hx-indicator="#search-indicator">
+
+        <div id="search-indicator" class="htmx-indicator absolute right-4 inset-y-0 flex items-center">
+            <span class="w-4 h-4 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></span>
+        </div>
+
+        <div id="search-results" class="absolute top-full left-0 right-0 mt-2 glass-card overflow-hidden z-50"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center space-x-4">
+        <!-- Notifications -->
+        <div class="relative" x-data="{ open: false }">
+            <button class="p-2 text-text-muted hover:text-white transition-colors relative" x-on:click="open = !open">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                    </path>
+                </svg>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full"></span>
+            </button>
+
+            <div x-show="open" @click.outside="open = false"
+                class="absolute right-0 mt-4 w-80 glass-card p-4 shadow-2xl z-50">
+                <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
+                    <span class="text-xs font-bold text-white uppercase tracking-widest">Уведомления</span>
+                    <button class="text-[10px] text-blue-400 hover:text-blue-300">Очистить все</button>
+                </div>
+                <!-- Mini notification list -->
+                <div class="space-y-3">
+                    <div class="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
+                        <div class="text-xs font-bold text-white">Новые KYC заявки (2)</div>
+                        <div class="text-[10px] text-text-muted mt-1">Ожидают проверки документов</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile -->
+        <div class="relative flex items-center space-x-3 pl-4 border-l border-white/5" x-data="{ open: false }">
+            <div class="text-right hidden sm:block">
+                <div class="text-xs font-bold text-white">{{ user.username }}</div>
+                <div class="text-[10px] text-text-muted uppercase tracking-tighter">{{
+                    admin_profile.role.name|default:"Administrator" }}</div>
+            </div>
+            <button
+                class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-white/10"
+                x-on:click="open = !open">
+                {{ user.username|slice:":1"|upper }}
+            </button>
+
+            <div x-show="open" @click.outside="open = false"
+                class="absolute right-0 top-full mt-4 w-48 glass-card overflow-hidden shadow-2xl z-50">
+                <a href="#"
+                    class="block px-4 py-3 text-sm text-text-secondary hover:bg-white/5 hover:text-white transition-colors">Мой
+                    профиль</a>
+                <a href="#"
+                    class="block px-4 py-3 text-sm text-text-secondary hover:bg-white/5 hover:text-white transition-colors">Настройки</a>
+                <div class="border-t border-white/5"></div>
+                <a href="{% url 'accounts:logout' %}"
+                    class="block px-4 py-3 text-sm text-rose-400 hover:bg-rose-500/10 transition-colors">Выйти</a>
+            </div>
+        </div>
     </div>
 </nav>

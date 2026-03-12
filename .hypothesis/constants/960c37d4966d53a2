@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\admin.py
+# hypothesis_version: 6.151.9
+
+['auto_cashout', 'bet_amount', 'cashout_at', 'client_seed', 'code', 'crash_game', 'crash_point', 'created_at', 'currency', 'game_data', 'game_id', 'game_type', 'house_edge', 'is_active', 'is_new', 'is_popular', 'max_bet', 'min_bet', 'name', 'nonce', 'players_count', 'round_id', 'rtp', 'server_seed', 'server_seed_hash', 'started_at', 'status', 'total_bet', 'total_bets', 'total_payout', 'total_wagered_usd', 'updated_at', 'user', 'user__email', 'win_amount', 'win_multiplier']

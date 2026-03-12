@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\wallet\services\wallet_service.py
+# hypothesis_version: 6.151.9
+
+['$', '1.0', 'Registration bonus', 'US Dollar', 'USD', 'available', 'bonus', 'currency', 'decimal_places', 'fiat', 'frozen', 'name', 'primary_currency', 'rate_to_usd', 'symbol', 'total', 'type', 'updated_at', 'usd_equivalent']

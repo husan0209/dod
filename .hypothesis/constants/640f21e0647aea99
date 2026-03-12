@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\predictions\services\market_service.py
+# hypothesis_version: 6.151.9
+
+[500, '%Y%m%d%H%M%S', '-created_at', '-resolved_at', '-total_volume', '0.5000', 'Category not found', 'Close date too soon', 'Invalid question', 'PM', 'active', 'closed', 'closes_at', 'resolved']

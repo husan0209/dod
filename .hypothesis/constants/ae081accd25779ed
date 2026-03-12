@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\telegram_bot\keyboards.py
+# hypothesis_version: 6.151.9
+
+['settings_bets', 'settings_finance', 'settings_promo', 'settings_save', 'settings_security', 'Безопасность ✅', 'Промо-акции ❌', 'Результаты ставок ❌', 'Финансы ✅', '⚙️ Настройки', '❓ Помощь', '🎰 Казино', '💰 Баланс', '💾 Сохранить', '📋 Поддержка', '🔗 Привязать аккаунт', '🤝 Рефералы']

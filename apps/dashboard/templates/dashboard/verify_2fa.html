@@ -1,0 +1,60 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Подтверждение 2FA | DOD Admin{% endblock %}
+{% block page_title %}Подтверждение 2FA{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto">
+    <div class="glass-card p-8">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-3xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-.736.106-1.442.305-2.11A4 4 0 1118 12v2a2 2 0 01-2 2h-1m-6 0H8a2 2 0 01-2-2v-2c0-1.48.804-2.773 2-3.464M12 15v2m0 4h.01"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white font-outfit mb-2">Подтвердите вход в админ-панель</h2>
+            <p class="text-xs text-text-muted uppercase tracking-widest font-bold">Введите код из приложения или резервный код</p>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <div class="space-y-1">
+                <label for="{{ form.totp_code.id_for_label }}" class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Код из приложения</label>
+                {{ form.totp_code }}
+                {% if form.totp_code.errors %}
+                <div class="text-rose-400 text-xs">{{ form.totp_code.errors|first }}</div>
+                {% endif %}
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="h-px flex-1 bg-white/10"></div>
+                <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">или</div>
+                <div class="h-px flex-1 bg-white/10"></div>
+            </div>
+
+            <div class="space-y-1">
+                <label for="{{ form.backup_code.id_for_label }}" class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Резервный код</label>
+                {{ form.backup_code }}
+                {% if form.backup_code.errors %}
+                <div class="text-rose-400 text-xs">{{ form.backup_code.errors|first }}</div>
+                {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="p-4 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 text-sm">
+                {{ form.non_field_errors|first }}
+            </div>
+            {% endif %}
+
+            <button type="submit" class="w-full btn-premium py-3 text-sm font-bold bg-blue-600 hover:bg-blue-500 shadow-blue-500/20">
+                Подтвердить
+            </button>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-white/5 text-center">
+            <a href="{% url 'accounts:logout' %}" class="text-xs text-text-muted hover:text-white transition-colors">Выйти</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

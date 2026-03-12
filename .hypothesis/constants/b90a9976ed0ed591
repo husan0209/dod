@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\miniapp\decorators.py
+# hypothesis_version: 6.151.9
+
+[401, 403, 'error', 'miniapp:home', 'miniapp:link-account', 'telegram_user']

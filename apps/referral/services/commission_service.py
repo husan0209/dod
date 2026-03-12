@@ -423,6 +423,8 @@ class PartnerTierService:
                 AdminActionLog.objects.create(
                     admin_user=None,
                     action_type='partner_tier_changed',
+                    module='referral',
+                    action_category='tier',
                     target_user=partner,
                     description=f'Auto: {old_tier.name} → {tier.name}',
                     details={
@@ -521,3 +523,12 @@ class PartnerTierService:
             monthly_earned=0,
             monthly_referrals=0,
         )
+
+    @staticmethod
+    def process_payout_request(user, amount, payout_method, payout_details, ip_address=None):
+        """
+        Обработать запрос на выплату.
+        Делегирует PayoutService.
+        """
+        from apps.referral.services.payout_service import PayoutService
+        return PayoutService.process_payout_request(user, amount, payout_method, payout_details, ip_address)

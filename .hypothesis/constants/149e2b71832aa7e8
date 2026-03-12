@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\accounts\views.py
+# hypothesis_version: 6.151.9
+
+['2fa_user_id', 'GET', 'POST', 'REMOTE_ADDR', 'accounts/login.html', 'accounts:link_phone', 'accounts:login', 'accounts:profile', 'accounts:register', 'accounts:verify_2fa', 'active_sessions', 'backup_code', 'backup_codes', 'backup_codes_count', 'code', 'codes', 'dashboard:dashboard', 'dashboard:home', 'email', 'form', 'is_2fa_enabled', 'language', 'linked_accounts', 'login_history', 'new_password1', 'old_password', 'password', 'password1', 'phone', 'provider', 'qr_code', 'ru', 'secret', 'token', 'totp_code', 'totp_secret', 'two_fa_method', 'user', 'username', 'Вы успешно вошли.', 'Вы успешно вышли.', 'Неверный код']

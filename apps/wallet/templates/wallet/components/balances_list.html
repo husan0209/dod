@@ -1,0 +1,23 @@
+{% load wallet_tags %}
+<div class="space-y-2">
+  {% for b in balances %}
+    <div class="flex items-center justify-between bg-dod-surface/60 rounded-lg px-3 py-2">
+      <div>
+        <div class="text-sm font-semibold">
+          {% currency_icon b.currency %} {{ b.currency }}
+        </div>
+        <div class="text-xs text-text-secondary">
+          Доступно: {{ b.available }} • Заморожено: {{ b.frozen }}
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="text-sm font-bold">
+          {{ b.symbol }}{{ b.total }}
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-sm text-text-secondary">Балансов пока нет.</p>
+  {% endfor %}
+</div>
+

@@ -1,0 +1,27 @@
+{# Dropdown/Menu component #}
+<div x-data="{ open: false }" @click.outside="open = false" class="relative">
+    
+    <!-- Trigger Button -->
+    <button @click="open = !open" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors">
+        {{ trigger_text|default:"Menu" }}
+        <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+    </button>
+    
+    <!-- Dropdown Menu -->
+    <div x-show="open" 
+         x-transition 
+         class="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-lg shadow-xl">
+        {% if items %}
+            {% for item in items %}
+                <a href="{{ item.url }}" 
+                   class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                    {{ item.label }}
+                </a>
+            {% endfor %}
+        {% else %}
+            <slot></slot>
+        {% endif %}
+    </div>
+</div>

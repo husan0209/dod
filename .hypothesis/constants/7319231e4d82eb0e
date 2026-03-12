@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\accounts\managers.py
+# hypothesis_version: 6.151.9
+
+['Email обязателен', 'Username обязателен', 'is_email_verified', 'is_staff', 'is_superuser', 'trust_level']

@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Ticket, Message, FAQCategory, FAQArticle, QuickReply
 from .forms import TicketCreateForm, TicketReplyForm
 from .services.ticket_service import TicketService
@@ -47,7 +48,7 @@ def create_ticket(request):
                 messages.success(request, f'Тикет #{ticket.ticket_number} создан успешно!')
                 return redirect('support:ticket_detail', ticket_id=ticket.id)
             else:
-                messages.error(request, error)
+                messages.error(request, error or 'Ошибка при создании тикета')
     else:
         form = TicketCreateForm()
 
@@ -112,7 +113,7 @@ def ticket_detail(request, ticket_id):
     else:
         form = TicketReplyForm()
 
-    messages_list = ticket.messages.filter(is_internal=False).order_by('created_at')
+    messages_list = Message.objects.filter(ticket=ticket, is_internal=False).order_by('created_at')
 
     return render(request, 'support/ticket_detail.html', {
         'ticket': ticket,
@@ -136,7 +137,7 @@ def rate_ticket(request, ticket_id):
     if success:
         messages.success(request, 'Спасибо за оценку!')
     else:
-        messages.error(request, error)
+        messages.error(request, error or 'Ошибка при оценке тикета')
 
     return redirect('support:ticket_detail', ticket_id=ticket.id)
 
@@ -222,6 +223,8 @@ def suggest_faq(request):
     html = render(request, 'support/partials/faq_suggestions.html', {
         'suggested_faqs': suggested_faqs,
     }).content.decode('utf-8')
+
+    return JsonResponse({'html': html})
 
 from .services.sla_service import SLAService
 
@@ -317,7 +320,7 @@ def operator_ticket_detail(request, ticket_id):
             # Handle status change
             pass
 
-    messages_list = ticket.messages.filter(is_internal=False).order_by('created_at')
+    messages_list = Message.objects.filter(ticket=ticket, is_internal=False).order_by('created_at')
 
     context = {
         'ticket': ticket,

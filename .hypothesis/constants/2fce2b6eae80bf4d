@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\views.py
+# hypothesis_version: 6.151.9
+
+[0.01, 99.98, 99.99, 100, 400, '-started_at', '1d', '30d', '7d', '98.0', 'USD', '[]', 'auto_cashout', 'bet_amount', 'bets', 'casino/crash.html', 'casino/dice.html', 'casino/fairness.html', 'casino/history.html', 'casino/index.html', 'casino/mines.html', 'casino/plinko.html', 'casino/roulette.html', 'casino/slots.html', 'casino:index', 'cell', 'client_seed', 'condition', 'currency', 'current_round', 'error', 'field_size', 'game_data', 'game_id', 'game_session_id', 'game_type', 'game_type_filter', 'game_types', 'high', 'lost', 'low', 'medium', 'mines_count', 'mines_positions', 'multiplier', 'nonce', 'over', 'period', 'period_filter', 'result', 'result_filter', 'risk', 'rows', 'server_seed', 'sessions', 'settings', 'sort_order', 'success', 'target', 'user_seed', 'waiting', 'win_amount', 'win_chance', 'won', '{}', 'Неверные параметры', 'Нет ставок']

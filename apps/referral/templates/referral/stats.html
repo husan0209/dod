@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Детальная статистика - DOD{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">📊 Детальная статистика</h1>
+            <p class="text-slate-400">Полный анализ вашей партнёрской программы</p>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <p class="text-slate-400 text-sm mb-2">👥 Всего рефералов</p>
+                <p class="text-3xl font-bold text-white">{{ total_referrals }}</p>
+                <p class="text-slate-400 text-xs mt-1">За всё время</p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <p class="text-slate-400 text-sm mb-2">💰 Всего заработано</p>
+                <p class="text-3xl font-bold text-green-400">${{ total_earned|floatformat:2 }}</p>
+                <p class="text-slate-400 text-xs mt-1">USD</p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <p class="text-slate-400 text-sm mb-2">💸 Выведено</p>
+                <p class="text-3xl font-bold text-blue-400">${{ total_withdrawn|floatformat:2 }}</p>
+                <p class="text-slate-400 text-xs mt-1">Выплачено</p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <p class="text-slate-400 text-sm mb-2">💳 На счёте</p>
+                <p class="text-3xl font-bold text-purple-400">${{ balance|floatformat:2 }}</p>
+                <p class="text-slate-400 text-xs mt-1">Готово</p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <p class="text-slate-400 text-sm mb-2">📈 Коэффициент депозита</p>
+                <p class="text-3xl font-bold text-orange-400">{{ conversion_rate|floatformat:1 }}%</p>
+                <p class="text-slate-400 text-xs mt-1">{{ deposited_refs }} из {{ total_referrals }}</p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <p class="text-slate-400 text-sm mb-2">🎯 Средний GGR</p>
+                <p class="text-3xl font-bold text-indigo-400">${{ avg_ggr_per_ref|floatformat:2 }}</p>
+                <p class="text-slate-400 text-xs mt-1">На реферала</p>
+            </div>
+        </div>
+
+        <!-- GGR Overview -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <h3 class="text-xl font-bold text-white mb-6">📊 Общий GGR</h3>
+                <div class="bg-gradient-to-br from-purple-900 to-indigo-900 rounded-lg p-6 mb-4">
+                    <p class="text-purple-200 text-sm mb-2">Суммарно от всех рефералов</p>
+                    <p class="text-4xl font-bold text-white">${{ total_ggr|floatformat:2 }}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <p class="text-slate-400 text-xs mb-1">1-й уровень</p>
+                        <p class="text-white font-bold">${{ total_ggr|floatformat:2 }}</p>
+                    </div>
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <p class="text-slate-400 text-xs mb-1">2-й уровень</p>
+                        <p class="text-white font-bold">$0.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <h3 class="text-xl font-bold text-white mb-6">🏆 Лучшие достижения</h3>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-slate-400 text-sm mb-1">Лучший месяц</p>
+                        <p class="text-white font-bold text-lg">${{ balance |floatformat:2}}</p>
+                    </div>
+                    <div class="pt-4 border-t border-slate-700">
+                        <p class="text-slate-400 text-sm mb-1">Средний доход в месяц</p>
+                        <p class="text-white font-bold text-lg">${{ total_earned|floatformat:2 }}</p>
+                    </div>
+                    <div class="pt-4 border-t border-slate-700">
+                        <p class="text-slate-400 text-sm mb-1">Из расчета на реферала</p>
+                        <p class="text-white font-bold text-lg">${{ avg_ggr_per_ref|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Source Analysis -->
+        {% if source_stats %}
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 mb-8">
+            <h3 class="text-xl font-bold text-white mb-6">🎯 Анализ по источникам</h3>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-slate-700">
+                            <th class="text-left py-3 px-4 text-slate-400 font-semibold">Источник</th>
+                            <th class="text-right py-3 px-4 text-slate-400 font-semibold">Регистрации</th>
+                            <th class="text-right py-3 px-4 text-slate-400 font-semibold">Депозиты</th>
+                            <th class="text-right py-3 px-4 text-slate-400 font-semibold">GGR</th>
+                            <th class="text-right py-3 px-4 text-slate-400 font-semibold">Заработано</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in source_stats %}
+                        <tr class="border-b border-slate-700 hover:bg-slate-700 transition-colors">
+                            <td class="py-3 px-4 text-white font-semibold">{{ stat.promo_link__name|default:"Основная ссылка" }}</td>
+                            <td class="py-3 px-4 text-right text-blue-400">{{ stat.registrations }}</td>
+                            <td class="py-3 px-4 text-right text-green-400">{{ stat.deposits }}</td>
+                            <td class="py-3 px-4 text-right text-purple-400">${{ stat.total_ggr|floatformat:2 }}</td>
+                            <td class="py-3 px-4 text-right text-orange-400 font-bold">${{ stat.total_earned|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Top Referrals -->
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 p-6">
+            <h3 class="text-xl font-bold text-white mb-6">👑 Топ рефералы</h3>
+            
+            {% if top_referrals %}
+            <div class="space-y-3">
+                {% for referral in top_referrals %}
+                <div class="bg-slate-700 rounded-lg p-4 flex items-center justify-between hover:bg-slate-600 transition-colors">
+                    <div class="flex items-center gap-4 flex-1">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                            #{{ forloop.counter }}
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">{{ referral.referral.username }}</p>
+                            <p class="text-slate-400 text-sm">{{ referral.referral.email }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-white font-bold">${{ referral.total_ggr|floatformat:2 }} GGR</p>
+                        <p class="text-green-400 text-sm">${{ referral.total_commission_earned|floatformat:2 }} заработано</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-center text-slate-400 py-8">Нет данных</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

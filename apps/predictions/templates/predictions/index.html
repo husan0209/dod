@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% load static %}
+{% load prediction_tags %}
+
+{% block title %}Маркеты Предсказаний | DOD{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'predictions/css/predictions.css' %}">
+<style>
+    :root {
+        --primary: #3b82f6;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --dark: #1f2937;
+        --light: #f9fafb;
+        --border: #e5e7eb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="predictions-container">
+    
+    <!-- 🎯 Hero Section -->
+    <section class="hero-section">
+        <div class="container-lg">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="star">⭐</span> 
+                    Маркеты Предсказаний
+                </h1>
+                <p class="hero-subtitle">
+                    Торгуйте долями исходов реальных событий.
+                    Предсказывайте будущее и зарабатывайте на своих знаниях.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <span class="stat-value">{{ markets.count }}</span>
+                        <span class="stat-label">Активных маркетов</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">💰 ${{ total_volume|floatformat:0 }}</span>
+                        <span class="stat-label">Общий объём</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">👥 2.3K</span>
+                        <span class="stat-label">Активных трейдеров</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🔍 Поиск и фильтры -->
+    <section class="filters-section">
+        <div class="container-lg">
+            <div class="filters-grid">
+                
+                <!-- Поиск -->
+                <div class="search-box">
+                    <i class="icon-search">🔍</i>
+                    <form method="get" class="search-form">
+                        <input 
+                            type="text" 
+                            name="q" 
+                            placeholder="Найти маркет..."
+                            value="{{ query }}"
+                            class="search-input"
+                        >
+                    </form>
+                </div>
+
+                <!-- Категории -->
+                <div class="category-filter">
+                    <select name="category" id="category" class="filter-select" onchange="filterByCategory()">
+                        <option value="">Все категории</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}" {% if cat.id == selected_category %}selected{% endif %}>
+                                {{ cat.icon }} {{ cat.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Сортировка -->
+                <div class="sort-filter">
+                    <select name="filter" class="filter-select" onchange="filterByType()">
+                        <option value="">Все маркеты</option>
+                        <option value="trending" {% if filter_type == 'trending' %}selected{% endif %}>
+                            🔥 Горячие
+                        </option>
+                        <option value="closing_soon" {% if filter_type == 'closing_soon' %}selected{% endif %}>
+                            ⏰ Скоро закроются
+                        </option>
+                        <option value="resolved" {% if filter_type == 'resolved' %}selected{% endif %}>
+                            ✅ Разрешённые
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 📊 Маркеты -->
+    <section class="markets-section">
+        <div class="container-lg">
+            
+            <div class="markets-header">
+                <h2>{{ markets.count }} маркетов найдено</h2>
+                {% if user.is_staff %}
+                    <a href="{% url 'predictions:create_market' %}" class="btn btn-primary">
+                        <span>➕</span> Создать маркет
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if markets %}
+                <div class="markets-grid">
+                    {% for market in markets %}
+                        <a href="{% url 'predictions:market_detail' market.id %}" class="market-card">
+                            
+                            <!-- Статус и популярность -->
+                            <div class="card-header">
+                                <div class="card-badges">
+                                    {% if market.is_featured %}
+                                        <span class="badge badge-featured">⭐ Featured</span>
+                                    {% endif %}
+                                    {% if market.is_trending %}
+                                        <span class="badge badge-hot">🔥 Hot</span>
+                                    {% endif %}
+                                </div>
+                                <span class="card-category">{{ market.category.icon }} {{ market.category.name }}</span>
+                            </div>
+
+                            <!-- Изображение -->
+                            {% if market.thumbnail %}
+                                <div class="card-image">
+                                    <img src="{{ market.thumbnail.url }}" alt="{{ market.question }}" loading="lazy">
+                                </div>
+                            {% else %}
+                                <div class="card-image card-image--empty">
+                                    <span class="empty-icon">📊</span>
+                                </div>
+                            {% endif %}
+
+                            <!-- Содержание -->
+                            <div class="card-content">
+                                <h3 class="card-title">{{ market.question|truncatewords:15 }}</h3>
+                                <p class="card-description">{{ market.description|truncatewords:20 }}</p>
+
+                                <!-- Цены -->
+                                <div class="prices-row">
+                                    <div class="price-item yes">
+                                        <span class="price-label">YES</span>
+                                        <span class="price-value">${{ market.yes_price|floatformat:2 }}</span>
+                                        <span class="price-prob">{{ market.get_yes_probability|floatformat:0 }}%</span>
+                                    </div>
+                                    <div class="price-divider"></div>
+                                    <div class="price-item no">
+                                        <span class="price-label">NO</span>
+                                        <span class="price-value">${{ market.no_price|floatformat:2 }}</span>
+                                        <span class="price-prob">{{ market.get_no_probability|floatformat:0 }}%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Статистика -->
+                                <div class="card-stats">
+                                    <div class="stat">
+                                        <span class="stat-icon">💰</span>
+                                        <span class="stat-text">${{ market.volume_24h_usd|floatformat:0 }}/24h</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-icon">👥</span>
+                                        <span class="stat-text">{{ market.unique_traders }} трейдеров</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-icon">⏰</span>
+                                        <span class="stat-text">{{ market.get_time_until_close|timeuntil }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Footer-->
+                                <div class="card-footer">
+                                    <span class="view-count">👁️ {{ market.views_count }}</span>
+                                    <span class="arrow">→</span>
+                                </div>
+                            </div>
+
+                        </a>
+                    {% endfor %}
+                </div>
+
+                <!-- Пpagination -->
+                {% if is_paginated %}
+                    <div class="pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1" class="btn btn-sm">« В начало</a>
+                            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm">‹ Назад</a>
+                        {% endif %}
+                        
+                        <span class="page-info">
+                            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                        </span>
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm">Вперёд ›</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-sm">В конец »</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+            {% else %}
+                <div class="empty-state">
+                    <span class="empty-icon">🔎</span>
+                    <h3>Маркеты не найдены</h3>
+                    <p>Попробуйте изменить фильтры или поиск</p>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'predictions/js/predictions.js' %}"></script>
+<script>
+function filterByCategory() {
+    const category = document.getElementById('category').value;
+    const params = new URLSearchParams(window.location.search);
+    if (category) {
+        params.set('category', category);
+    } else {
+        params.delete('category');
+    }
+    window.location.search = params;
+}
+
+function filterByType() {
+    document.closest('form').submit();
+}
+</script>
+{% endblock %}

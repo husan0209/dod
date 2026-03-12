@@ -1,0 +1,207 @@
+{# Компонент торговой формы - YES/NO #}
+{% load static %}
+
+<form class="trade-form" data-market-id="{{ market.id }}" data-side="{{ side }}">
+    {% csrf_token %}
+    
+    <div class="trade-price-display">
+        <span class="label">Текущая цена</span>
+        <div class="price-display">
+            <span class="price">${{ price|floatformat:4 }}</span>
+            <span class="probability">({{ price|floatformat:0 }}%)</span>
+        </div>
+    </div>
+
+    <!-- Amount Input -->
+    <div class="form-group">
+        <label for="amount-{{ side }}">
+            Сумма (USD)
+            <span class="wallet-balance">Баланс: <strong>${{ request.user.wallet.get_balance_usd|default:"N/A" }}</strong></span>
+        </label>
+        <div class="input-group">
+            <input 
+                type="number" 
+                id="amount-{{ side }}"
+                name="amount"
+                class="form-input amount-input"
+                placeholder="0.00"
+                min="0.10"
+                max="10000"
+                step="0.01"
+                data-side="{{ side }}"
+            >
+            <span class="input-suffix">USD</span>
+        </div>
+        <div class="quick-amounts">
+            <button type="button" class="quick-btn" data-amount="10">$10</button>
+            <button type="button" class="quick-btn" data-amount="50">$50</button>
+            <button type="button" class="quick-btn" data-amount="100">$100</button>
+            <button type="button" class="quick-btn" data-amount="500">$500</button>
+        </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="trade-preview" style="display: none;">
+        <div class="preview-row">
+            <span class="label">Получите долей</span>
+            <span class="value" id="shares-{{ side }}">0.00</span>
+        </div>
+        <div class="preview-row">
+            <span class="label">Средняя цена</span>
+            <span class="value" id="avg-price-{{ side }}">${{ price|floatformat:4 }}</span>
+        </div>
+        <div class="preview-row">
+            <span class="label">Проскальзывание</span>
+            <span class="value slippage" id="slippage-{{ side }}">0.00%</span>
+        </div>
+        <div class="preview-row">
+            <span class="label">Комиссия</span>
+            <span class="value warning" id="fee-{{ side }}">$0.00</span>
+        </div>
+        <div class="preview-row preview-total">
+            <span class="label">Итого</span>
+            <span class="value" id="total-{{ side }}">$0.00</span>
+        </div>
+    </div>
+
+    <!-- Error messages -->
+    <div class="error-message" id="error-{{ side }}" style="display: none;"></div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-lg btn-{{ side }}" id="submit-{{ side }}">
+        <span class="btn-icon">{% if side == 'yes' %}✅{% else %}❌{% endif %}</span>
+        <span class="btn-text">Купить {{ side|upper }}</span>
+    </button>
+
+    <!-- Info -->
+    <div class="trade-info">
+        <p class="info-text">
+            ℹ️ Купите доли по цене ${{ price|floatformat:4 }}. Если исход победит, каждая доля будет стоить $1.00.
+        </p>
+    </div>
+
+</form>
+
+<script>
+(function() {
+    const form = document.querySelector('[data-side="{{ side }}"]');
+    const amountInput = form.querySelector('.amount-input');
+    const preview = form.querySelector('.trade-preview');
+    const errorDiv = form.querySelector('.error-message');
+    
+    // Обновление превью при изменен количества
+    amountInput.addEventListener('input', function() {
+        const amount = parseFloat(this.value) || 0;
+        
+        if (amount <= 0) {
+            preview.style.display = 'none';
+            errorDiv.style.display = 'none';
+            return;
+        }
+
+        // AJAX запрос для превью
+        fetch("{% url 'predictions:preview_buy' market.id %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `side={{ side }}&amount=${amount}`
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                errorDiv.textContent = '❌ ' + data.error;
+                errorDiv.style.display = 'block';
+                preview.style.display = 'none';
+            } else {
+                errorDiv.style.display = 'none';
+                preview.style.display = 'block';
+                
+                // Обновить значения
+                document.getElementById('shares-{{ side }}').textContent = 
+                    (parseFloat(data.shares) || 0).toFixed(2);
+                document.getElementById('avg-price-{{ side }}').textContent = 
+                    '$' + (parseFloat(data.avg_price) || 0).toFixed(4);
+                document.getElementById('slippage-{{ side }}').textContent = 
+                    (parseFloat(data.slippage) || 0).toFixed(2) + '%';
+                document.getElementById('fee-{{ side }}').textContent = 
+                    '$' + (parseFloat(data.fee) || 0).toFixed(2);
+                document.getElementById('total-{{ side }}').textContent = 
+                    '$' + (parseFloat(data.total) || 0).toFixed(2);
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            errorDiv.textContent = '❌ Ошибка при получении превью';
+            errorDiv.style.display = 'block';
+        });
+    });
+
+    // Quick amount buttons
+    form.querySelectorAll('.quick-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            amountInput.value = this.dataset.amount;
+            amountInput.dispatchEvent(new Event('input'));
+        });
+    });
+
+    // Form submit
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const amount = parseFloat(amountInput.value);
+        if (amount <= 0) {
+            errorDiv.textContent = '❌ Введите корректную сумму';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        const submitBtn = form.querySelector('[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = '⏳ Обработка...';
+
+        try {
+            const response = await fetch("{% url 'predictions:trade' market.id %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `action=buy&side={{ side }}&amount=${amount}`
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                errorDiv.textContent = '❌ ' + data.error;
+                errorDiv.style.display = 'block';
+            } else {
+                // Успех!
+                errorDiv.style.display = 'none';
+                errorDiv.innerHTML = `
+                    <div class="success-message">
+                        ✅ Сделка выполнена успешно!
+                        <br>Вы получили ${data.shares.toFixed(2)} долей
+                    </div>
+                `;
+                errorDiv.style.display = 'block';
+
+                // Очистить форму
+                amountInput.value = '';
+                preview.style.display = 'none';
+
+                // Перезагрузить страницу через 2 сек
+                setTimeout(() => window.location.reload(), 2000);
+            }
+        } catch (error) {
+            errorDiv.textContent = '❌ Ошибка сервера: ' + error.message;
+            errorDiv.style.display = 'block';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="btn-icon">{% if side == "yes" %}✅{% else %}❌{% endif %}</span> <span class="btn-text">Купить {{ side|upper }}</span>';
+        }
+    });
+})();
+</script>

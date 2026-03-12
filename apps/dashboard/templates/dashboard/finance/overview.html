@@ -1,126 +1,198 @@
 {% extends 'dashboard/base.html' %}
+{% load static %}
 
-{% block title %}Финансы{% endblock %}
-{% block page_title %}💰 Финансы{% endblock %}
+{% block title %}Финансовый обзор | DOD Admin{% endblock %}
+{% block page_title %}Финансовый мониторинг{% endblock %}
+
+{% block page_actions %}
+<a href="#"
+    class="btn-premium px-4 py-2 text-xs flex items-center bg-white/5 border-white/10 hover:bg-white/10 shadow-none transition-all">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+        </path>
+    </svg>
+    Экспорт отчета
+</a>
+{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <!-- Today's Metrics -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h6 class="mb-0">Сегодня</h6>
+<div class="space-y-8">
+    <!-- Today's High-Level Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-8 bg-gradient-to-br from-emerald-500/5 to-transparent border-emerald-500/10">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Депозиты сегодня</span>
+                <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                    </svg>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h4 class="text-success">${{ deposits_today|floatformat:0 }}</h4>
-                            <p>Депозиты ({{ deposits_count }} шт)</p>
+            <div class="text-3xl font-bold text-white font-outfit mb-1">${{ deposits_today|floatformat:2 }}</div>
+            <div class="text-[10px] text-text-muted uppercase tracking-tighter">Всего операций: {{ deposits_count }}
+            </div>
+        </div>
+
+        <div class="glass-card p-8 bg-gradient-to-br from-rose-500/5 to-transparent border-rose-500/10">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] font-bold text-rose-400 uppercase tracking-widest">Выводы сегодня</span>
+                <div class="p-2 bg-rose-500/10 rounded-lg text-rose-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="text-3xl font-bold text-white font-outfit mb-1">${{ withdrawals_today|floatformat:2 }}</div>
+            <div class="text-[10px] text-text-muted uppercase tracking-tighter">Всего операций: {{ withdrawals_count }}
+            </div>
+        </div>
+
+        <div class="glass-card p-8 bg-gradient-to-br from-blue-500/5 to-transparent border-blue-500/10">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Чистый поток (Net)</span>
+                <div class="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                    </svg>
+                </div>
+            </div>
+            <div
+                class="text-3xl font-bold {% if net_flow >= 0 %}text-white{% else %}text-rose-400{% endif %} font-outfit mb-1">
+                {% if net_flow >= 0 %}+{% endif %}${{ net_flow|floatformat:2 }}
+            </div>
+            <div class="text-[10px] text-text-muted uppercase tracking-tighter">Разница IN/OUT</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Pending Alerts -->
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Требуют внимания</h3>
+            <div class="space-y-4">
+                <a href="{% url 'dashboard:finance_withdrawals' %}"
+                    class="flex items-center justify-between p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 hover:bg-amber-500/10 transition-all group">
+                    <div class="flex items-center">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 mr-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">
+                                Очередь выводов</div>
+                            <div class="text-[10px] text-text-muted uppercase tracking-widest">{{
+                                pending_withdrawals_count }} заявок ожидают одобрения</div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h4 class="text-danger">${{ withdrawals_today|floatformat:0 }}</h4>
-                            <p>Выводы ({{ withdrawals_count }} шт)</p>
+                    <div class="text-right">
+                        <div class="text-sm font-bold text-white">${{ pending_withdrawals_amount|floatformat:0 }}</div>
+                        <div class="text-[10px] text-text-muted uppercase tracking-tighter">Всего</div>
+                    </div>
+                </a>
+
+                <div class="flex items-center justify-between p-4 rounded-2xl bg-rose-500/5 border border-rose-500/10">
+                    <div class="flex items-center">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 mr-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Подозрительные транзакции</div>
+                            <div class="text-[10px] text-text-muted uppercase tracking-widest">Срабатывание AML фильтров
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h4 class="{% if net_flow >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                {% if net_flow >= 0 %}+{% endif %}${{ net_flow|floatformat:0 }}
-                            </h4>
-                            <p>Нет-поток</p>
+                    <span class="badge-premium bg-rose-500/10 text-rose-400 border-rose-500/20">3 Alert</span>
+                </div>
+
+                <div class="flex items-center justify-between p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10">
+                    <div class="flex items-center">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 mr-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">Крупные пополнения</div>
+                            <div class="text-[10px] text-text-muted uppercase tracking-widest">Транзакции выше $5,000
+                            </div>
                         </div>
                     </div>
+                    <span class="badge-premium bg-blue-500/10 text-blue-400 border-blue-500/20">2 High</span>
                 </div>
             </div>
         </div>
 
-        <!-- Pending Actions -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h6 class="mb-0">Ожидают действия</h6>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="alert alert-warning">
-                            <h6>⏳ Выводов на одобрение: {{ pending_withdrawals_count }}</h6>
-                            <p class="mb-0">${{ pending_withdrawals_amount|floatformat:0 }}</p>
-                        </div>
+        <!-- Hot Wallets & Gateways -->
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Балансы Платформы</h3>
+            <div class="grid grid-cols-1 gap-6">
+                <!-- NOWPayments -->
+                <div class="p-6 rounded-2xl bg-white/5 border border-white/5 transition-all hover:bg-white/10">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Gateway:
+                            NOWpayments</span>
+                        <span
+                            class="flex items-center text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-2"></span> Online
+                        </span>
                     </div>
-                    <div class="col-md-6">
-                        <div class="alert alert-danger">
-                            <h6>⚠️ Подозрительных: 3</h6>
-                            <p class="mb-0">$4,567</p>
+                    <div class="flex items-end justify-between">
+                        <div class="space-y-1">
+                            <div class="text-lg font-bold text-white">BTC: 1.23400</div>
+                            <div class="text-lg font-bold text-white">USDT: $45,678.00</div>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="alert alert-info">
-                            <h6>🟡 Крупных (> $5k): 2</h6>
-                            <p class="mb-0">$15,000</p>
+                        <div class="text-right text-[10px] text-text-muted uppercase tracking-tighter">
+                            Последняя синхронизация: 2 мин назад
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Payment Systems -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h6 class="mb-0">Платёжные системы</h6>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="d-flex justify-content-between">
-                            <span>NOWpayments</span>
-                            <span>✅ Работает | $12,345 сегодня</span>
-                        </div>
+                <!-- RUkassa -->
+                <div class="p-6 rounded-2xl bg-white/5 border border-white/5 transition-all hover:bg-white/10">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Gateway:
+                            RUkassa</span>
+                        <span
+                            class="flex items-center text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-2"></span> Online
+                        </span>
                     </div>
-                    <div class="col-md-6">
-                        <div class="d-flex justify-content-between">
-                            <span>RUkassa</span>
-                            <span>✅ Работает | $33,333 сегодня</span>
+                    <div class="flex items-end justify-between">
+                        <div class="space-y-1">
+                            <div class="text-lg font-bold text-white">RUB: 2,345,678.00 ₽</div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Platform Balance -->
-        <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0">Баланс платформы</h6>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-2">
-                            <strong>Горячий кошелёк BTC:</strong> 1.234 BTC
-                        </div>
-                        <div class="mb-2">
-                            <strong>Горячий кошелёк USDT:</strong> $45,678
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-2">
-                            <strong>RUkassa баланс:</strong> ₽2,345,678
+                        <div class="text-right text-[10px] text-text-muted uppercase tracking-tighter">
+                            Дневной оборот: $33,333
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Quick Actions -->
-        <div class="mt-4">
-            <a href="{% url 'dashboard:finance_withdrawals' %}" class="btn btn-primary">Очередь выводов</a>
-            <a href="{% url 'dashboard:finance_transactions' %}" class="btn btn-secondary">Все транзакции</a>
-            <a href="#" class="btn btn-success">Финансовые отчёты</a>
-        </div>
+    <!-- Quick Links Footer -->
+    <div class="flex flex-wrap gap-4 pt-4 border-t border-white/5">
+        <a href="{% url 'dashboard:finance_withdrawals' %}" class="btn-premium px-8 py-3 text-sm font-bold">Очередь
+            выводов</a>
+        <a href="{% url 'dashboard:finance_transactions' %}"
+            class="btn-premium px-8 py-3 text-sm font-bold bg-white/5 border-white/10 hover:bg-white/10 shadow-none">Все
+            транзакции</a>
+        <a href="#"
+            class="btn-premium px-8 py-3 text-sm font-bold bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20 shadow-none">Финансовые
+            отчеты</a>
     </div>
 </div>
 {% endblock %}

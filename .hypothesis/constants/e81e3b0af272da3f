@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\support\services\sla_service.py
+# hypothesis_version: 6.151.9
+
+[100, 3600, '-ticket_count', 'abandonment_rate', 'assigned_tickets', 'assigned_to', 'avg', 'avg_first_response', 'avg_rating', 'avg_resolution', 'avg_resolution_hours', 'avg_wait_seconds', 'busy', 'category', 'closed', 'created_at', 'ended', 'first_response_at', 'helpful_no', 'helpful_percentage', 'helpful_yes', 'id', 'in_progress', 'new', 'online', 'open', 'rating', 'resolved', 'resolved_at', 'resolved_rate', 'sla_breaches', 'sla_percentage', 'timeout', 'total', 'total_chats', 'total_feedback', 'total_tickets', 'total_views', 'user', 'user__username', 'views_count', 'wait_time_seconds', 'waiting', 'waiting_admin', 'waiting_user']

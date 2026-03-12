@@ -15,8 +15,8 @@ from apps.payments.webhooks.nowpayments_webhook import handle_nowpayments_webhoo
 class RUkassaWebhookTests(TestCase):
     fixtures = ["payments_providers_methods.json"]
 
-    def _sign(self, shop_id: str, amount: str, order_id: str, secret: str) -> str:
-        return hashlib.md5(f"{shop_id}{amount}{order_id}{secret}".encode("utf-8")).hexdigest()
+    def _sign(self, shop_id: str, order_id: str, amount: str, status: str, secret: str) -> str:
+        return hashlib.md5(f"{shop_id}:{order_id}:{amount}:{status}:{secret}".encode("utf-8")).hexdigest()
 
     def test_invalid_signature_returns_400(self):
         payload = {"order_id": "DEP-1", "amount": "100.00", "sign": "bad"}
@@ -28,11 +28,12 @@ class RUkassaWebhookTests(TestCase):
         shop_id = "CHANGE_ME"
         secret = "CHANGE_ME"
         payload = {
+            "shop_id": shop_id,
             "order_id": "DEP-123",
             "amount": "150.00",
             "status": "PAID",
         }
-        payload["sign"] = self._sign(shop_id, payload["amount"], payload["order_id"], secret)
+        payload["sign"] = self._sign(shop_id, payload["order_id"], payload["amount"], payload["status"], secret)
 
         with patch("apps.payments.webhooks.rukassa_webhook.PaymentService.complete_deposit") as mock_complete:
             mock_complete.return_value = "completed"

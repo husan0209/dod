@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\referral\urls.py
+# hypothesis_version: 6.151.9
+
+['api/promo-links/', 'api/referrals/', 'api/stats/', 'api_promo_links', 'api_referrals', 'api_stats', 'commissions', 'commissions/', 'dashboard', 'payouts', 'payouts/', 'promo', 'promo/', 'referral', 'referral_detail', 'referrals', 'referrals/', 'settings', 'settings/', 'stats', 'stats/']

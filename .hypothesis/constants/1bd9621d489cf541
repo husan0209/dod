@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\games\crash.py
+# hypothesis_version: 6.151.9
+
+['1.01', 'active', 'auto_cashout', 'bet_amount', 'busted', 'cashed_out', 'cashout_at', 'crash', 'crash_global', 'crash_point', 'crashed', 'currency_code', 'running', 'waiting', 'Раунд не активен', 'Слишком поздно']

@@ -1,113 +1,141 @@
-<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
-    <div class="position-sticky pt-3">
-        <ul class="nav flex-column">
-            {% if admin_profile.has_permission 'dashboard' 'view' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
-                   href="{% url 'dashboard:dashboard' %}">
-                    📊 Дашборд
+<aside id="sidebar-menu"
+    class="fixed inset-y-0 left-0 z-40 w-64 bg-dod-bg border-r border-white/5 transition-transform duration-300 transform lg:translate-x-0"
+    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+    <div class="h-full flex flex-col pt-20 px-4 overflow-y-auto custom-scrollbar">
+        <ul class="space-y-1 pb-8">
+            {% load dashboard_filters %}
+            {% comment %} Проверяем все права доступа {% endcomment %}
+            {% check_permission admin_profile "dashboard.view" as perm_dashboard %}
+            {% check_permission admin_profile "users.view" as perm_users %}
+            {% check_permission admin_profile "finance.view_transactions" as perm_finance %}
+            {% check_permission admin_profile "sports.view" as perm_sports %}
+            {% check_permission admin_profile "casino.view" as perm_casino %}
+            {% check_permission admin_profile "predictions.view" as perm_predictions %}
+            {% check_permission admin_profile "support.view_tickets" as perm_support %}
+            {% check_permission admin_profile "settings.view" as perm_settings %}
+            {% check_permission admin_profile "logs.view_admin_logs" as perm_logs %}
+            
+            {% if perm_dashboard %}
+            <li>
+                <a href="{% url 'dashboard:dashboard' %}" x-on:click="sidebarOpen = false"
+                    class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all group {% if 'dashboard' in request.path and not 'users' in request.path and not 'finance' in request.path %}bg-blue-600/10 text-blue-400 border border-blue-500/20{% else %}text-text-secondary hover:text-white hover:bg-white/5 border border-transparent{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                        </path>
+                    </svg>
+                    Дашборд
                 </a>
             </li>
             {% endif %}
-            
-            {% if admin_profile.has_permission 'users' 'view' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'users' %}active{% endif %}"
-                   href="{% url 'dashboard:users' %}">
-                    👥 Пользователи
+
+            {% if perm_users %}
+            <li>
+                <a href="{% url 'dashboard:users' %}" x-on:click="sidebarOpen = false"
+                    class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all group {% if 'users' in request.path %}bg-blue-600/10 text-blue-400 border border-blue-500/20{% else %}text-text-secondary hover:text-white hover:bg-white/5 border border-transparent{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    Пользователи
                 </a>
             </li>
             {% endif %}
-            
-            {% if admin_profile.has_permission 'finance' 'view_transactions' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'finance' %}active{% endif %}"
-                   href="{% url 'dashboard:finance' %}">
-                    💰 Финансы
+
+            {% if perm_finance %}
+            <li>
+                <a href="{% url 'dashboard:finance' %}" x-on:click="sidebarOpen = false"
+                    class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all group {% if 'finance' in request.path %}bg-blue-600/10 text-blue-400 border border-blue-500/20{% else %}text-text-secondary hover:text-white hover:bg-white/5 border border-transparent{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                        </path>
+                    </svg>
+                    Финансы
                 </a>
             </li>
             {% endif %}
-            
-            {% if admin_profile.has_permission 'sports' 'view' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'sports' %}active{% endif %}"
-                   href="{% url 'dashboard:sports' %}">
-                    ⚽ Спорт
+
+            <!-- Divider -->
+            <li class="my-4 border-t border-white/5 mx-4"></li>
+            <li class="px-4 mb-2"><span
+                    class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Продукты</span></li>
+
+            {% if perm_sports %}
+            <li>
+                <a href="{% url 'dashboard:sports' %}" x-on:click="sidebarOpen = false"
+                    class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all group {% if 'sports' in request.path %}bg-blue-600/10 text-blue-400 border border-blue-500/20{% else %}text-text-secondary hover:text-white hover:bg-white/5 border border-transparent{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                        </path>
+                    </svg>
+                    Спорт
                 </a>
             </li>
             {% endif %}
-            
-            {% if admin_profile.has_permission 'casino' 'view' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'casino' %}active{% endif %}"
-                   href="{% url 'dashboard:casino' %}">
-                    🎰 Казино
+
+            {% if perm_casino %}
+            <li>
+                <a href="{% url 'dashboard:casino' %}" x-on:click="sidebarOpen = false"
+                    class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all group {% if 'casino' in request.path %}bg-blue-600/10 text-blue-400 border border-blue-500/20{% else %}text-text-secondary hover:text-white hover:bg-white/5 border border-transparent{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Казино
                 </a>
             </li>
             {% endif %}
-            
-            {% if admin_profile.has_permission 'predictions' 'view' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'predictions' %}active{% endif %}"
-                   href="{% url 'dashboard:predictions' %}">
-                    📊 Predictions
+
+            {% if perm_predictions %}
+            <li>
+                <a href="{% url 'dashboard:predictions' %}" x-on:click="sidebarOpen = false"
+                    class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all group {% if 'predictions' in request.path %}bg-blue-600/10 text-blue-400 border border-blue-500/20{% else %}text-text-secondary hover:text-white hover:bg-white/5 border border-transparent{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                    Predictions
                 </a>
             </li>
             {% endif %}
-            
-            {% if admin_profile.has_permission 'referral' 'view' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'referral' %}active{% endif %}"
-                   href="{% url 'dashboard:referral' %}">
-                    🤝 Партнёрка
+
+            {% if perm_support or perm_logs %}
+            <li class="my-4 border-t border-white/5 mx-4"></li>
+            <li class="px-4 mb-2"><span
+                    class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Система</span></li>
+            {% endif %}
+
+            {% if perm_support %}
+            <li>
+                <a href="/support/operator/" x-on:click="sidebarOpen = false"
+                    class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all group text-text-secondary hover:text-white hover:bg-white/5 border border-transparent">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M18 10c0 3.866-3.582 7-8 7a8.98 8.98 0 01-4-.93L2 18l1.43-3A6.99 6.99 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7z"></path>
+                    </svg>
+                    Поддержка
                 </a>
             </li>
             {% endif %}
-            
-            {% if admin_profile.has_permission 'support' 'view_tickets' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'support' %}active{% endif %}"
-                   href="{% url 'dashboard:support' %}">
-                    🎧 Поддержка
-                </a>
-            </li>
-            {% endif %}
-            
-            {% if admin_profile.has_permission 'content' 'manage_banners' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'content' %}active{% endif %}"
-                   href="{% url 'dashboard:content' %}">
-                    📄 Контент
-                </a>
-            </li>
-            {% endif %}
-            
-            {% if admin_profile.has_permission 'analytics' 'view_dashboard' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}"
-                   href="{% url 'dashboard:analytics' %}">
-                    📈 Аналитика
-                </a>
-            </li>
-            {% endif %}
-            
-            {% if admin_profile.has_permission 'settings' 'view' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
-                   href="{% url 'dashboard:settings' %}">
-                    ⚙️ Настройки
-                </a>
-            </li>
-            {% endif %}
-            
-            {% if admin_profile.has_permission 'logs' 'view_admin_logs' %}
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'logs' %}active{% endif %}"
-                   href="{% url 'dashboard:logs' %}">
-                    📋 Логи
+
+            {% if perm_logs %}
+            <li>
+                <a href="{% url 'dashboard:logs' %}" x-on:click="sidebarOpen = false"
+                    class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all group {% if 'logs' in request.path %}bg-blue-600/10 text-blue-400 border border-blue-500/20{% else %}text-text-secondary hover:text-white hover:bg-white/5 border border-transparent{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 17v-2a4 4 0 014-4h6M9 7h.01M9 11h.01M9 15h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    Логи
                 </a>
             </li>
             {% endif %}
         </ul>
     </div>
-</nav>
+</aside>

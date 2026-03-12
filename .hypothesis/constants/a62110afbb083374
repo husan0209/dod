@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\predictions\services\resolution_service.py
+# hypothesis_version: 6.151.9
+
+[0.0, 1.0, '1.00', 'USD', 'active', 'disputed', 'pending_resolution', 'prediction_void', 'refund', 'resolved', 'user__wallet', 'voided', 'win', 'yes']

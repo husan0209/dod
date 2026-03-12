@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\config\urls.py
+# hypothesis_version: 6.151.9
+
+[200, 503, 'SELECT 1', 'accounts/', 'accounts:login', 'admin/', 'allauth.urls', 'allauth/', 'apps.accounts.urls', 'apps.casino.urls', 'apps.dashboard.urls', 'apps.miniapp.urls', 'apps.payments.urls', 'apps.referral.urls', 'apps.sports.urls', 'apps.support.urls', 'apps.wallet.urls', 'casino/', 'celery_beat', 'checks', 'dashboard/', 'dashboard:dashboard', 'database', 'django_prometheus', 'error', 'health-check', 'health/', 'health_check', 'healthy', 'home', 'metrics/', 'no tasks', 'ok', 'partners/', 'payments/', 'r/<str:code>/', 'redis', 'referral-redirect', 'sports/', 'status', 'support/', 'telegram/', 'tg/', 'unavailable', 'unhealthy', 'wallet/']

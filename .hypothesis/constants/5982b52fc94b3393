@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\config\celery.py
+# hypothesis_version: 6.151.9
+
+['*/30', '*/5', 'CELERY', 'CELERY_BROKER_URL', 'UTC', 'cache+memory://', 'config', 'delete-old-comments', 'django.conf:settings', 'memory', 'memory://', 'schedule', 'task', 'test', 'update-volume-24h']

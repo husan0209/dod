@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Мой портфель | Маркеты Предсказаний{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'predictions/css/predictions.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="portfolio-container">
+    
+    <div class="container-lg">
+        <h1 class="page-title">📊 Мой портфель</h1>
+
+        <!-- Сводка -->
+        <section class="portfolio-summary">
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <span class="card-label">Общая инвестиция</span>
+                    <span class="card-value">${{ portfolio.total_invested|floatformat:2 }}</span>
+                </div>
+                <div class="summary-card">
+                    <span class="card-label">Текущая стоимость</span>
+                    <span class="card-value">${{ portfolio.current_value|floatformat:2 }}</span>
+                </div>
+                <div class="summary-card {% if portfolio.pnl > 0 %}positive{% else %}negative{% endif %}">
+                    <span class="card-label">P&L</span>
+                    <span class="card-value">
+                        {% if portfolio.pnl > 0 %}+{% endif %}${{ portfolio.pnl|floatformat:2 }}
+                    </span>
+                    <span class="card-subtext">({{ portfolio.pnl_percent|floatformat:1 }}%)</span>
+                </div>
+                <div class="summary-card">
+                    <span class="card-label">Активных позиций</span>
+                    <span class="card-value">{{ portfolio.open_positions_count }}</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Вкладки -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="positions">
+                📈 Активные позиции
+            </button>
+            <button class="tab-btn" data-tab="history">
+                📋 История сделок
+            </button>
+            <button class="tab-btn" data-tab="closed">
+                ✅ Закрытые позиции
+            </button>
+        </div>
+
+        <!-- TAB: Активные позиции -->
+        <div class="tab-content active" data-tab="positions">
+            {% if portfolio.open_positions %}
+                <div class="positions-table">
+                    <div class="table-header">
+                        <div class="col col-market">Маркет</div>
+                        <div class="col col-side">Сторона</div>
+                        <div class="col col-shares">Доли</div>
+                        <div class="col col-invested">Инвестировано</div>
+                        <div class="col col-current">Текущая стоимость</div>
+                        <div class="col col-pnl">P&L</div>
+                        <div class="col col-actions">Действия</div>
+                    </div>
+                    <div class="table-body">
+                        {% for position in portfolio.open_positions %}
+                            <div class="table-row">
+                                <div class="col col-market">
+                                    <a href="{% url 'predictions:market_detail' position.market.id %}">
+                                        {{ position.market.question|truncatewords:8 }}
+                                    </a>
+                                </div>
+                                <div class="col col-side">
+                                    <span class="badge {{ position.side }}">{{ position.side|upper }}</span>
+                                </div>
+                                <div class="col col-shares">{{ position.shares|floatformat:2 }}</div>
+                                <div class="col col-invested">${{ position.total_invested|floatformat:2 }}</div>
+                                <div class="col col-current">${{ position.current_value|floatformat:2 }}</div>
+                                <div class="col col-pnl {% if position.unrealized_pnl > 0 %}positive{% else %}negative{% endif %}">
+                                    {% if position.unrealized_pnl > 0 %}+{% endif %}${{ position.unrealized_pnl|floatformat:2 }}
+                                </div>
+                                <div class="col col-actions">
+                                    <a href="{% url 'predictions:market_detail' position.market.id %}#trading" class="action-btn">
+                                        Продать
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <span class="icon">📉</span>
+                    <h3>Нет активных позиций</h3>
+                    <p><a href="{% url 'predictions:index' %}">Начните торговать</a></p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- TAB: История сделок -->
+        <div class="tab-content" data-tab="history">
+            {% if portfolio.trades %}
+                <div class="trades-timeline">
+                    {% for trade in portfolio.trades %}
+                        <div class="trade-card">
+                            <div class="trade-marker {{ trade.action }}"></div>
+                            <div class="trade-content">
+                                <h4>{{ trade.get_action_display }} {{ trade.side|upper }}</h4>
+                                <p class="trade-market">{{ trade.market.question|truncatewords:12 }}</p>
+                                <div class="trade-details">
+                                    <span>{{ trade.shares|floatformat:2 }} долей @ ${{ trade.price|floatformat:4 }}</span>
+                                    <span class="trade-cost">${{ trade.total_cost|floatformat:2 }}</span>
+                                </div>
+                                <span class="trade-time">{{ trade.created_at|date:"d.m.Y H:i" }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <span class="icon">📊</span>
+                    <h3>Нет сделок</h3>
+                    <p><a href="{% url 'predictions:index' %}">Начните торговать</a></p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- TAB: Закрытые позиции -->
+        <div class="tab-content" data-tab="closed">
+            {% if portfolio.closed_positions %}
+                <div class="positions-table">
+                    <div class="table-header">
+                        <div class="col col-market">Маркет</div>
+                        <div class="col col-result">Результат</div>
+                        <div class="col col-invested">Инвестировано</div>
+                        <div class="col col-settled">Выплачено</div>
+                        <div class="col col-pnl">P&L</div>
+                    </div>
+                    <div class="table-body">
+                        {% for position in portfolio.closed_positions %}
+                            <div class="table-row">
+                                <div class="col col-market">
+                                    <a href="{% url 'predictions:market_detail' position.market.id %}">
+                                        {{ position.market.question|truncatewords:8 }}
+                                    </a>
+                                </div>
+                                <div class="col col-result">
+                                    {% if position.is_winner %}<span class="badge success">✅ Выиграл</span>
+                                    {% else %}<span class="badge danger">❌ Проиграл</span>{% endif %}
+                                </div>
+                                <div class="col col-invested">${{ position.total_invested|floatformat:2 }}</div>
+                                <div class="col col-settled">${{ position.settlement_amount|floatformat:2 }}</div>
+                                <div class="col col-pnl {% if position.realized_pnl > 0 %}positive{% else %}negative{% endif %}">
+                                    {% if position.realized_pnl > 0 %}+{% endif %}${{ position.realized_pnl|floatformat:2 }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <span class="icon">✅</span>
+                    <h3>Нет закрытых позиций</h3>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        this.classList.add('active');
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    });
+});
+</script>
+{% endblock %}

@@ -9,8 +9,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 COPY requirements.txt /app/
-RUN pip install --upgrade pip && pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir --trusted-host * --disable-pip-version-check -r requirements.txt
 
 COPY . /app
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+EXPOSE 9000
+
+CMD ["python", "manage.py", "runserver", "0.0.0.0:9000"]

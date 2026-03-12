@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\dashboard\migrations\0001_initial.py
+# hypothesis_version: 6.151.9
+
+['-level', 'AdminProfile', 'AdminRole', 'ID', 'admin_profile', 'created_at', 'custom_permissions', 'dashboard.adminrole', 'deactivated_at', 'deactivated_reason', 'description', 'id', 'ip_whitelist', 'is_active', 'is_admin_active', 'is_system', 'last_action_at', 'level', 'name', 'ordering', 'permissions', 'role', 'slug', 'total_actions', 'user', 'verbose_name', 'verbose_name_plural', 'work_schedule', 'Активен как админ', 'Активна', 'Белый список IP', 'Всего действий', 'График работы', 'Деактивирован', 'Индивидуальные права', 'Каналы уведомлений', 'Название роли', 'Описание', 'Пользователь', 'Последнее действие', 'Права доступа', 'Причина деактивации', 'Роли администраторов', 'Роль', 'Роль администратора', 'Системная роль', 'Слаг', 'Уровень доступа']

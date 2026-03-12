@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\telegram_bot\urls.py
+# hypothesis_version: 6.151.9
+
+['telegram_bot', 'webhook', 'webhook/']

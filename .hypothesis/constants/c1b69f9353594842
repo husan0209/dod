@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\accounts\forms.py
+# hypothesis_version: 6.151.9
+
+['+7XXXXXXXXXX', '000000', 'Email', 'English', 'accept', 'autocomplete', 'avatar', 'backup_code', 'class', 'code', 'country', 'current-password', 'date', 'date_of_birth', 'email', 'en', 'first_name', 'form-file', 'form-input', 'form-select', 'image/*', 'inputmode', 'language', 'last_name', 'new-password', 'new_password1', 'new_password2', 'numeric', 'off', 'password1', 'password2', 'phone', 'placeholder', 'preferred_currency', 'readonly', 'ru', 'tel', 'timezone', 'totp_code', 'type', 'username', 'Введите email', 'Введите пароль', 'Имя', 'Новый пароль', 'Пароли не совпадают.', 'Пароль', 'Подтвердите пароль', 'Русский', 'Текущий пароль', 'Фамилия', 'или резервный код']

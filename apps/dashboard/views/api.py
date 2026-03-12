@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from django.utils import timezone
 from datetime import timedelta
@@ -7,6 +8,7 @@ from django.db import models
 
 from apps.accounts.models import User, AdminActionLog
 from apps.wallet.models import Transaction
+from apps.dashboard.decorators import require_permission
 
 # Try to import optional models
 try:
@@ -25,6 +27,8 @@ except ImportError:
     KYCRequest = None
 
 
+@login_required
+@require_permission('dashboard', 'view')
 def stats_view(request):
     """Return dashboard stats HTML fragment"""
     now = timezone.now()
@@ -120,11 +124,14 @@ def stats_view(request):
     return HttpResponse(html)
 
 
+@login_required
+@require_permission('dashboard', 'view')
 def global_search_view(request):
     """Global search API"""
     query = request.GET.get('q', '').strip()
-    
-    results = []
+
+    user_results = []
+    ticket_results = []
     if query:
         # Search users
         users = User.objects.filter(
@@ -132,8 +139,7 @@ def global_search_view(request):
             models.Q(username__icontains=query)
         )[:5]
         for user in users:
-            results.append({
-                'type': 'user',
+            user_results.append({
                 'title': user.username,
                 'subtitle': user.email,
                 'url': f'/admin-panel/users/{user.id}/'
@@ -146,16 +152,16 @@ def global_search_view(request):
                 models.Q(description__icontains=query)
             )[:3]
             for ticket in tickets:
-                results.append({
-                    'type': 'ticket',
-                    'title': f'Ticket #{ticket.id}',
+                ticket_results.append({
+                    'title': f'#{ticket.ticket_number}' if getattr(ticket, 'ticket_number', None) else f'Ticket #{ticket.id}',
                     'subtitle': ticket.title,
-                    'url': f'/support/ticket/{ticket.id}/'
+                    'url': f'/support/operator/tickets/{ticket.id}/'
                 })
     
     context = {
         'query': query,
-        'results': results
+        'user_results': user_results,
+        'ticket_results': ticket_results,
     }
     
     html = render_to_string('dashboard/search_results.html', context)

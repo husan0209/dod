@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\manage.py
+# hypothesis_version: 6.151.9
+
+['.env', 'CELERY_BROKER_URL', 'REDIS_URL', '__main__', 'cache+memory://', 'memory://', 'redis://localhost:0', 'test']

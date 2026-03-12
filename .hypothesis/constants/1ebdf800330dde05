@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\accounts\urls.py
+# hypothesis_version: 6.151.9
+
+['2fa/', '2fa/disable/', '2fa/setup/', 'accounts', 'change_password', 'disable_2fa', 'link_phone', 'login', 'login/', 'logout', 'logout/', 'password/change/', 'password/reset/', 'password_reset', 'phone/link/', 'phone/verify/', 'profile', 'profile/', 'register', 'register/', 'security/', 'security_settings', 'setup_2fa', 'unlink_account', 'verify_2fa', 'verify_email', 'verify_phone']

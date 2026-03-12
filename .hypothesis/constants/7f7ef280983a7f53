@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\games\dice.py
+# hypothesis_version: 6.151.9
+
+['0.01', '1', '100', '2.00', '98', '99.98', '99.99', 'bet_amount', 'condition', 'dice', 'multiplier', 'over', 'result', 'target', 'under', 'win_chance']

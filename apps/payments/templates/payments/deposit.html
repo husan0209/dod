@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Пополнение кошелька{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+  <h1 class="text-2xl font-bold text-white mb-4">📥 Пополнение кошелька</h1>
+
+  {% if error %}
+    <div class="rounded-lg bg-red-500/10 border border-red-500/40 px-4 py-3 text-sm text-red-200">
+      ❌ {{ error }}
+    </div>
+  {% endif %}
+
+  <div class="bg-dod-surface/70 rounded-2xl p-6 space-y-6">
+    <form method="post" action="{% url 'payments:create_deposit' %}" id="depositForm" class="space-y-6">
+      {% csrf_token %}
+
+      <!-- Currency Selection -->
+      <div>
+        <label class="block text-sm font-medium text-white mb-3">Валюта</label>
+        <select name="currency" id="currencySelect" 
+                class="w-full bg-black/40 border border-dod-surface rounded-lg px-4 py-3 text-sm text-white focus:border-accent focus:outline-none">
+          <option value="">Выберите валюту</option>
+        </select>
+      </div>
+
+      <!-- Amount Input -->
+      <div>
+        <label class="block text-sm font-medium text-white mb-3">Сумма</label>
+        <input type="number" 
+               name="amount" 
+               id="amountInput"
+               step="0.00000001" 
+               min="0"
+               placeholder="Введите сумму"
+               class="w-full bg-black/40 border border-dod-surface rounded-lg px-4 py-3 text-sm text-white focus:border-accent focus:outline-none"
+               required />
+        <p class="mt-2 text-xs text-text-secondary" id="amountHint">
+          Выберите способ оплаты, чтобы увидеть лимиты
+        </p>
+      </div>
+
+      <!-- Payment Provider Selection -->
+      <div>
+        <label class="block text-sm font-medium text-white mb-3">Способ оплаты</label>
+        
+        <!-- Fiat Providers -->
+        {% if fiat_providers %}
+        <div class="mb-6">
+          <h3 class="text-xs font-medium text-text-secondary mb-3">💳 Фиатные платежи</h3>
+          <div class="space-y-4">
+            {% for provider_data in fiat_providers %}
+            <div class="bg-black/20 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-lg">{{ provider_data.provider.icon }}</span>
+                <span class="text-sm font-medium text-white">{{ provider_data.provider.name }}</span>
+                <span class="text-xs text-text-secondary">{{ provider_data.provider.processing_time }}</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {% for method in provider_data.methods %}
+                <label class="flex items-center gap-3 p-3 rounded-lg bg-black/40 border border-dod-surface cursor-pointer hover:border-accent transition-colors">
+                  <input type="radio" 
+                         name="payment_method_id" 
+                         value="{{ method.id }}"
+                         data-min="{{ method.min_amount }}"
+                         data-max="{{ method.max_amount }}"
+                         data-currency="{{ method.currency.code }}"
+                         data-fee-percent="{{ method.fee_percent }}"
+                         data-fee-fixed="{{ method.fee_fixed }}"
+                         class="payment-method-radio"
+                         required />
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2">
+                      <span>{{ method.icon }}</span>
+                      <span class="text-sm text-white">{{ method.name }}</span>
+                    </div>
+                    <div class="text-xs text-text-secondary mt-1">
+                      {{ method.min_amount }} - {{ method.max_amount }} {{ method.currency.code }}
+                      {% if method.fee_percent > 0 or method.fee_fixed > 0 %}
+                        • Комиссия: 
+                        {% if method.fee_fixed > 0 %}{{ method.fee_fixed }} {{ method.currency.code }}{% endif %}
+                        {% if method.fee_percent > 0 %}{% if method.fee_fixed > 0 %} + {% endif %}{{ method.fee_percent }}%{% endif %}
+                      {% endif %}
+                    </div>
+                  </div>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Crypto Providers -->
+        {% if crypto_providers %}
+        <div>
+          <h3 class="text-xs font-medium text-text-secondary mb-3">₿ Криптовалюты</h3>
+          <div class="space-y-4">
+            {% for provider_data in crypto_providers %}
+            <div class="bg-black/20 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-lg">{{ provider_data.provider.icon }}</span>
+                <span class="text-sm font-medium text-white">{{ provider_data.provider.name }}</span>
+                <span class="text-xs text-text-secondary">{{ provider_data.provider.processing_time }}</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {% for method in provider_data.methods %}
+                <label class="flex items-center gap-3 p-3 rounded-lg bg-black/40 border border-dod-surface cursor-pointer hover:border-accent transition-colors">
+                  <input type="radio" 
+                         name="payment_method_id" 
+                         value="{{ method.id }}"
+                         data-min="{{ method.min_amount }}"
+                         data-max="{{ method.max_amount }}"
+                         data-currency="{{ method.currency.code }}"
+                         data-fee-percent="{{ method.fee_percent }}"
+                         data-fee-fixed="{{ method.fee_fixed }}"
+                         class="payment-method-radio"
+                         required />
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2">
+                      <span>{{ method.icon }}</span>
+                      <span class="text-sm text-white">{{ method.name }}</span>
+                    </div>
+                    <div class="text-xs text-text-secondary mt-1">
+                      {{ method.min_amount }} - {{ method.max_amount }} {{ method.currency.code }}
+                      {% if method.fee_percent > 0 or method.fee_fixed > 0 %}
+                        • Комиссия: 
+                        {% if method.fee_fixed > 0 %}{{ method.fee_fixed }} {{ method.currency.code }}{% endif %}
+                        {% if method.fee_percent > 0 %}{% if method.fee_fixed > 0 %} + {% endif %}{{ method.fee_percent }}%{% endif %}
+                      {% endif %}
+                    </div>
+                  </div>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if not fiat_providers and not crypto_providers %}
+        <div class="text-center py-8 text-text-secondary">
+          <p>Нет доступных способов пополнения</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Submit Button -->
+      <div class="border-t border-dod-surface pt-6">
+        <button type="submit" 
+                class="w-full bg-accent hover:bg-accent/90 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+          Перейти к оплате
+        </button>
+        <p class="mt-3 text-xs text-center text-text-secondary">
+          После нажатия вы будете перенаправлены на страницу платёжной системы
+        </p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('depositForm');
+  const currencySelect = document.getElementById('currencySelect');
+  const amountInput = document.getElementById('amountInput');
+  const amountHint = document.getElementById('amountHint');
+  const paymentMethodRadios = document.querySelectorAll('.payment-method-radio');
+
+  // Collect unique currencies from payment methods
+  const currencies = new Set();
+  paymentMethodRadios.forEach(radio => {
+    currencies.add(radio.dataset.currency);
+  });
+
+  // Populate currency select
+  currencies.forEach(currency => {
+    const option = document.createElement('option');
+    option.value = currency;
+    option.textContent = currency;
+    currencySelect.appendChild(option);
+  });
+
+  // Update amount hint when payment method is selected
+  paymentMethodRadios.forEach(radio => {
+    radio.addEventListener('change', function() {
+      if (this.checked) {
+        const min = this.dataset.min;
+        const max = this.dataset.max;
+        const currency = this.dataset.currency;
+        const feePercent = parseFloat(this.dataset.feePercent);
+        const feeFixed = parseFloat(this.dataset.feeFixed);
+
+        amountInput.min = min;
+        amountInput.max = max;
+        
+        let feeText = '';
+        if (feeFixed > 0 || feePercent > 0) {
+          feeText = ' (комиссия: ';
+          if (feeFixed > 0) feeText += feeFixed + ' ' + currency;
+          if (feePercent > 0) {
+            if (feeFixed > 0) feeText += ' + ';
+            feeText += feePercent + '%';
+          }
+          feeText += ')';
+        }
+
+        amountHint.textContent = `Минимум: ${min} ${currency}, Максимум: ${max} ${currency}${feeText}`;
+        
+        // Set currency select to match
+        currencySelect.value = currency;
+      }
+    });
+  });
+
+  // Filter payment methods by currency
+  currencySelect.addEventListener('change', function() {
+    const selectedCurrency = this.value;
+    
+    paymentMethodRadios.forEach(radio => {
+      const label = radio.closest('label');
+      if (!selectedCurrency || radio.dataset.currency === selectedCurrency) {
+        label.style.display = '';
+      } else {
+        label.style.display = 'none';
+        if (radio.checked) {
+          radio.checked = false;
+        }
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

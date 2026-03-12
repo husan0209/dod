@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% load static %}
+{% load prediction_tags %}
+
+{% block title %}{{ market.question }} | Маркеты Предсказаний{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'predictions/css/predictions.css' %}">
+<link rel="stylesheet" href="{% static 'predictions/css/charts.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="market-detail-container">
+    
+    <!-- 📊 Основная информация -->
+    <section class="market-hero">
+        <div class="container-lg">
+            <div class="market-hero-content">
+                
+                <!-- Левая часть: Вопрос и описание -->
+                <div class="hero-left">
+                    <div class="market-header">
+                        <div class="market-badges">
+                            <span class="badge" style="background-color: {{ market.category.color }}">
+                                {{ market.category.icon }} {{ market.category.name }}
+                            </span>
+                            {% if market.is_featured %}
+                                <span class="badge badge-featured">⭐ Featured</span>
+                            {% endif %}
+                            {% if market.is_trending %}
+                                <span class="badge badge-hot">🔥 Hot</span>
+                            {% endif %}
+                            <span class="badge badge-{{ market.status }}">
+                                {{ market.get_status_display }}
+                            </span>
+                        </div>
+                        <h1 class="market-title">{{ market.question }}</h1>
+                    </div>
+
+                    <div class="market-info">
+                        <div class="info-item">
+                            <span class="info-label">📅 Дедлайн:</span>
+                            <span class="info-value">
+                                {{ market.close_date|date:"d.m.Y H:i" }} UTC
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">⏱️ Времени осталось:</span>
+                            <span class="info-value time-countdown" data-time="{{ market.close_date|date:'U' }}">
+                                {{ market.get_time_until_close|timeuntil }}
+                            </span>
+                        </div>
+                        {% if market.is_resolved %}
+                            <div class="info-item">
+                                <span class="info-label">✅ Результат:</span>
+                                <span class="info-value result-{{ market.resolution|lower }}">
+                                    {{ market.get_resolution_display }}
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="market-description">
+                        <h3>📖 Описание</h3>
+                        <div class="description-text">
+                            {{ market.description|linebreaks }}
+                        </div>
+                    </div>
+
+                    {% if market.resolution_source %}
+                        <div class="resolution-source">
+                            <h4>🔗 Источник резолюции:</h4>
+                            <p>{{ market.resolution_source }}</p>
+                        </div>
+                    {% endif %}
+
+                </div>
+
+                <!-- Правая часть: Торговая панель -->
+                <div class="hero-right">
+                    <div class="trading-panel">
+                        <h3 class="panel-title">🔄 Торговля</h3>
+
+                        {% if not user.is_authenticated %}
+                            <div class="auth-prompt">
+                                <p>Пожалуйста, <a href="{% url 'login' %}">войдите в систему</a>, чтобы торговать</p>
+                            </div>
+                        {% else %}
+
+                            {% if market.is_tradeable %}
+                                
+                                <!-- Вкладки YES/NO -->
+                                <div class="trade-tabs">
+                                    <input type="radio" id="tab-yes" name="trade-side" class="trade-tab-radio" checked>
+                                    <input type="radio" id="tab-no" name="trade-side" class="trade-tab-radio">
+
+                                    <label for="tab-yes" class="trade-tab-label yes">
+                                        <span class="tab-icon">✅</span>
+                                        YES
+                                        <span class="tab-price">${{ market.yes_price|floatformat:2 }}</span>
+                                    </label>
+                                    <label for="tab-no" class="trade-tab-label no">
+                                        <span class="tab-icon">❌</span>
+                                        NO
+                                        <span class="tab-price">${{ market.no_price|floatformat:2 }}</span>
+                                    </label>
+
+                                    <!-- YES Form -->
+                                    <div class="trade-tab-content yes-content">
+                                        {% include "predictions/components/trade_form.html" with side="yes" price=market.yes_price market=market %}
+                                    </div>
+
+                                    <!-- NO Form -->
+                                    <div class="trade-tab-content no-content">
+                                        {% include "predictions/components/trade_form.html" with side="no" price=market.no_price market=market %}
+                                    </div>
+                                </div>
+
+                            {% else %}
+                                <div class="market-closed-notice">
+                                    <span class="icon">🔒</span>
+                                    <p>Торги на этом маркете закрыты</p>
+                                </div>
+                            {% endif %}
+
+                            <!-- Пользовательские позиции -->
+                            {% if user_yes_position or user_no_position %}
+                                <div class="user-positions">
+                                    <h4>📈 Ваши позиции</h4>
+                                    
+                                    {% if user_yes_position and user_yes_position.shares > 0 %}
+                                        <div class="position-card yes">
+                                            <div class="position-header">
+                                                <span class="position-label">YES</span>
+                                                <span class="position-value">{{ user_yes_position.shares|floatformat:2 }} долей</span>
+                                            </div>
+                                            <div class="position-details">
+                                                <span>Инвестировано: ${{ user_yes_position.total_invested|floatformat:2 }}</span>
+                                                <span>Сред. цена: ${{ user_yes_position.avg_price|floatformat:4 }}</span>
+                                                <span class="pnl {% if user_yes_position.unrealized_pnl|floatformat:0 > 0 %}positive{% else %}negative{% endif %}">
+                                                    P&L: ${{ user_yes_position.unrealized_pnl|floatformat:2 }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if user_no_position and user_no_position.shares > 0 %}
+                                        <div class="position-card no">
+                                            <div class="position-header">
+                                                <span class="position-label">NO</span>
+                                                <span class="position-value">{{ user_no_position.shares|floatformat:2 }} долей</span>
+                                            </div>
+                                            <div class="position-details">
+                                                <span>Инвестировано: ${{ user_no_position.total_invested|floatformat:2 }}</span>
+                                                <span>Сред. цена: ${{ user_no_position.avg_price|floatformat:4 }}</span>
+                                                <span class="pnl {% if user_no_position.unrealized_pnl|floatformat:0 > 0 %}positive{% else %}negative{% endif %}">
+                                                    P&L: ${{ user_no_position.unrealized_pnl|floatformat:2 }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+
+                                </div>
+                            {% endif %}
+
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 📈 Графиков и статистика -->
+    <section class="market-analytics">
+        <div class="container-lg">
+            <div class="analytics-grid">
+                
+                <!-- График цен -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3>📊 График цен</h3>
+                        <div class="period-selector">
+                            <button class="period-btn active" data-period="24h">24h</button>
+                            <button class="period-btn" data-period="7d">7d</button>
+                            <button class="period-btn" data-period="30d">30d</button>
+                            <button class="period-btn" data-period="all">All</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Статистика -->
+                <div class="analytics-card">
+                    <h3>📈 Статистика</h3>
+                    <div class="stats-list">
+                        <div class="stat-row">
+                            <span class="stat-name">Общий объём:</span>
+                            <span class="stat-value">${{ market.volume_usd|floatformat:0 }}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Объём 24h:</span>
+                            <span class="stat-value">${{ market.volume_24h_usd|floatformat:0 }}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Сделок:</span>
+                            <span class="stat-value">{{ market.trades_count }}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Трейдеров:</span>
+                            <span class="stat-value">{{ market.unique_traders }}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">HOLDERS YES:</span>
+                            <span class="stat-value">{{ market.yes_holders }}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">HOLDERS NO:</span>
+                            <span class="stat-value">{{ market.no_holders }}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Ликвидность:</span>
+                            <span class="stat-value">${{ market.liquidity_usd|floatformat:0 }}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 💬 Сделки и комментарии -->
+    <section class="market-activity">
+        <div class="container-lg">
+            <div class="activity-grid">
+                
+                <!-- Последние сделки -->
+                <div class="activity-card">
+                    <h3>💱 Последние сделки</h3>
+                    <div class="trades-list">
+                        {% for trade in recent_trades %}
+                            <div class="trade-item">
+                                <div class="trade-info">
+                                    <span class="trade-user">{{ trade.user.email|truncatechars:20 }}</span>
+                                    <span class="trade-action {% if trade.action == 'buy' %}buy{% else %}sell{% endif %}">
+                                        {{ trade.get_action_display }}
+                                    </span>
+                                </div>
+                                <div class="trade-details">
+                                    <span class="trade-side {{ trade.side }}">{{ trade.side|upper }}</span>
+                                    <span class="trade-shares">{{ trade.shares|floatformat:2 }} @ ${{ trade.price|floatformat:4 }}</span>
+                                    <span class="trade-time">{{ trade.created_at|timesince }} назад</span>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="empty">Пока нет сделок</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Комментарии -->
+                <div class="activity-card">
+                    <h3>💬 Комментарии ({{ market.comments_count }})</h3>
+                    
+                    {% if market.comments_enabled and user.is_authenticated %}
+                        <form method="post" action="{% url 'predictions:add_comment' market.id %}" class="comment-form">
+                            {% csrf_token %}
+                            <textarea 
+                                name="text" 
+                                placeholder="Поделитесь своим мнением..."
+                                class="comment-input"
+                                rows="3"
+                            ></textarea>
+                            <div class="comment-footer">
+                                <label>
+                                    <input type="radio" name="user_position" value="">
+                                    <span>Нейтрально</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="user_position" value="yes">
+                                    <span>Верю в YES ✅</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="user_position" value="no">
+                                    <span>Верю в NO ❌</span>
+                                </label>
+                                <button type="submit" class="btn btn-sm btn-primary">Отправить</button>
+                            </div>
+                        </form>
+                    {% endif %}
+
+                    <div class="comments-list">
+                        {% for comment in comments %}
+                            {% include "predictions/components/comment.html" %}
+                        {% empty %}
+                            <p class="empty">Пока нет комментариев. Будьте первым!</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'predictions/js/trading.js' %}"></script>
+<script src="{% static 'predictions/js/charts.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация графика
+    const chartData = {{ chart_data|safe }};
+    initPriceChart(chartData);
+
+    // Обновление таймера
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+});
+
+function updateCountdown() {
+    const countdownEl = document.querySelector('.time-countdown');
+    if (!countdownEl) return;
+    
+    const targetTime = parseInt(countdownEl.dataset.time) * 1000;
+    const now = Date.now();
+    const remaining = targetTime - now;
+
+    if (remaining <= 0) {
+        countdownEl.textContent = 'Торги закрыты';
+        return;
+    }
+
+    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((remaining / 1000 / 60) % 60);
+    const seconds = Math.floor((remaining / 1000) % 60);
+
+    countdownEl.textContent = `${days}д ${hours}ч ${minutes}м ${seconds}с`;
+}
+</script>
+{% endblock %}

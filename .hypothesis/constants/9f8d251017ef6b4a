@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\accounts\migrations\0004_linkedaccount_totpdevice.py
+# hypothesis_version: 6.151.9
+
+[254, 255, '-created_at', '-linked_at', 'Google', 'LinkedAccount', 'TOTP', 'TOTP устройства', 'TOTP устройство', 'TOTPDevice', 'Telegram', 'accounts', 'confirmed', 'created_at', 'google', 'id', 'indexes', 'is_primary', 'linked_accounts', 'linked_at', 'name', 'ordering', 'phone', 'provider', 'provider_avatar', 'provider_email', 'provider_id', 'provider_username', 'secret', 'telegram', 'totp_devices', 'unique_together', 'user', 'verbose_name', 'verbose_name_plural', 'Привязанные аккаунты', 'Привязанный аккаунт', 'Телефон']

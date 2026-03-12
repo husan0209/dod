@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\services\provably_fair.py
+# hypothesis_version: 6.151.9
+
+[1.0, 100, 10000, 4294967295, '1.00', 'calculated_result', 'client_seed', 'crash', 'crash_point', 'dice', 'error', 'field_size', 'landing_position', 'match', 'mines', 'mines_count', 'mines_positions', 'new_seed_hash', 'nonce', 'path', 'plinko', 'reels', 'result', 'revealed_seed', 'roulette', 'rows', 'server_seed', 'server_seed_valid', 'slots', 'stored_result', 'verified', 'winning_number', 'Неизвестный тип игры']

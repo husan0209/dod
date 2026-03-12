@@ -11,7 +11,8 @@ def handle_rukassa_webhook(*, payload, headers, ip_address: str):
         return {"status": 400, "body": {"error": "provider not configured"}}
 
     provider_client = get_provider_instance(provider)
-    valid_signature = provider_client.verify_webhook_signature(payload, headers)
+    signature = payload.get("sign", "") if isinstance(payload, dict) else ""
+    valid_signature = provider_client.verify_webhook_signature(payload, signature, headers)
 
     log = WebhookLog.objects.create(
         provider="rukassa",
@@ -29,10 +30,10 @@ def handle_rukassa_webhook(*, payload, headers, ip_address: str):
         log.save(update_fields=["processing_result", "response_code"])
         return {"status": 400, "body": {"error": "invalid signature"}}
 
-    parsed = provider_client.parse_webhook(payload, headers)
+    parsed = provider_client.parse_webhook(payload)
     log.related_order_id = parsed.get("order_id")
 
-    if parsed.get("event_type") == "deposit_completed" and parsed.get("status") == "completed":
+    if parsed.get("status") == "completed":
         result = PaymentService.complete_deposit(parsed.get("order_id"), parsed.get("amount"))
         log.is_processed = True
         log.processing_result = result

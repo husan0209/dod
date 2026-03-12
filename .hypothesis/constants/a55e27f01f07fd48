@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\providers\nowpayments.py
+# hypothesis_version: 6.151.9
+
+['+00:00', ',', '/v1/payment', '/v1/payout', ':', 'GET', 'POST', 'Z', 'actually_paid', 'address', 'amount', 'cancel_url', 'completed', 'confirmed', 'confirming', 'crypto_address', 'currency', 'default_stablecoin', 'expired', 'extra_id', 'failed', 'finished', 'id', 'invoice_url', 'ipn_callback_url', 'network', 'order_description', 'order_id', 'partially_paid', 'pay_address', 'pay_amount', 'pay_currency', 'payment_id', 'payment_status', 'pending', 'price_amount', 'price_currency', 'processing', 'provider_order_id', 'provider_status', 'refunded', 'sending', 'status', 'success_url', 'unknown', 'updated_at', 'usdttrc20', 'utf-8', 'waiting', 'webhook_url', 'withdrawals', 'x-api-key']

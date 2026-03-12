@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\support\views.py
+# hypothesis_version: 6.151.9
+
+['-created_at', '-is_pinned', '-updated_at', '-views_count', 'Invalid choice', 'Invalid rating', 'POST', 'action', 'active_chats', 'active_tickets', 'article', 'articles', 'attachments', 'avg_rating', 'categories', 'category', 'category_filter', 'category_slug', 'category_stats', 'change_status', 'chat_stats', 'comment', 'created_at', 'description', 'faq_stats', 'form', 'helpful', 'helpful_no', 'helpful_yes', 'html', 'in_progress', 'messages', 'no', 'open', 'operator_stats', 'page', 'popular_articles', 'q', 'query', 'rating', 'reply', 'sla_stats', 'sort_order', 'stats', 'status', 'status_filter', 'subject', 'success', 'suggested_faqs', 'support/center.html', 'text', 'ticket', 'tickets', 'total_handled', 'utf-8', 'views_count', 'waiting_user', 'yes', 'Ответ отправлен!', 'Спасибо за оценку!']

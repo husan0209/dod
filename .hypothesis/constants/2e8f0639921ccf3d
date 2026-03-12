@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\dashboard\middleware.py
+# hypothesis_version: 6.151.9
+
+[200, 400, 1000, ',', '/', '/admin-panel/', 'Access denied', 'DELETE', 'HTTP_X_FORWARDED_FOR', 'PATCH', 'POST', 'PUT', 'REMOTE_ADDR', 'accounts:login', 'admin-panel', 'admin_2fa_verified', 'dashboard', 'dashboard:verify-2fa', 'security', 'unauthorized_access', 'unknown']

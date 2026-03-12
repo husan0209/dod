@@ -29,8 +29,13 @@ class PermissionTestCase(TestCase):
             slug='test', 
             permissions={}
         )
+        other_user = User.objects.create_user(
+            email='test2@example.com',
+            username='test2',
+            password='pass'
+        )
         profile = AdminProfile.objects.create(
-            user=self.user, 
+            user=other_user,
             role=role
         )
         self.assertFalse(profile.has_permission('dashboard', 'view'))

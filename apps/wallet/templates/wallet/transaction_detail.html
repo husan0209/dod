@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load wallet_tags %}
+
+{% block title %}Транзакция {{ transaction.transaction_id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-6 space-y-4">
+  <h1 class="text-2xl font-bold text-white mb-4">
+    {{ transaction.get_type_icon }} Транзакция {{ transaction.transaction_id }}
+  </h1>
+
+  <div class="bg-dod-surface/70 rounded-2xl p-5 space-y-2 text-sm">
+    <div class="flex justify-between">
+      <span class="text-text-secondary">Дата</span>
+      <span>{{ transaction.created_at|date:"d.m.Y H:i:s" }}</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-text-secondary">Тип</span>
+      <span>{{ transaction.get_type_display }}</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-text-secondary">Валюта</span>
+      <span>{{ transaction.currency_id }}</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-text-secondary">Сумма</span>
+      <span>
+        {% format_transaction_amount transaction as amt_html %}
+        {{ amt_html|safe }}
+      </span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-text-secondary">Баланс до</span>
+      <span>{{ transaction.balance_before }}</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-text-secondary">Баланс после</span>
+      <span>{{ transaction.balance_after }}</span>
+    </div>
+    {% if transaction.description %}
+      <div class="pt-2 border-t border-dod-surface mt-2">
+        <span class="block text-xs text-text-secondary mb-1">Описание</span>
+        <p class="text-sm">{{ transaction.description }}</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+

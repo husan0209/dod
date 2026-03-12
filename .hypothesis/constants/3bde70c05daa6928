@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\signals.py
+# hypothesis_version: 6.151.9
+
+['total_bets', 'total_wagered_usd', 'total_won_usd']

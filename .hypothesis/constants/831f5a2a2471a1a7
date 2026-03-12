@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\services\payment_service.py
+# hypothesis_version: 6.151.9
+
+['0', '0.00000001', '100', 'SITE_URL', 'amount', 'amount_received', 'both', 'cancelled', 'code', 'completed', 'completed_at', 'created', 'crypto', 'crypto_address', 'crypto_network', 'currency', 'deposit', 'deposit_id', 'deposit_order', 'deposit_order_id', 'duplicate', 'error', 'expired', 'expires_at', 'fail_url', 'failed', 'fee', 'formatted_net', 'formatted_total', 'icon', 'invalid_state', 'max', 'method', 'methods', 'min', 'name', 'net', 'order_id', 'payment_url', 'pending', 'processing', 'processing_time', 'provider', 'provider__sort_order', 'provider_name', 'provider_order_id', 'provider_status', 'sort_order', 'status', 'success_url', 'total', 'transaction', 'updated_at', 'wallet']

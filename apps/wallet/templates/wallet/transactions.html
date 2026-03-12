@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load wallet_tags %}
+
+{% block title %}История транзакций{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+  <h1 class="text-2xl font-bold text-white mb-4">📋 История транзакций</h1>
+
+  <form method="get" class="bg-dod-surface/70 rounded-2xl p-4 mb-4 flex flex-wrap gap-3 items-end"
+        hx-get="."
+        hx-target="#transactions-table"
+        hx-swap="innerHTML">
+    <div>
+      <label class="block text-xs text-text-secondary mb-1">Тип</label>
+      <select name="type" class="bg-black/40 border border-dod-surface rounded-lg px-3 py-1.5 text-xs text-white">
+        <option value="">Все</option>
+        <option value="deposit">Пополнение</option>
+        <option value="withdrawal">Вывод</option>
+        <option value="bet">Ставка</option>
+        <option value="win">Выигрыш</option>
+        <option value="bonus">Бонус</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs text-text-secondary mb-1">Валюта</label>
+      <input name="currency" class="bg-black/40 border border-dod-surface rounded-lg px-3 py-1.5 text-xs text-white" placeholder="USD / BTC / RUB" />
+    </div>
+    <div>
+      <label class="block text-xs text-text-secondary mb-1">Период (дней)</label>
+      <input type="number" name="period" value="{{ selected_period }}" min="1" max="365"
+             class="w-20 bg-black/40 border border-dod-surface rounded-lg px-3 py-1.5 text-xs text-white" />
+    </div>
+    <button type="submit" class="btn-secondary text-xs">Фильтровать</button>
+  </form>
+
+  <div id="transactions-table">
+    {% include "wallet/transactions_table.html" %}
+  </div>
+
+  <div class="flex gap-2 mt-3">
+    <a href="{% url 'wallet:transactions_export_csv' %}" class="btn-outline text-xs">
+      📥 Экспорт CSV
+    </a>
+    <a href="{% url 'wallet:transactions_export_xls' %}" class="btn-outline text-xs">
+      📊 Экспорт Excel
+    </a>
+  </div>
+</div>
+{% endblock %}
+

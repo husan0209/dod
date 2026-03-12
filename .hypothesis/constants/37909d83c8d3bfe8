@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\webhooks\nowpayments_webhook.py
+# hypothesis_version: 6.151.9
+
+[200, 400, 'amount', 'amount_received', 'body', 'completed', 'deposit', 'deposit_completed', 'error', 'event_type', 'ignored', 'invalid signature', 'invalid_signature', 'is_processed', 'nowpayments', 'ok', 'order_id', 'processing_result', 'related_order_id', 'response_code', 'status', 'updated_at', 'x-nowpayments-sig']

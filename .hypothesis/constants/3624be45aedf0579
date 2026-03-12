@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\services\antifraud_service.py
+# hypothesis_version: 6.151.9
+
+['0', 'amount_usd', 'blocked', 'completed', 'critical', 'daily_limit_exceeded', 'high', 'high_velocity', 'ip_address', 'large_deposit', 'low', 'medium', 'multiple_ips', 'reason', 'reasons', 'registration_ip', 'risk', 'risk_factors', 'risk_level', 'total']

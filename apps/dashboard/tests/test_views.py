@@ -17,6 +17,7 @@ class ViewTestCase(TestCase):
             password='pass'
         )
         self.user.is_staff = True
+        self.user.is_2fa_enabled = True
         self.user.save()
         self.admin_profile = AdminProfile.objects.create(
             user=self.user, 
@@ -29,5 +30,8 @@ class ViewTestCase(TestCase):
 
     def test_dashboard_with_permission(self):
         self.client.force_login(self.user)
+        session = self.client.session
+        session['admin_2fa_verified'] = True
+        session.save()
         response = self.client.get('/admin-panel/')
         self.assertEqual(response.status_code, 200)

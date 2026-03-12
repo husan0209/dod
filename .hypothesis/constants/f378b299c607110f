@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\games\__init__.py
+# hypothesis_version: 6.151.9
+
+['BaseGame', 'CrashGame', 'DiceGame', 'MinesGame', 'PlinkoGame', 'RouletteGame', 'SlotsGame']

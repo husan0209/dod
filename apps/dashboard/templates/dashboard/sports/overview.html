@@ -1,0 +1,109 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Sports Overview | DOD Admin{% endblock %}
+{% block page_title %}Управление Спортом{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glass-card p-6 border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10">
+            <div class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Активные события</div>
+            <div class="text-3xl font-bold text-white font-outfit">{{ active_events }}</div>
+        </div>
+        <div class="glass-card p-6 border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-teal-500/10">
+            <div class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Ставок сегодня</div>
+            <div class="text-3xl font-bold text-white font-outfit">{{ bets_today }}</div>
+        </div>
+        <div class="glass-card p-6 border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
+            <div class="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">GGR Спорт</div>
+            <div class="text-3xl font-bold text-white font-outfit">${{ ggr_sports|floatformat:2 }}</div>
+        </div>
+        <div class="glass-card p-6 border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-orange-500/10">
+            <div class="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-1">Live Матчи</div>
+            <div class="text-3xl font-bold text-white font-outfit">{{ live_matches }}</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Actions -->
+        <div class="lg:col-span-1 space-y-4">
+            <div class="glass-card p-6">
+                <h3 class="text-xs font-bold text-white uppercase tracking-widest mb-4">Управление</h3>
+                <div class="space-y-2">
+                    <button class="w-full btn-premium py-3 text-xs flex items-center justify-between">
+                        <span>🏆 Менеджер турниров</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </button>
+                    <button class="w-full btn-premium py-3 text-xs flex items-center justify-between">
+                        <span>📈 Настройка коэффициентов</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </button>
+                    <button class="w-full btn-premium py-3 text-xs flex items-center justify-between">
+                        <span>🛡️ Анти-фрод лимиты</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Markets -->
+        <div class="lg:col-span-2">
+            <div class="glass-card h-full">
+                <div class="px-6 py-4 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-white uppercase tracking-widest">Активные рынки</h3>
+                    <button
+                        class="text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:text-white transition-colors">Смотреть
+                        все</button>
+                </div>
+                <div class="p-0">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr
+                                class="text-[9px] font-bold text-text-muted uppercase tracking-widest border-b border-white/5">
+                                <th class="px-6 py-3">Событие</th>
+                                <th class="px-6 py-3">Объем</th>
+                                <th class="px-6 py-3">Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            <tr class="hover:bg-white/[0.02] transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="text-xs font-bold text-white uppercase">UCL: Man City vs Real Madrid
+                                    </div>
+                                    <div class="text-[10px] text-text-muted">Football • Tomorrow, 21:00</div>
+                                </td>
+                                <td class="px-6 py-4 text-xs text-white font-outfit">$45,200</td>
+                                <td class="px-6 py-4">
+                                    <span
+                                        class="badge-premium bg-blue-500/10 text-blue-400 border-blue-500/20">PRE-MATCH</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-white/[0.02] transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="text-xs font-bold text-white uppercase">NBA: Lakers vs Warriors</div>
+                                    <div class="text-[10px] text-text-muted">Basketball • Live</div>
+                                </td>
+                                <td class="px-6 py-4 text-xs text-white font-outfit">$12,800</td>
+                                <td class="px-6 py-4">
+                                    <span
+                                        class="badge-premium bg-emerald-500/10 text-emerald-400 border-emerald-500/20">LIVE</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

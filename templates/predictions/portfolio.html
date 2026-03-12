@@ -1,166 +1,245 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}My Portfolio{% endblock %}
+{% block title %}Мой портфель | DOD Platform{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">My Portfolio</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-12">
+        <div>
+            <h1 class="text-4xl font-bold font-outfit mb-2 text-white">💼 Мой портфель</h1>
+            <p class="text-text-secondary">Ваши позиции и статистика торговли</p>
+        </div>
+        
+        <a href="{% url 'predictions:index' %}" class="btn-premium px-6 py-3">
+            ➕ Новая позиция
+        </a>
+    </div>
 
-    <!-- Portfolio Summary -->
-    <div class="bg-white p-6 rounded-lg shadow mb-8">
-        <h2 class="text-xl font-bold mb-4">Summary</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="text-center">
-                <div class="text-2xl font-bold text-green-600">${{ portfolio.total_invested|floatformat:2 }}</div>
-                <div class="text-sm text-gray-600">Total Invested</div>
-            </div>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-blue-600">${{ portfolio.current_value|floatformat:2 }}</div>
-                <div class="text-sm text-gray-600">Current Value</div>
-            </div>
-            <div class="text-center">
-                <div class="text-2xl font-bold {% if portfolio.total_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                    ${{ portfolio.total_pnl|floatformat:2 }}
-                </div>
-                <div class="text-sm text-gray-600">Total PnL</div>
-            </div>
-            <div class="text-center">
-                <div class="text-2xl font-bold {% if portfolio.total_pnl_percent >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                    {{ portfolio.total_pnl_percent|floatformat:1 }}%
-                </div>
-                <div class="text-sm text-gray-600">Total Return</div>
+    <!-- Portfolio Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-12">
+        <!-- Total Invested -->
+        <div class="glass-card p-6">
+            <div class="text-xs text-text-muted uppercase tracking-widest mb-2">Инвестировано</div>
+            <div class="text-2xl font-bold text-white">${{ portfolio.total_invested|floatformat:2 }}</div>
+        </div>
+
+        <!-- Current Value -->
+        <div class="glass-card p-6">
+            <div class="text-xs text-text-muted uppercase tracking-widest mb-2">Текущая стоимость</div>
+            <div class="text-2xl font-bold text-blue-400">${{ portfolio.current_value|floatformat:2 }}</div>
+        </div>
+
+        <!-- Total P&L -->
+        <div class="glass-card p-6">
+            <div class="text-xs text-text-muted uppercase tracking-widest mb-2">Реализованный P&L</div>
+            <div class="text-2xl font-bold {% if portfolio.realized_pnl >= 0 %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                {% if portfolio.realized_pnl >= 0 %}+{% endif %}${{ portfolio.realized_pnl|floatformat:2 }}
             </div>
         </div>
-        <div class="mt-4 text-center">
-            <div class="text-lg">Win Rate: {{ portfolio.win_rate|floatformat:1 }}%</div>
-            <div class="text-sm text-gray-600">Total Trades: {{ portfolio.total_trades }}</div>
+
+        <!-- Unrealized P&L -->
+        <div class="glass-card p-6">
+            <div class="text-xs text-text-muted uppercase tracking-widest mb-2">Нереализованный P&L</div>
+            <div class="text-2xl font-bold {% if portfolio.unrealized_pnl >= 0 %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                {% if portfolio.unrealized_pnl >= 0 %}+{% endif %}${{ portfolio.unrealized_pnl|floatformat:2 }}
+            </div>
+        </div>
+
+        <!-- Total Return % -->
+        <div class="glass-card p-6">
+            <div class="text-xs text-text-muted uppercase tracking-widest mb-2">Доход %</div>
+            <div class="text-2xl font-bold {% if portfolio.total_pnl_percent >= 0 %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                {% if portfolio.total_pnl_percent >= 0 %}+{% endif %}{{ portfolio.total_pnl_percent|floatformat:1 }}%
+            </div>
         </div>
     </div>
 
-    <!-- Tabs for Active/Settled -->
-    <div class="tabs tabs-boxed mb-6">
-        <a class="tab tab-active" href="#active">Active Positions ({{ portfolio.active_positions|length }})</a>
-        <a class="tab" href="#settled">Settled Positions ({{ portfolio.settled_positions|length }})</a>
+    <!-- Stats Row -->
+    <div class="glass-card p-6 mb-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div>
+                <div class="text-xs text-text-muted uppercase mb-2">Всего позиций</div>
+                <div class="text-2xl font-bold">{{ portfolio.active_positions|length }}</div>
+            </div>
+            <div>
+                <div class="text-xs text-text-muted uppercase mb-2">Разрешённых позиций</div>
+                <div class="text-2xl font-bold">{{ portfolio.settled_positions|length }}</div>
+            </div>
+            <div>
+                <div class="text-xs text-text-muted uppercase mb-2">Win Rate</div>
+                <div class="text-2xl font-bold text-emerald-400">{{ portfolio.win_rate|floatformat:1 }}%</div>
+            </div>
+            <div>
+                <div class="text-xs text-text-muted uppercase mb-2">Всего сделок</div>
+                <div class="text-2xl font-bold">{{ portfolio.total_trades }}</div>
+            </div>
+        </div>
     </div>
 
-    <!-- Active Positions -->
-    <div id="active" class="tab-content">
-        <h2 class="text-2xl font-bold mb-6">Active Positions</h2>
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-8 border-b border-white/10">
+        <button onclick="switchTab('active')" id="tab-active" class="tab-btn tab-active px-6 py-4 font-bold text-white border-b-2 border-blue-400">
+            🔄 Активные позиции ({{ portfolio.active_positions|length }})
+        </button>
+        <button onclick="switchTab('settled')" id="tab-settled" class="tab-btn px-6 py-4 font-bold text-text-secondary border-b-2 border-transparent">
+            ✅ Закрытые позиции ({{ portfolio.settled_positions|length }})
+        </button>
+    </div>
+
+    <!-- Active Positions Tab -->
+    <div id="active-content" class="space-y-4">
         {% if portfolio.active_positions %}
-        <div class="grid gap-4">
             {% for position in portfolio.active_positions %}
-            <div class="bg-white p-6 rounded-lg shadow">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 class="text-lg font-bold">{{ position.market }}</h3>
-                        <div class="badge {% if position.side == 'yes' %}badge-success{% else %}badge-error{% endif %}">
+            <div class="glass-card p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <!-- Left: Market Info -->
+                <div class="flex-1">
+                    <a href="{% url 'predictions:market_detail' position.market.id %}" class="text-lg font-bold text-white hover:text-blue-400 transition-colors">
+                        {{ position.market.question|truncatechars:60 }}
+                    </a>
+                    <div class="mt-2 flex items-center gap-2">
+                        <span class="badge {% if position.side == 'yes' %}bg-emerald-500/20 text-emerald-400 border-emerald-500/30{% else %}bg-rose-500/20 text-rose-400 border-rose-500/30{% endif %} border px-2 py-1 rounded text-xs">
                             {{ position.side|upper }}
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-sm text-gray-600">Shares: {{ position.shares|floatformat:8 }}</div>
-                        <div class="text-sm text-gray-600">Avg Price: ${{ position.avg_price|floatformat:4 }}</div>
+                        </span>
+                        <span class="text-xs text-text-muted">{{ position.market.category.name }}</span>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                        <div class="text-sm text-gray-600">Invested</div>
-                        <div class="text-lg font-bold">${{ position.invested|floatformat:2 }}</div>
+
+                <!-- Center: Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div class="text-center md:text-left">
+                        <div class="text-xs text-text-muted mb-1">SHARES</div>
+                        <div class="font-bold">{{ position.shares|floatformat:4 }}</div>
                     </div>
-                    <div>
-                        <div class="text-sm text-gray-600">Current Value</div>
-                        <div class="text-lg font-bold">${{ position.current_value|floatformat:2 }}</div>
+                    <div class="text-center md:text-left">
+                        <div class="text-xs text-text-muted mb-1">AVG PRICE</div>
+                        <div class="font-bold">${{ position.avg_price|floatformat:4 }}</div>
                     </div>
-                    <div>
-                        <div class="text-sm text-gray-600">Unrealized PnL</div>
-                        <div class="text-lg font-bold {% if position.unrealized_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                            ${{ position.unrealized_pnl|floatformat:2 }}
-                        </div>
+                    <div class="text-center md:text-left">
+                        <div class="text-xs text-text-muted mb-1">INVESTED</div>
+                        <div class="font-bold">${{ position.total_invested|floatformat:2 }}</div>
                     </div>
-                    <div>
-                        <div class="text-sm text-gray-600">Return</div>
-                        <div class="text-lg font-bold {% if position.pnl_percent >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                            {{ position.pnl_percent|floatformat:1 }}%
-                        </div>
+                    <div class="text-center md:text-left">
+                        <div class="text-xs text-text-muted mb-1">CURRENT VALUE</div>
+                        <div class="font-bold text-blue-400">${{ position.current_value|floatformat:2 }}</div>
+                    </div>
+                </div>
+
+                <!-- Right: P&L -->
+                <div class="text-right">
+                    <div class="text-2xl font-bold {% if position.unrealized_pnl >= 0 %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                        {% if position.unrealized_pnl >= 0 %}+{% endif %}${{ position.unrealized_pnl|floatformat:2 }}
+                    </div>
+                    <div class="text-xs text-text-muted">
+                        {% if position.pnl_percent >= 0 %}+{% endif %}{{ position.pnl_percent|floatformat:1 }}%
+                    </div>
+                    <a href="{% url 'predictions:market_detail' position.market.id %}" class="text-xs text-blue-400 hover:text-blue-300 mt-2 inline-block">
+                        Изменить →
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="glass-card p-12 text-center">
+            <div class="text-4xl mb-4 opacity-20">📋</div>
+            <p class="text-text-secondary mb-4">У вас пока нет активных позиций</p>
+            <a href="{% url 'predictions:index' %}" class="btn-premium px-6 py-2">
+                → Открыть позицию
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Settled Positions Tab -->
+    <div id="settled-content" class="hidden space-y-4">
+        {% if portfolio.settled_positions %}
+        <div class="space-y-4">
+            {% for position in portfolio.settled_positions %}
+            <div class="glass-card p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <!-- Left: Market Info -->
+                <div class="flex-1">
+                    <a href="{% url 'predictions:market_detail' position.market.id %}" class="text-lg font-bold text-white hover:text-blue-400 transition-colors">
+                        {{ position.market.question|truncatechars:60 }}
+                    </a>
+                    <div class="mt-2 flex items-center gap-2">
+                        <span class="badge {% if position.side == position.market.resolution %}bg-emerald-500/20 text-emerald-400 border-emerald-500/30{% else %}bg-rose-500/20 text-rose-400 border-rose-500/30{% endif %} border px-2 py-1 rounded text-xs">
+                            {{ position.side|upper }}
+                        </span>
+                        {% if position.side == position.market.resolution %}
+                        <span class="text-xs text-emerald-400">✅ WON</span>
+                        {% else %}
+                        <span class="text-xs text-rose-400">❌ LOST</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Center: Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div class="text-center md:text-left">
+                        <div class="text-xs text-text-muted mb-1">INVESTED</div>
+                        <div class="font-bold">${{ position.total_invested|floatformat:2 }}</div>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <div class="text-xs text-text-muted mb-1">RETURNED</div>
+                        <div class="font-bold">${{ position.total_returned|floatformat:2 }}</div>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <div class="text-xs text-text-muted mb-1">REALIZED P&L</div>
+                        <div class="font-bold">{{ position.realized_pnl|floatformat:2 }}</div>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <div class="text-xs text-text-muted mb-1">SETTLEMENT</div>
+                        <div class="font-bold">${{ position.settlement_amount|floatformat:2 }}</div>
+                    </div>
+                </div>
+
+                <!-- Right: Status -->
+                <div class="text-right">
+                    <div class="text-sm text-text-muted">
+                        Разрешена {{ position.market.resolved_at|date:'j M, H:i' }}
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="bg-white p-8 rounded-lg shadow text-center">
-            <p class="text-gray-600">No active positions</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Settled Positions -->
-    <div id="settled" class="tab-content hidden">
-        <h2 class="text-2xl font-bold mb-6">Settled Positions</h2>
-        {% if portfolio.settled_positions %}
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-                <thead>
-                    <tr>
-                        <th>Market</th>
-                        <th>Side</th>
-                        <th>Invested</th>
-                        <th>Returned</th>
-                        <th>Realized PnL</th>
-                        <th>Settlement</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for position in portfolio.settled_positions %}
-                    <tr>
-                        <td>{{ position.market|truncatechars:30 }}</td>
-                        <td>
-                            <span class="badge {% if position.side == 'yes' %}badge-success{% else %}badge-error{% endif %}">
-                                {{ position.side|upper }}
-                            </span>
-                        </td>
-                        <td>${{ position.invested|floatformat:2 }}</td>
-                        <td>${{ position.returned|floatformat:2 }}</td>
-                        <td class="{% if position.realized_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                            ${{ position.realized_pnl|floatformat:2 }}
-                        </td>
-                        <td>${{ position.settlement_amount|floatformat:2 }}</td>
-                        <td>
-                            {% if position.settlement_amount > 0 %}
-                            <span class="text-green-600">Win</span>
-                            {% else %}
-                            <span class="text-red-600">Loss</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="bg-white p-8 rounded-lg shadow text-center">
-            <p class="text-gray-600">No settled positions</p>
+        <div class="glass-card p-12 text-center">
+            <div class="text-4xl mb-4 opacity-20">✅</div>
+            <p class="text-text-secondary">У вас пока нет закрытых позиций</p>
         </div>
         {% endif %}
     </div>
 </div>
 
 <script>
-// Tab switching
-document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = this.getAttribute('href');
+    function switchTab(tab) {
+        // Hide all content
+        document.getElementById('active-content').classList.add('hidden');
+        document.getElementById('settled-content').classList.add('hidden');
         
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
-        this.classList.add('tab-active');
+        // Remove active state from buttons
+        document.getElementById('tab-active').classList.remove('tab-active');
+        document.getElementById('tab-settled').classList.remove('tab-active');
         
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.add('hidden');
-        });
-        document.querySelector(target).classList.remove('hidden');
-    });
-});
+        // Show selected content
+        document.getElementById(tab + '-content').classList.remove('hidden');
+        document.getElementById('tab-' + tab).classList.add('tab-active');
+    }
 </script>
+
+<style>
+    .tab-btn {
+        transition: all 0.3s ease;
+    }
+    
+    .tab-btn.tab-active {
+        color: white;
+        border-bottom-color: #3b82f6;
+    }
+    
+    .tab-btn:hover {
+        color: #93c5fd;
+    }
+</style>
 {% endblock %}

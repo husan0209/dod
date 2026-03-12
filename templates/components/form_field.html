@@ -1,0 +1,62 @@
+{# Form Field Component - include with: {% include "components/form_field.html" %} #}
+<div class="space-y-2">
+    <label for="{{ field_id }}" class="block text-sm font-medium text-slate-200">
+        {{ label }}
+        {% if required %}<span class="text-red-500">*</span>{% endif %}
+    </label>
+    
+    {% if field_type == "textarea" %}
+        <textarea 
+            id="{{ field_id }}"
+            name="{{ field_name }}"
+            class="form-textarea"
+            placeholder="{{ placeholder|default:'' }}"
+            rows="{{ rows|default:3 }}"
+            {% if required %}required{% endif %}>{{ value|default:'' }}</textarea>
+    {% elif field_type == "select" %}
+        <select 
+            id="{{ field_id }}"
+            name="{{ field_name }}"
+            class="form-select"
+            {% if required %}required{% endif %}>
+            <option value="">{{ select_placeholder|default:"Select an option" }}</option>
+            {% for option_value, option_label in options %}
+                <option value="{{ option_value }}" {% if value == option_value %}selected{% endif %}>
+                    {{ option_label }}
+                </option>
+            {% endfor %}
+        </select>
+    {% elif field_type == "checkbox" %}
+        <div class="flex items-center">
+            <input 
+                type="checkbox"
+                id="{{ field_id }}"
+                name="{{ field_name }}"
+                class="w-4 h-4 bg-slate-900 border border-slate-700 rounded focus:ring-primary-500 cursor-pointer"
+                {% if checked %}checked{% endif %}>
+            <label for="{{ field_id }}" class="ml-3 text-sm text-slate-400 cursor-pointer">
+                {{ label }}
+            </label>
+        </div>
+    {% else %}
+        {# Default: text input #}
+        <input 
+            type="{{ field_type|default:'text' }}"
+            id="{{ field_id }}"
+            name="{{ field_name }}"
+            class="form-input"
+            placeholder="{{ placeholder|default:'' }}"
+            value="{{ value|default:'' }}"
+            {% if minlength %}minlength="{{ minlength }}"{% endif %}
+            {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}
+            {% if required %}required{% endif %}>
+    {% endif %}
+    
+    {% if help_text %}
+        <p class="text-xs text-slate-500 mt-1">{{ help_text }}</p>
+    {% endif %}
+    
+    {% if error %}
+        <p class="text-sm text-red-400 mt-1">{{ error }}</p>
+    {% endif %}
+</div>

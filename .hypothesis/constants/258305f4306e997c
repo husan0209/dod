@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\support\urls.py
+# hypothesis_version: 6.151.9
+
+['admin/analytics/', 'analytics', 'api/suggest-faq/', 'create_ticket', 'faq/', 'faq_detail', 'faq_helpful', 'faq_list', 'home', 'my_tickets', 'new/', 'operator', 'operator/', 'operator_dashboard', 'operator_tickets', 'rate_ticket', 'suggest_faq', 'support', 'ticket_detail', 'tickets/']

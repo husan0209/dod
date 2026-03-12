@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\predictions\templatetags\prediction_tags.py
+# hypothesis_version: 6.151.9
+
+['Active', 'Disputed', 'Draft', 'Pending Resolution', 'Pending Review', 'Resolved', 'Trading Halted', 'Voided', 'active', 'badge-error', 'badge-info', 'badge-neutral', 'badge-primary', 'badge-success', 'badge-warning', 'disputed', 'draft', 'pending_resolution', 'pending_review', 'resolved', 'text-gray-600', 'text-green-600', 'text-red-600', 'text-yellow-600', 'trading_halted', 'voided']

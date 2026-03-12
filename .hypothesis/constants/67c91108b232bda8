@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\webhooks\handler.py
+# hypothesis_version: 6.151.9
+
+[200, 400, 401, 403, 404, 500, 1000, ',', '/', '18.209.98.55', '185.71.76.0/27', '185.71.77.0/27', '52.200.159.85', '54.236.28.238', '77.83.247.0/27', 'Bad Request', 'Forbidden', 'HTTP_X_FORWARDED_FOR', 'Not Found', 'OK', 'REMOTE_ADDR', 'Signature', 'Unauthorized', 'X-Nowpayments-Sig', 'X-Signature', 'application/json', 'deposit', 'duplicate', 'error', 'extra_id', 'ip_rejected', 'nowpayments', 'order_id', 'payout', 'payout_id', 'provider_not_found', 'rukassa', 'sign', 'signature', 'signature_invalid', 'success', 'utf-8', 'x-nowpayments-sig']

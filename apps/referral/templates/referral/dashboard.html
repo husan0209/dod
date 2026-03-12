@@ -1,0 +1,460 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Партнёрская панель - DOD{% endblock %}
+
+{% block extra_css %}
+<style>
+    .metric-card {
+        transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(99, 102, 241, 0.2);
+    }
+
+    .skeleton {
+        background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    .progress-ring {
+        transform: rotate(-90deg);
+    }
+
+    .progress-ring__circle {
+        transition: stroke-dashoffset 1s ease;
+        transform-origin: 50% 50%;
+    }
+
+    .popup-badge {
+        animation: popIn 0.3s ease-out;
+    }
+
+    @keyframes popIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #6366f1, #a855f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header with Welcome Message -->
+        <div class="mb-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <h1 class="text-4xl font-bold text-white">🤝 Партнёрская программа</h1>
+                        <span class="inline-block px-3 py-1 bg-green-900 text-green-200 text-xs rounded-full font-semibold">
+                            ✅ Активна
+                        </span>
+                    </div>
+                    <p class="text-slate-400">Добро пожаловать, <span class="text-white font-semibold">{{ user.first_name|default:user.username }}</span>! Зарабатывайте вместе с DOD</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex gap-2">
+                    <a href="{% url 'referral:promo' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Создать ссылку
+                    </a>
+                    <a href="{% url 'referral:settings' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Настройки
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tier & Balance Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Current Tier Card -->
+            <div class="lg:col-span-2 bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl p-8 border border-slate-700 hover:border-indigo-500 transition-colors shadow-lg">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <p class="text-slate-400 text-sm mb-3 uppercase tracking-wider font-semibold">Ваш текущий уровень</p>
+                        <div class="flex items-center gap-4">
+                            <span class="text-6xl">{{ current_tier.icon }}</span>
+                            <div>
+                                <h2 class="text-4xl font-bold text-white gradient-text">{{ current_tier.name }}</h2>
+                                <p class="text-slate-400 mt-2">Комиссия {{ current_tier.commission_rate_month_1 }}% в первый месяц</p>
+                                <div class="flex gap-2 mt-3">
+                                    <span class="px-3 py-1 bg-indigo-900 text-indigo-200 text-xs rounded-full font-semibold">
+                                        2-й уровень: {{ current_tier.level2_commission_rate }}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commission Rates -->
+                <div class="pt-6 border-t border-slate-600">
+                    <p class="text-slate-300 text-sm font-semibold mb-4">📊 Комиссионные ставки по месяцам</p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-slate-700 rounded-lg p-3 text-center">
+                            <p class="text-slate-400 text-xs mb-1">Месяц 1</p>
+                            <p class="text-green-400 text-2xl font-bold">{{ current_tier.commission_rate_month_1 }}%</p>
+                        </div>
+                        <div class="bg-slate-700 rounded-lg p-3 text-center">
+                            <p class="text-slate-400 text-xs mb-1">Месяцы 2-3</p>
+                            <p class="text-blue-400 text-2xl font-bold">{{ current_tier.commission_rate_month_2_3 }}%</p>
+                        </div>
+                        <div class="bg-slate-700 rounded-lg p-3 text-center">
+                            <p class="text-slate-400 text-xs mb-1">Месяц 4+</p>
+                            <p class="text-purple-400 text-2xl font-bold">{{ current_tier.commission_rate_month_4_plus }}%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress to Next Tier -->
+                {% if next_tier %}
+                <div class="mt-8 pt-6 border-t border-slate-600">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-slate-300 text-sm font-semibold">Прогресс к уровню <span class="text-white">{{ next_tier.name }}</span> {{ next_tier.icon }}</p>
+                        <span class="text-white font-bold text-sm">{{ progress_percent }}%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 rounded-full h-3 mb-3 overflow-hidden">
+                        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500" style="width: {{ progress_percent }}%"></div>
+                    </div>
+                    <p class="text-slate-400 text-xs">{{ progress_text }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Balance Card -->
+            <div class="bg-gradient-to-br from-green-900 to-emerald-900 rounded-2xl p-8 border border-green-700 shadow-lg metric-card">
+                <p class="text-green-200 text-sm mb-2 uppercase tracking-wider font-semibold">Баланс партнёра</p>
+                <h3 class="text-4xl font-bold text-white mb-1">${{ profile.balance|floatformat:2 }}</h3>
+                <p class="text-green-300 text-sm mb-6">Доступно для вывода</p>
+
+                <div class="space-y-2 mb-6 pt-6 border-t border-green-700">
+                    <div class="flex justify-between items-center">
+                        <span class="text-green-200 text-sm">Всего заработано:</span>
+                        <span class="text-white font-bold">${{ profile.total_earned|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-green-200 text-sm">Выведено:</span>
+                        <span class="text-white font-bold">${{ profile.total_withdrawn|floatformat:2 }}</span>
+                    </div>
+                </div>
+
+                {% if profile.available_for_payout %}
+                <a href="{% url 'referral:payouts' %}" class="block w-full px-4 py-3 bg-white text-green-900 rounded-lg font-bold text-center hover:bg-green-50 transition-all shadow-lg">
+                    💚 Вывести средства
+                </a>
+                {% else %}
+                <div class="p-3 bg-amber-900 border border-amber-700 rounded-lg">
+                    <p class="text-amber-200 text-xs text-center">Мин. сумма: <span class="font-bold">${{ profile.tier.min_payout_amount }}</span></p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- KPI Metrics -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            <div class="metric-card bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl p-6 border border-blue-700">
+                <div class="flex items-start justify-between mb-2">
+                    <p class="text-blue-300 text-sm font-semibold">👥 Рефералы</p>
+                    <span class="text-2xl">👥</span>
+                </div>
+                <p class="text-3xl font-bold text-white">{{ total_referrals }}</p>
+                <p class="text-blue-300 text-xs mt-2">{% if profile.monthly_referrals %}+{{ profile.monthly_referrals }} мес.{% else %}0 новых{% endif %}</p>
+            </div>
+
+            <div class="metric-card bg-gradient-to-br from-green-900 to-emerald-800 rounded-xl p-6 border border-green-700">
+                <div class="flex items-start justify-between mb-2">
+                    <p class="text-green-300 text-sm font-semibold">💰 Всего доход</p>
+                    <span class="text-2xl">💰</span>
+                </div>
+                <p class="text-3xl font-bold text-white">${{ profile.total_earned|floatformat:0 }}</p>
+                <p class="text-green-300 text-xs mt-2">Карьерный доход</p>
+            </div>
+
+            <div class="metric-card bg-gradient-to-br from-purple-900 to-violet-800 rounded-xl p-6 border border-purple-700">
+                <div class="flex items-start justify-between mb-2">
+                    <p class="text-purple-300 text-sm font-semibold">📊 Месячный GGR</p>
+                    <span class="text-2xl">📊</span>
+                </div>
+                <p class="text-3xl font-bold text-white">${{ monthly_ggr|floatformat:0 }}</p>
+                <p class="text-purple-300 text-xs mt-2">От рефералов</p>
+            </div>
+
+            <div class="metric-card bg-gradient-to-br from-orange-900 to-amber-800 rounded-xl p-6 border border-orange-700">
+                <div class="flex items-start justify-between mb-2">
+                    <p class="text-orange-300 text-sm font-semibold">⚡ Месячный доход</p>
+                    <span class="text-2xl">⚡</span>
+                </div>
+                <p class="text-3xl font-bold text-white">${{ monthly_earned|floatformat:2 }}</p>
+                <p class="text-orange-300 text-xs mt-2">Начислено</p>
+            </div>
+
+            <div class="metric-card bg-gradient-to-br from-pink-900 to-rose-800 rounded-xl p-6 border border-pink-700">
+                <div class="flex items-start justify-between mb-2">
+                    <p class="text-pink-300 text-sm font-semibold">🔥 Активных</p>
+                    <span class="text-2xl">🔥</span>
+                </div>
+                <p class="text-3xl font-bold text-white">{{ profile.active_referrals }}</p>
+                <p class="text-pink-300 text-xs mt-2">Активных рефералов</p>
+            </div>
+        </div>
+
+        <!-- Charts & Analysis -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Earnings Chart -->
+            <div class="lg:col-span-2 bg-slate-800 rounded-2xl p-6 border border-slate-700 shadow-lg">
+                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    📈 Доход за последние 30 дней
+                    <span class="text-xs bg-indigo-900 text-indigo-200 px-2 py-1 rounded-full">Реальные данные</span>
+                </h3>
+                <div class="relative h-80">
+                    <canvas id="earnings-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Commissions -->
+            <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 shadow-lg">
+                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    💸 Последние начисления
+                </h3>
+                <div class="space-y-3 max-h-96 overflow-y-auto">
+                    {% for commission in recent_commissions %}
+                    <div class="bg-gradient-to-r from-slate-700 to-slate-600 rounded-lg p-4 hover:from-slate-600 hover:to-slate-500 transition-all border border-slate-600">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <p class="text-white text-sm font-semibold">
+                                    {% if commission.commission_type == 'ggr' %}
+                                        📊 GGR комиссия
+                                    {% elif commission.commission_type == 'signup_bonus' %}
+                                        🎁 Бонус регистрации
+                                    {% elif commission.commission_type == 'first_deposit' %}
+                                        💵 Бонус 1-го депозита
+                                    {% else %}
+                                        {{ commission.get_commission_type_display }}
+                                    {% endif %}
+                                </p>
+                                <p class="text-slate-400 text-xs mt-1">От: {{ commission.referral.referral.username }}</p>
+                            </div>
+                            <span class="inline-block px-2 py-1 rounded text-xs font-semibold
+                                {% if commission.status == 'approved' %}bg-green-900 text-green-200
+                                {% elif commission.status == 'pending' %}bg-yellow-900 text-yellow-200
+                                {% else %}bg-slate-700 text-slate-300{% endif %}">
+                                {% if commission.status == 'approved' %}✅
+                                {% elif commission.status == 'pending' %}⏳
+                                {% else %}❌{% endif %}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <p class="text-slate-400 text-xs">{{ commission.created_at|date:"d.m.Y H:i" }}</p>
+                            <p class="text-green-400 font-bold text-lg">${{ commission.net_amount|floatformat:2 }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-8">
+                        <p class="text-slate-400">Нет комиссий за период</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <a href="{% url 'referral:commissions' %}" class="mt-4 block w-full text-center py-2 px-4 bg-slate-700 text-white rounded-lg hover:bg-indigo-600 transition-colors text-sm font-semibold">
+                    Все комиссии →
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Referrals Table -->
+        <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 shadow-lg mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    🆕 Недавние рефералы
+                </h3>
+                <a href="{% url 'referral:referrals' %}" class="text-indigo-400 hover:text-indigo-300 text-sm font-semibold flex items-center gap-1">
+                    Все рефералы
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-slate-700">
+                            <th class="text-left py-4 px-4 text-slate-400 font-semibold text-sm">Пользователь</th>
+                            <th class="text-left py-4 px-4 text-slate-400 font-semibold text-sm hidden sm:table-cell">Статус</th>
+                            <th class="text-center py-4 px-4 text-slate-400 font-semibold text-sm hidden md:table-cell">Квалифицирован</th>
+                            <th class="text-right py-4 px-4 text-slate-400 font-semibold text-sm hidden md:table-cell">GGR</th>
+                            <th class="text-right py-4 px-4 text-slate-400 font-semibold text-sm">Комиссия</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700">
+                        {% for referral in recent_referrals %}
+                        <tr class="hover:bg-slate-700 transition-colors group">
+                            <td class="py-4 px-4">
+                                <a href="{% url 'referral:referral_detail' referral.id %}" class="text-white hover:text-indigo-400 font-semibold group-hover:underline">
+                                    {{ referral.referral.username }}
+                                </a>
+                                <p class="text-slate-400 text-xs mt-1">{{ referral.referral.email }}</p>
+                            </td>
+                            <td class="py-4 px-4 hidden sm:table-cell">
+                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold
+                                    {% if referral.status == 'active' %}bg-green-900 text-green-200
+                                    {% elif referral.status == 'deposited' %}bg-blue-900 text-blue-200
+                                    {% elif referral.status == 'registered' %}bg-slate-700 text-slate-300
+                                    {% else %}bg-red-900 text-red-200{% endif %}">
+                                    <span class="inline-block w-2 h-2 rounded-full
+                                        {% if referral.status == 'active' %}bg-green-400
+                                        {% elif referral.status == 'deposited' %}bg-blue-400
+                                        {% else %}bg-slate-400{% endif %}"></span>
+                                    {{ referral.get_status_display|truncatewords:1 }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-4 hidden md:table-cell text-center">
+                                {% if referral.is_qualified %}
+                                    <span class="inline-block px-2 py-1 bg-green-900 text-green-200 text-xs rounded font-semibold">✅ Да</span>
+                                {% else %}
+                                    <span class="inline-block px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded font-semibold">⏳ Нет</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-4 hidden md:table-cell text-right text-purple-400 font-semibold">${{ referral.total_ggr|floatformat:2 }}</td>
+                            <td class="py-4 px-4 text-right">
+                                <a href="{% url 'referral:referral_detail' referral.id %}" class="text-green-400 font-bold hover:text-green-300">
+                                    ${{{ referral.total_commission_earned|floatformat:2 }}}
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-8 text-center">
+                                <div class="text-slate-400">
+                                    <p class="text-lg font-semibold mb-2">Нет рефералов</p>
+                                    <a href="{% url 'referral:promo' %}" class="text-indigo-400 hover:text-indigo-300 text-sm">Начните делиться вашей реферальной ссылкой →</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Quick Action Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="{% url 'referral:promo' %}" class="group bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl p-6 border border-blue-700 hover:border-blue-500 transition-all hover:shadow-lg">
+                <div class="text-4xl mb-3 group-hover:scale-125 transition-transform origin-left">🔗</div>
+                <p class="text-white font-semibold mb-1">Промо-ссылки</p>
+                <p class="text-blue-300 text-sm">Создавайте и отслеживайте</p>
+            </a>
+
+            <a href="{% url 'referral:referrals' %}" class="group bg-gradient-to-br from-purple-900 to-purple-800 rounded-xl p-6 border border-purple-700 hover:border-purple-500 transition-all hover:shadow-lg">
+                <div class="text-4xl mb-3 group-hover:scale-125 transition-transform origin-left">👥</div>
+                <p class="text-white font-semibold mb-1">Управление</p>
+                <p class="text-purple-300 text-sm">Мои рефералы</p>
+            </a>
+
+            <a href="{% url 'referral:stats' %}" class="group bg-gradient-to-br from-green-900 to-green-800 rounded-xl p-6 border border-green-700 hover:border-green-500 transition-all hover:shadow-lg">
+                <div class="text-4xl mb-3 group-hover:scale-125 transition-transform origin-left">📊</div>
+                <p class="text-white font-semibold mb-1">Аналитика</p>
+                <p class="text-green-300 text-sm">Подробная статистика</p>
+            </a>
+
+            <a href="{% url 'referral:payouts' %}" class="group bg-gradient-to-br from-orange-900 to-orange-800 rounded-xl p-6 border border-orange-700 hover:border-orange-500 transition-all hover:shadow-lg">
+                <div class="text-4xl mb-3 group-hover:scale-125 transition-transform origin-left">💵</div>
+                <p class="text-white font-semibold mb-1">Выплаты</p>
+                <p class="text-orange-300 text-sm">История и заявки</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('earnings-chart');
+    if (ctx) {
+        const data = {{ earnings_chart|safe }};
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.date),
+                datasets: [{
+                    label: 'Доход (USD)',
+                    data: data.map(d => d.amount),
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#1e293b',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBorderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                        borderColor: '#6366f1',
+                        borderWidth: 1,
+                        titleColor: '#fff',
+                        bodyColor: '#e2e8f0',
+                        padding: 12,
+                        displayColors: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { 
+                            color: '#475569',
+                            drawBorder: false
+                        },
+                        ticks: { 
+                            color: '#94a3b8',
+                            callback: function(value) {
+                                return '$' + value.toFixed(0);
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

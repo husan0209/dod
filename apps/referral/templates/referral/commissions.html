@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Комиссии - DOD{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">💰 История комиссий</h1>
+            <p class="text-slate-400">Все начисления от вашей партнёрской программы</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <p class="text-slate-400 text-sm mb-1">Всего начислено</p>
+                <p class="text-3xl font-bold text-white">
+                    {% load django_filters %}
+                    ${{ commissions|length }}
+                </p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <p class="text-slate-400 text-sm mb-1">Одобрено</p>
+                <p class="text-3xl font-bold text-green-400">{{ commissions|length }}</p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <p class="text-slate-400 text-sm mb-1">В ожидании</p>
+                <p class="text-3xl font-bold text-yellow-400">0</p>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                <p class="text-slate-400 text-sm mb-1">Выплачено</p>
+                <p class="text-3xl font-bold text-blue-400">0</p>
+            </div>
+        </div>
+
+        <!-- Commissions Table -->
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+            {% if commissions %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-slate-700 border-b border-slate-600">
+                            <th class="text-left py-4 px-6 text-slate-300 font-semibold">Реферал</th>
+                            <th class="text-left py-4 px-6 text-slate-300 font-semibold hidden md:table-cell">Тип</th>
+                            <th class="text-left py-4 px-6 text-slate-300 font-semibold hidden sm:table-cell">Период</th>
+                            <th class="text-right py-4 px-6 text-slate-300 font-semibold hidden lg:table-cell">GGR</th>
+                            <th class="text-right py-4 px-6 text-slate-300 font-semibold">Сумма</th>
+                            <th class="text-center py-4 px-6 text-slate-300 font-semibold">Статус</th>
+                            <th class="text-left py-4 px-6 text-slate-300 font-semibold hidden sm:table-cell">Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for commission in commissions %}
+                        <tr class="border-b border-slate-700 hover:bg-slate-700 transition-colors">
+                            <td class="py-4 px-6">
+                                <div>
+                                    <p class="text-white font-semibold">{{ commission.referral.referral.username }}</p>
+                                    <p class="text-slate-400 text-sm">{{ commission.referral.referral.email }}</p>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 hidden md:table-cell">
+                                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
+                                    {% if commission.commission_type == 'ggr' %}bg-purple-900 text-purple-200
+                                    {% elif commission.commission_type == 'signup_bonus' %}bg-blue-900 text-blue-200
+                                    {% elif commission.commission_type == 'first_deposit' %}bg-green-900 text-green-200
+                                    {% elif commission.commission_type == 'level2_ggr' %}bg-indigo-900 text-indigo-200
+                                    {% else %}bg-slate-700 text-slate-300{% endif %}">
+                                    {% if commission.commission_type == 'ggr' %}GGR
+                                    {% elif commission.commission_type == 'signup_bonus' %}Регистрация
+                                    {% elif commission.commission_type == 'first_deposit' %}1-й депозит
+                                    {% elif commission.commission_type == 'level2_ggr' %}2-й уровень
+                                    {% else %}{{ commission.get_commission_type_display }}{% endif %}
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 hidden sm:table-cell text-slate-400 text-sm">
+                                {{ commission.period_start|date:"d.m.y" }} - {{ commission.period_end|date:"d.m.y" }}
+                            </td>
+                            <td class="py-4 px-6 hidden lg:table-cell text-right text-purple-400 font-semibold">
+                                ${{ commission.referral_ggr|floatformat:2 }}
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <p class="text-white font-bold">
+                                    {% if commission.net_amount > 0 %}
+                                        <span class="text-green-400">+${{ commission.net_amount|floatformat:2 }}</span>
+                                    {% else %}
+                                        <span class="text-slate-400">$0</span>
+                                    {% endif %}
+                                </p>
+                                <p class="text-slate-400 text-xs">{{ commission.commission_rate }}%</p>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
+                                    {% if commission.status == 'approved' %}bg-green-900 text-green-200
+                                    {% elif commission.status == 'pending' %}bg-yellow-900 text-yellow-200
+                                    {% elif commission.status == 'paid' %}bg-blue-900 text-blue-200
+                                    {% elif commission.status == 'cancelled' %}bg-red-900 text-red-200
+                                    {% else %}bg-slate-700 text-slate-300{% endif %}">
+                                    {% if commission.status == 'approved' %}✅ OK
+                                    {% elif commission.status == 'pending' %}⏳ Ожидание
+                                    {% elif commission.status == 'paid' %}💶 Выплачена
+                                    {% elif commission.status == 'cancelled' %}❌ Отмена
+                                    {% elif commission.status == 'held' %}🔒 Задержана
+                                    {% else %}{{ commission.get_status_display }}{% endif %}
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 hidden sm:table-cell text-slate-400 text-sm">
+                                {{ commission.created_at|date:"d.m.y H:i" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-slate-700 px-6 py-3 border-t border-slate-600 text-slate-400 text-sm">
+                Показано {{ commissions|length }} записей
+            </div>
+            {% else %}
+            <div class="text-center py-16">
+                <p class="text-5xl mb-4">🚫</p>
+                <p class="text-slate-300 text-lg font-bold mb-2">Нет комиссий</p>
+                <p class="text-slate-400 mb-6">Комиссии появятся когда ваши рефералы начнут активно играть</p>
+                <a href="{% url 'referral:referrals' %}" class="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
+                    👥 Посмотреть рефералов →
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- How It Works -->
+        <div class="mt-12 bg-slate-800 rounded-2xl border border-slate-700 p-8">
+            <h2 class="text-2xl font-bold text-white mb-6">❓ Как начисляются комиссии?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-bold text-indigo-400 mb-3">💰 Комиссия от GGR</h3>
+                    <p class="text-slate-300 mb-3">
+                        Рассчитывается ежедневно от GGR (Gross Gaming Revenue) ваших рефералов.
+                    </p>
+                    <p class="text-slate-400 text-sm">
+                        GGR = Сумма ставок - Сумма выигрышей
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-green-400 mb-3">🎁 Бонусы</h3>
+                    <p class="text-slate-300 mb-3">
+                        Дополнительные бонусы за регистрацию и первый депозит реферала.
+                    </p>
+                    <p class="text-slate-400 text-sm">
+                        Зависит от вашего уровня партнёра.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-purple-400 mb-3">📊 Отрицательный GGR</h3>
+                    <p class="text-slate-300 mb-3">
+                        Если реферал выиграл больше, чем проиграл, прибыль переносится на следующай период.
+                    </p>
+                    <p class="text-slate-400 text-sm">
+                        После покрытия отрицательного GGR комиссия начисляется обычно.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-orange-400 mb-3">👥 2-й уровень</h3>
+                    <p class="text-slate-300 mb-3">
+                        Получайте комиссию от рефералов ваших рефералов!
+                    </p>
+                    <p class="text-slate-400 text-sm">
+                        Доступно с уровня Продвинутый и выше.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

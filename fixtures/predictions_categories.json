@@ -1,0 +1,133 @@
+[
+    {
+        "model": "predictions.marketcategory",
+        "fields": {
+            "name": "Политика",
+            "name_en": "Politics",
+            "slug": "politics",
+            "icon": "🏛️",
+            "description": "События в мировой политике",
+            "color": "#3498db",
+            "sort_order": 1,
+            "is_active": true
+        }
+    },
+    {
+        "model": "predictions.marketcategory",
+        "fields": {
+            "name": "Крипто",
+            "name_en": "Cryptocurrency",
+            "slug": "crypto",
+            "icon": "🪙",
+            "description": "Прогнозы о криптовалютах",
+            "color": "#f39c12",
+            "sort_order": 2,
+            "is_active": true
+        }
+    },
+    {
+        "model": "predictions.marketcategory",
+        "fields": {
+            "name": "Спорт",
+            "name_en": "Sports",
+            "slug": "sports",
+            "icon": "⚽",
+            "description": "Спортивные события и матчи",
+            "color": "#e74c3c",
+            "sort_order": 3,
+            "is_active": true
+        }
+    },
+    {
+        "model": "predictions.marketcategory",
+        "fields": {
+            "name": "Технология",
+            "name_en": "Technology",
+            "slug": "technology",
+            "icon": "🤖",
+            "description": "Технологические инновации и новости",
+            "color": "#9b59b6",
+            "sort_order": 4,
+            "is_active": true
+        }
+    },
+    {
+        "model": "predictions.marketcategory",
+        "fields": {
+            "name": "Мир",
+            "name_en": "World",
+            "slug": "world",
+            "icon": "🌍",
+            "description": "Глобальные события и новости",
+            "color": "#16a085",
+            "sort_order": 5,
+            "is_active": true
+        }
+    },
+    {
+        "model": "predictions.marketcategory",
+        "fields": {
+            "name": "Экономика",
+            "name_en": "Economics",
+            "slug": "economics",
+            "icon": "💹",
+            "description": "Экономические показатели и рынки",
+            "color": "#27ae60",
+            "sort_order": 6,
+            "is_active": true
+        }
+    },
+    {
+        "model": "predictions.marketcategory",
+        "fields": {
+            "name": "Развлечения",
+            "name_en": "Entertainment",
+            "slug": "entertainment",
+            "icon": "🎬",
+            "description": "Кинематография, музыка и развлечения",
+            "color": "#e67e22",
+            "sort_order": 7,
+            "is_active": true
+        }
+    },
+    {
+        "model": "predictions.marketcategory",
+        "fields": {
+            "name": "Наука",
+            "name_en": "Science",
+            "slug": "science",
+            "icon": "🔬",
+            "description": "Научные открытия и исследования",
+            "color": "#3498db",
+            "sort_order": 8,
+            "is_active": true
+        }
+    },
+    {
+        "model": "predictions.marketcategory",
+        "fields": {
+            "name": "Игры",
+            "name_en": "Gaming",
+            "slug": "gaming",
+            "icon": "🎮",
+            "description": "Киберспорт и видеоигры",
+            "color": "#c0392b",
+            "sort_order": 9,
+            "is_active": true
+        }
+    },
+    {
+        "model": "predictions.marketcategory",
+        "fields": {
+            "name": "Социум",
+            "name_en": "Social",
+            "slug": "social",
+            "icon": "👥",
+            "description": "Социальные события и тренды",
+            "color": "#2980b9",
+            "sort_order": 10,
+            "is_active": true
+        }
+    }
+]
+

@@ -1,19 +1,89 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Казино - {{ user.username }}</title>
-</head>
-<body>
-    <h1>Казино DOD</h1>
-    <div id="game-list">
-        {% for game in game_types %}
-            <div class="game-card">
-                <h3>{{ game.name }}</h3>
-                <p>{{ game.description }}</p>
-                <a href="{% url 'casino:'|add:game.code %}">Играть</a>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Казино - {{ user.username|default:"Гость" }} | DOD Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden rounded-3xl bg-slate-900 border border-white/5 mb-16 p-8 md:p-12">
+        <div class="relative z-10 max-w-2xl">
+            <h1
+                class="text-4xl md:text-5xl font-bold font-outfit mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                Добро пожаловать в Инновационное Казино
+            </h1>
+            <p class="text-text-secondary text-lg mb-8">
+                Все игры используют алгоритмы доказуемой честности (Provably Fair). Играйте безопасно и выигрывайте
+                по-крупному.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <button class="btn-premium px-8 py-3">Пополнить баланс</button>
+                <button
+                    class="px-8 py-3 rounded-xl border border-white/10 text-white font-medium hover:bg-white/5 transition-colors">Узнать
+                    больше</button>
             </div>
-        {% endfor %}
+        </div>
+        <!-- Decorative subtle gradient -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px]"></div>
     </div>
-</body>
-</html>
+
+    <!-- Games Grid -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-bold font-outfit mb-8 flex items-center">
+            <span class="w-2 h-8 bg-blue-500 rounded-full mr-4"></span>
+            Популярные игры
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {% for game in game_types %}
+            <div class="glass-card flex flex-col h-full group overflow-hidden">
+                <div class="aspect-video bg-dod-surface relative overflow-hidden">
+                    <!-- Placeholder for game cover -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
+                        <svg class="w-12 h-12 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div
+                        class="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-2 py-1 rounded-md text-[10px] font-bold text-blue-400 border border-white/5">
+                        PROVABLY FAIR</div>
+                </div>
+
+                <div class="p-6 flex-grow flex flex-col">
+                    <h3 class="text-xl font-bold font-outfit mb-2 group-hover:text-blue-400 transition-colors">{{
+                        game.name }}</h3>
+                    <p class="text-text-secondary text-sm mb-6 flex-grow">
+                        {{ game.description|truncatechars:80 }}
+                    </p>
+                    <a href="{% url 'casino:'|add:game.code %}" class="btn-premium w-full text-center py-2.5 text-sm">
+                        Играть сейчас
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Fallback/Mockup if no games provided by view yet -->
+            {% for mock in "1234"|make_list %}
+            <div class="glass-card flex flex-col h-full group">
+                <div class="aspect-video bg-dod-surface relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-4xl font-bold text-slate-700">DOD</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold font-outfit mb-2">Игра скоро..</h3>
+                    <p class="text-text-secondary text-sm mb-6">Готовим для вас что-то по-настоящему захватывающее.</p>
+                    <button class="btn-premium w-full opacity-50 cursor-not-allowed">Ожидается</button>
+                </div>
+            </div>
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

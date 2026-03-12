@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\urls.py
+# hypothesis_version: 6.151.9
+
+['casino', 'crash', 'crash/', 'crash/play/', 'crash_play', 'dice', 'dice/', 'dice/calculate/', 'dice/play/', 'dice_calculate', 'dice_play', 'fairness', 'fairness/', 'fairness/verify/', 'fairness_change_seed', 'fairness_verify', 'history', 'history/', 'index', 'mines', 'mines/', 'mines/cashout/', 'mines/reveal/', 'mines/start/', 'mines_cashout', 'mines_reveal', 'mines_start', 'plinko', 'plinko/', 'plinko/play/', 'plinko_play', 'roulette', 'roulette/', 'roulette/play/', 'roulette_play', 'slots', 'slots/', 'slots/play/', 'slots_play']

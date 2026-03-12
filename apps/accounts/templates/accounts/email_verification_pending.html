@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Подтверждение Email - DOD{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[calc(100vh-200px)]">
+    <div class="w-full max-w-md">
+        <div class="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
+            <div class="text-5xl mb-4">✉️</div>
+            <h1 class="text-3xl font-bold mb-2 text-white">Подтверждение Email</h1>
+            <p class="text-gray-400 mb-6">
+                Мы отправили письмо для подтверждения на адрес <strong>{{ user.email }}</strong>
+            </p>
+            
+            <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-8 text-left">
+                <h3 class="text-sm font-semibold text-gray-300 mb-3">📝 Что дальше?</h3>
+                <ol class="text-sm text-gray-400 space-y-2 list-decimal list-inside">
+                    <li>Откройте свой email</li>
+                    <li>Найдите письмо от DOD</li>
+                    <li>Нажмите на ссылку подтверждения</li>
+                    <li>Вернитесь сюда и войдите в аккаунт</li>
+                </ol>
+            </div>
+            
+            <p class="text-gray-400 text-sm mb-6">
+                Письмо может попасть в папку "Спам" или "Промоции". Проверьте эти папки.
+            </p>
+            
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary w-full">
+                Вернуться к входу
+            </a>
+            
+            <p class="text-gray-500 text-xs mt-6">
+                Не пришло письмо?
+                <a href="#" class="text-indigo-400 hover:text-indigo-300">Отправить повторно</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

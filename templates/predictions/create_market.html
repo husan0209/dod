@@ -1,53 +1,197 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Create Market{% endblock %}
+{% block title %}Создать маркет | DOD Platform{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8 max-w-2xl">
-    <h1 class="text-3xl font-bold mb-8">Create Prediction Market</h1>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header -->
+    <div class="mb-12">
+        <a href="{% url 'predictions:index' %}" class="text-blue-400 hover:text-blue-300 inline-flex items-center mb-6">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Вернуться
+        </a>
+        
+        <h1 class="text-4xl font-bold font-outfit mb-3 text-white">
+            Создать новый маркет
+        </h1>
+        <p class="text-text-secondary">Добавьте новое событие для торговли предсказаниями</p>
+    </div>
 
     {% if error %}
-    <div class="alert alert-error mb-6">
-        <span>{{ error }}</span>
+    <div class="glass-card bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl mb-6">
+        <p class="text-rose-400">❌ {{ error }}</p>
     </div>
     {% endif %}
 
-    <div class="bg-white p-6 rounded-lg shadow">
-        <form method="post">
-            {% csrf_token %}
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+        
+        <!-- Section 1: Basic Info -->
+        <div class="glass-card p-8">
+            <h2 class="text-xl font-bold font-outfit mb-6 flex items-center">
+                <span class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mr-3 text-sm">1</span>
+                Основная информация
+            </h2>
             
-            <div class="form-control mb-4">
-                <label class="label">Question (RU)</label>
-                <textarea name="question" class="textarea textarea-bordered" rows="3" required></textarea>
-                <label class="label">
-                    <span class="label-text-alt">⚠️ Must have a clear YES or NO answer</span>
+            <!-- Question RU -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-3">
+                    Вопрос (Русский) <span class="text-rose-500">*</span>
                 </label>
+                <textarea name="question" 
+                    class="input-premium w-full py-4 px-4 min-h-[100px] focus:ring-2 focus:ring-blue-500/20 transition-all" 
+                    placeholder="Напр: Вырастет ли цена BTC выше $100,000 к концу 2024?"
+                    required></textarea>
+                <p class="text-xs text-text-muted mt-2">⚠️ Вопрос должен иметь четкий ответ ДА или НЕТ</p>
             </div>
 
-            <div class="form-control mb-4">
-                <label class="label">Question (EN) - Optional</label>
-                <textarea name="question_en" class="textarea textarea-bordered" rows="3"></textarea>
-            </div>
-
-            <div class="form-control mb-4">
-                <label class="label">Description and Rules</label>
-                <textarea name="description" class="textarea textarea-bordered" rows="5" required></textarea>
-                <label class="label">
-                    <span class="label-text-alt">Explain how the market will be resolved</span>
+            <!-- Question EN -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-3">
+                    Вопрос (Английский) - Опционально
                 </label>
+                <textarea name="question_en" 
+                    class="input-premium w-full py-4 px-4 min-h-[100px] focus:ring-2 focus:ring-blue-500/20 transition-all" 
+                    placeholder="English version..."></textarea>
+            </div>
+        </div>
+
+        <!-- Section 2: Description -->
+        <div class="glass-card p-8">
+            <h2 class="text-xl font-bold font-outfit mb-6 flex items-center">
+                <span class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mr-3 text-sm">2</span>
+                Описание и критерии резолюции
+            </h2>
+            
+            <!-- Description RU -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-3">
+                    Подробное описание (Русский) <span class="text-rose-500">*</span>
+                </label>
+                <textarea name="description" 
+                    class="input-premium w-full py-4 px-4 min-h-[150px] focus:ring-2 focus:ring-blue-500/20 transition-all" 
+                    placeholder="Объясните как будет разрешен маркет, на какие источники опираться, критерии победы и поражения..."
+                    required></textarea>
+                <p class="text-xs text-text-muted mt-2">Будьте максимально подробны для ясности резолюции</p>
             </div>
 
-            <div class="form-control mb-4">
-                <label class="label">Description (EN) - Optional</label>
-                <textarea name="description_en" class="textarea textarea-bordered" rows="5"></textarea>
+            <!-- Description EN -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-3">
+                    Подробное описание (Английский) - Опционально
+                </label>
+                <textarea name="description_en" 
+                    class="input-premium w-full py-4 px-4 min-h-[150px] focus:ring-2 focus:ring-blue-500/20 transition-all" 
+                    placeholder="English description..."></textarea>
             </div>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div class="form-control">
-                    <label class="label">Category</label>
-                    <select name="category" class="select select-bordered" required>
+        <!-- Section 3: Settings -->
+        <div class="glass-card p-8">
+            <h2 class="text-xl font-bold font-outfit mb-6 flex items-center">
+                <span class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mr-3 text-sm">3</span>
+                Параметры маркета
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Category -->
+                <div>
+                    <label class="block text-sm font-bold mb-3">
+                        Категория <span class="text-rose-500">*</span>
+                    </label>
+                    <select name="category" class="input-premium w-full py-3 px-4" required>
+                        <option value="">-- Выберите категорию --</option>
                         {% for category in categories %}
                         <option value="{{ category.id }}">{{ category.icon }} {{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Close Date -->
+                <div>
+                    <label class="block text-sm font-bold mb-3">
+                        Дата закрытия торгов <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="datetime-local" name="close_date" class="input-premium w-full py-3 px-4" required>
+                    <p class="text-xs text-text-muted mt-2">После этой даты торговля будет невозможна</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Resolution Date -->
+                <div>
+                    <label class="block text-sm font-bold mb-3">
+                        Дата резолюции (опционально)
+                    </label>
+                    <input type="datetime-local" name="resolution_date" class="input-premium w-full py-3 px-4">
+                    <p class="text-xs text-text-muted mt-2">Когда будет известен результат</p>
+                </div>
+
+                <!-- Initial Liquidity -->
+                <div>
+                    <label class="block text-sm font-bold mb-3">
+                        Начальная ликвидность (USD) <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="number" name="initial_liquidity" class="input-premium w-full py-3 px-4" 
+                        step="100" min="1000" value="10000" required>
+                    <p class="text-xs text-text-muted mt-2">Минимум $1000, по умолчанию $10,000</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Advanced -->
+        <div class="glass-card p-8">
+            <h2 class="text-xl font-bold font-outfit mb-6 flex items-center">
+                <span class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mr-3 text-sm">4</span>
+                Дополнительно
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Source URL -->
+                <div>
+                    <label class="block text-sm font-bold mb-3">
+                        Ссылка на источник (опционально)
+                    </label>
+                    <input type="url" name="source_url" class="input-premium w-full py-3 px-4" 
+                        placeholder="https://...">
+                    <p class="text-xs text-text-muted mt-2">Ссылка на источник для проверки результата</p>
+                </div>
+
+                <!-- Featured -->
+                <div class="flex items-end">
+                    <label class="flex items-center space-x-3 cursor-pointer group pb-1">
+                        <input type="checkbox" name="is_featured" class="w-5 h-5 rounded border-white/10">
+                        <span class="text-sm font-bold">⭐ Показывать маркет в избранном</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Thumbnail -->
+            <div>
+                <label class="block text-sm font-bold mb-3">
+                    Миниатюра (опционально)
+                </label>
+                <input type="file" name="thumbnail" class="input-premium w-full py-3 px-4" accept="image/*">
+                <p class="text-xs text-text-muted mt-2">Рекомендуемый размер: 400x300px</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col md:flex-row gap-4 pb-8">
+            <button type="submit" class="btn-premium flex-1 py-4 text-base">
+                ✅ Создать маркет
+            </button>
+            <a href="{% url 'predictions:index' %}" class="flex-1 py-4 text-base rounded-2xl border border-white/10 hover:bg-white/5 transition-colors text-center font-bold">
+                ✕ Отменить
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
                         {% endfor %}
                     </select>
                 </div>

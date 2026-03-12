@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\accounts\middleware.py
+# hypothesis_version: 6.151.9
+
+['HTTP_USER_AGENT', 'REMOTE_ADDR', 'browser', 'desktop', 'device_name', 'device_type', 'ip_address', 'is_current', 'is_online', 'last_activity', 'mobile', 'os', 'tablet', 'unknown', 'updated_at', 'user']

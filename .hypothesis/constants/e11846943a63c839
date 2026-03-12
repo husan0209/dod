@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\referral\urls.py
+# hypothesis_version: 6.151.9
+
+['commissions', 'commissions/', 'dashboard', 'payouts', 'payouts/', 'promo', 'promo/', 'referral', 'referrals', 'referrals/', 'settings', 'settings/', 'stats', 'stats/']

@@ -199,6 +199,18 @@ class Referral(models.Model):
             models.Index(fields=['level']),
         ]
 
+    def __str__(self):
+        return f"{self.referral.username} → {self.partner.username}"
+
+    def get_level_display(self):
+        """Вернуть красивое название уровня."""
+        if self.level == 1:
+            return "Прямой реферал"
+        elif self.level == 2:
+            return "Реферал 2-го уровня"
+        else:
+            return f"Уровень {self.level}"
+
 
 class Commission(models.Model):
 

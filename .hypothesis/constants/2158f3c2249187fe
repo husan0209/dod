@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\providers\rukassa.py
+# hypothesis_version: 6.151.9
+
+['+00:00', '/api/v1/create', '/api/v1/payout', 'GET', 'POST', 'Z', 'account', 'amount', 'amount_received', 'cancel', 'cancelled', 'completed', 'completed_at', 'created', 'currency', 'email', 'expired', 'fail', 'fail_url', 'failed', 'method', 'new', 'order_id', 'paid', 'payment_id', 'payment_url', 'payout_id', 'pending', 'processing', 'provider_order_id', 'provider_status', 'shop_id', 'sign', 'status', 'success', 'success_url', 'unknown', 'wait']

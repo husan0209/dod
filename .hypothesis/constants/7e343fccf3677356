@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\sports\services\betting_service.py
+# hypothesis_version: 6.151.9
+
+[1.0, '%Y%m%d', '-', '1.0', 'bet', 'bet_id', 'bets_count', 'cancelled', 'combo', 'conflicts', 'error', 'errors', 'event', 'items', 'items_count', 'market', 'message', 'odd', 'open', 'outcome', 'outcome_id', 'pending', 'potential_win', 'prematch', 'single', 'stake', 'stake_usd', 'status', 'success', 'total_odd', 'total_stake', 'valid', 'Исход не найден', 'Исход недоступен', 'Маркет закрыт', 'Ставка не найдена']

@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\payments\providers\base.py
+# hypothesis_version: 6.151.9
+
+[400, 408, 1000, 'PATCH', 'POST', 'PUT', 'api_base_url', 'api_key', 'api_secret', 'cancelled', 'code', 'completed', 'created', 'duration_ms', 'endpoint', 'expired', 'extra_settings', 'failed', 'merchant_id', 'method', 'new', 'payment api call', 'pending', 'processing', 'provider', 'refunded', 'status_code', 'success', 'timeout', 'unknown', 'webhook_secret']

@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\predictions\services\amm_service.py
+# hypothesis_version: 6.151.9
+
+[100, '0', 'avg_price', 'new_price', 'payout', 'potential_payout', 'potential_profit', 'price_impact_percent', 'shares', 'shares_sold', 'total_cost', 'да']

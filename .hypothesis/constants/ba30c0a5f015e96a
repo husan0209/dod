@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\predictions\views.py
+# hypothesis_version: 6.151.9
+
+[400, '-created_at', '-is_featured', '-total_volume', '0', '7d', 'REMOTE_ADDR', 'USD', '[]', 'action', 'active', 'all', 'amount', 'buy', 'categories', 'category', 'closes_at', 'closing_soon', 'comment', 'comments', 'currency', 'description', 'description_en', 'dispatch', 'error', 'filter', 'filter_type', 'initial_liquidity', 'leaderboard', 'market', 'markets', 'parent_id', 'period', 'portfolio', 'predictions:index', 'q', 'query', 'recent_trades', 'resolution_source', 'resolved', 'selected_category', 'shares', 'side', 'sort_order', 'tags', 'text', 'title', 'title_en', 'trades', 'trending', 'user_position', 'views_count']

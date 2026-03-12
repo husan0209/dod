@@ -1,0 +1,41 @@
+{# Компонент комментария #}
+<div class="comment-item" data-comment-id="{{ comment.id }}">
+    <div class="comment-header">
+        <div class="comment-user-info">
+            {% if comment.user.profile.avatar %}
+                <img src="{{ comment.user.profile.avatar.url }}" alt="{{ comment.user.email }}" class="user-avatar">
+            {% else %}
+                <div class="user-avatar empty">
+                    {{ comment.user.email|first|upper }}
+                </div>
+            {% endif %}
+            <div class="user-details">
+                <span class="username">{{ comment.user.email|truncatechars:20 }}</span>
+                <span class="comment-time">{{ comment.created_at|timesince }} назад</span>
+            </div>
+        </div>
+        <div class="comment-actions">
+            {% if comment.side_prediction %}
+                <span class="position-badge {{ comment.side_prediction }}">
+                    {% if comment.side_prediction == 'yes' %}✅ YES{% else %}❌ NO{% endif %}
+                </span>
+            {% endif %}
+            <button class="like-btn" data-comment-id="{{ comment.id }}">
+                ❤️ <span class="like-count">{{ comment.likes_count }}</span>
+            </button>
+            {% if request.user == comment.user %}
+                <button class="btn-menu">⋯</button>
+            {% endif %}
+        </div>
+    </div>
+    <div class="comment-body">
+        <p>{{ comment.text }}</p>
+    </div>
+    {% if comment.replies.exists %}
+        <div class="comment-replies">
+            {% for reply in comment.replies.all %}
+                {% include "predictions/components/comment.html" with comment=reply %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

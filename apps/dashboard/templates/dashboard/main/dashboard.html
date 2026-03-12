@@ -1,23 +1,19 @@
 {% extends 'dashboard/base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard | DOD Admin{% endblock %}
 {% block page_title %}Дашборд DOD{% endblock %}
 
 {% block content %}
-<div id="stats-container" hx-get="/admin-panel/api/stats/" hx-trigger="load, every 30s" hx-target="#stats-container">
-    <!-- Loading placeholder -->
-    <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Загрузка...</span>
-        </div>
-        <p class="mt-2">Загрузка метрик...</p>
+<div id="stats-container" hx-get="{% url 'dashboard:stats' %}" hx-trigger="load, every 30s"
+    hx-target="#stats-container">
+    <!-- Premium Loading State -->
+    <div class="flex flex-col items-center justify-center py-20 animate-pulse">
+        <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+        <p class="text-xs text-text-muted font-bold uppercase tracking-widest">Агрегация данных...</p>
     </div>
 </div>
 
-<script>
-// Chart.js for graphs
-document.addEventListener('DOMContentLoaded', function() {
-    // Charts will be initialized when data is loaded via HTMX
-});
-</script>
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
 {% endblock %}

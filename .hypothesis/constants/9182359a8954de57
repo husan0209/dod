@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\accounts\migrations\0002_alter_user_managers_and_more.py
+# hypothesis_version: 6.151.9
+
+[128, '0001_initial', 'accounts', 'active', 'auth', 'auth.group', 'auth.permission', 'avatar', 'date joined', 'date_joined', 'emailverification', 'expires_at', 'groups', 'is_active', 'is_staff', 'loginhistory', 'objects', 'password', 'phoneverification', 'staff status', 'user', 'user permissions', 'user_permissions', 'user_set']

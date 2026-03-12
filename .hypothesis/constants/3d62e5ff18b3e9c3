@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\referral\services\antifraud_service.py
+# hypothesis_version: 6.151.9
+
+[0.8, '10minutemail.com', '@', 'HTTP_USER_AGENT', 'approve', 'block', 'blocked', 'cancelled', 'daily_limit_exceeded', 'disposable_email', 'guerrillamail.com', 'high_inactive_rate', 'high_risk', 'id', 'inactive', 'is_suspended', 'mailinator.com', 'partner', 'pending', 'rapid_registration', 'registered', 'same_ip_as_partner', 'self_referral', 'suspend', 'suspension_reason', 'system', 'temp-mail.org', 'tempmail.com', 'throwaway.email', 'too_many_from_ip', 'total', 'trashmail.com', 'yopmail.com', '⚠️', '🚫']

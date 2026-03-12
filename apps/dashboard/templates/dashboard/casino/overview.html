@@ -1,0 +1,79 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Casino Overview | DOD Admin{% endblock %}
+{% block page_title %}Управление Казино{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="glass-card p-6 border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
+            <div class="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">GGR Казино (24ч)</div>
+            <div class="text-3xl font-bold text-white font-outfit">${{ ggr_casino|floatformat:2 }}</div>
+        </div>
+        <div class="glass-card p-6 border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-teal-500/10">
+            <div class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Активных игроков</div>
+            <div class="text-3xl font-bold text-white font-outfit">{{ active_players }}</div>
+        </div>
+        <div class="glass-card p-6 border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10">
+            <div class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Раундов сыграно</div>
+            <div class="text-3xl font-bold text-white font-outfit">{{ rounds_today }}</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- Analytics -->
+        <div class="lg:col-span-3">
+            <div class="glass-card h-full">
+                <div class="px-6 py-4 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-white uppercase tracking-widest">GGR по играм</h3>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <div
+                            class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-text-muted">
+                            <span>Crash</span>
+                            <span class="text-white font-outfit">${{ crash_ggr|floatformat:2 }}</span>
+                        </div>
+                        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div
+                            class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-text-muted">
+                            <span>Mines</span>
+                            <span class="text-white font-outfit">${{ mines_ggr|floatformat:2 }}</span>
+                        </div>
+                        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full bg-purple-500" style="width: 35%"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div
+                            class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-text-muted">
+                            <span>Dice</span>
+                            <span class="text-white font-outfit">${{ dice_ggr|floatformat:2 }}</span>
+                        </div>
+                        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-500" style="width: 25%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="lg:col-span-1 space-y-4">
+            <div class="glass-card p-6 h-full flex flex-col justify-between">
+                <h3 class="text-xs font-bold text-white uppercase tracking-widest mb-4">Управление</h3>
+                <div class="space-y-3">
+                    <button class="w-full btn-premium py-2 text-[10px]">🎨 Дизайн карточек</button>
+                    <button class="w-full btn-premium py-2 text-[10px]">⚙️ RTP Конфиг</button>
+                    <button class="w-full btn-premium py-2 text-[10px]">🔍 Лог раундов</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

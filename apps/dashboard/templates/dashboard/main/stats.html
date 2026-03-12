@@ -1,236 +1,297 @@
 {% load static %}
-<div class="container-fluid px-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">📊 Дашборд DOD</h1>
-        <small class="text-muted">Обновлено: {{ updated_at|date:"H:i:s" }}</small>
-    </div>
 
-    <!-- Current Metrics -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">🟢 {{ online_users }}</h5>
-                            <p class="card-text">Онлайн сейчас</p>
-                        </div>
-                        <div class="align-self-center">
-                            <span class="badge bg-light text-success">↑12%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="space-y-8">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-white font-outfit mb-1">Дашборд DOD</h1>
+            <p class="text-xs text-text-muted uppercase tracking-widest font-bold">Системная аналитика и мониторинг</p>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">💰 ${{ deposits_today|floatformat:0 }}</h5>
-                            <p class="card-text">Депозиты сегодня</p>
-                        </div>
-                        <div class="align-self-center">
-                            <span class="badge bg-light text-primary">↑23%</span>
-                        </div>
-                    </div>
-                </div>
+        <div class="flex items-center space-x-4">
+            <div class="glass-card px-4 py-2 flex items-center space-x-3 text-xs">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-text-secondary">Обновлено: <span class="text-white font-bold">{{
+                        updated_at|date:"H:i:s" }}</span></span>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">📈 ${{ total_ggr|floatformat:0 }}</h5>
-                            <p class="card-text">GGR сегодня</p>
-                        </div>
-                        <div class="align-self-center">
-                            <span class="badge bg-light text-info">↑8%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title">🎧 {{ open_tickets }}</h5>
-                            <p class="card-text">Тикетов открытых</p>
-                        </div>
-                        <div class="align-self-center">
-                            <span class="badge bg-dark text-warning">↓3</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <button onclick="location.reload()" class="btn-premium p-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                    </path>
+                </svg>
+            </button>
         </div>
     </div>
 
-    <!-- Additional Metrics -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-secondary text-light">
-                <div class="card-body">
-                    <h5 class="card-title">👥 {{ new_registrations_today }}</h5>
-                    <p class="card-text">Новых регистраций</p>
-                    <small class="text-muted">сегодня</small>
+    <!-- Primary Metrics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Online Users -->
+        <div class="glass-card p-6 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-2 bg-emerald-500/20 rounded-xl text-emerald-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                        </path>
+                    </svg>
                 </div>
+                <span
+                    class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 uppercase">↑12%</span>
+            </div>
+            <div class="text-3xl font-bold text-white font-outfit mb-1">{{ online_users }}</div>
+            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Онлайн сейчас</div>
+        </div>
+
+        <!-- Deposits Today -->
+        <div class="glass-card p-6 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/20">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-2 bg-blue-500/20 rounded-xl text-blue-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                        </path>
+                    </svg>
+                </div>
+                <span
+                    class="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 uppercase">↑23%</span>
+            </div>
+            <div class="text-3xl font-bold text-white font-outfit mb-1">${{ deposits_today|floatformat:0 }}</div>
+            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Депозиты сегодня</div>
+        </div>
+
+        <!-- GGR Today -->
+        <div class="glass-card p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-2 bg-purple-500/20 rounded-xl text-purple-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
+                <span
+                    class="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20 uppercase">↑8%</span>
+            </div>
+            <div class="text-3xl font-bold text-white font-outfit mb-1">${{ total_ggr|floatformat:0 }}</div>
+            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">GGR сегодня</div>
+        </div>
+
+        <!-- Open Tickets -->
+        <div class="glass-card p-6 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-2 bg-amber-500/20 rounded-xl text-amber-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                        </path>
+                    </svg>
+                </div>
+                <span
+                    class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 uppercase">↓3</span>
+            </div>
+            <div class="text-3xl font-bold text-white font-outfit mb-1">{{ open_tickets }}</div>
+            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Тикетов открытых</div>
+        </div>
+    </div>
+
+    <!-- Secondary Metrics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glass-card p-5 border-white/5 bg-white/[0.02] flex items-center space-x-4">
+            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-text-muted">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="text-xl font-bold text-white font-outfit">{{ new_registrations_today }}</div>
+                <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Новых регистраций</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-secondary text-light">
-                <div class="card-body">
-                    <h5 class="card-title">💸 ${{ withdrawals_today|floatformat:0 }}</h5>
-                    <p class="card-text">Выводы сегодня</p>
-                    <small class="text-muted">ожидают: {{ withdrawals_pending }}</small>
-                </div>
+
+        <div class="glass-card p-5 border-white/5 bg-white/[0.02] flex items-center space-x-4">
+            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-text-muted">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
+                    </path>
+                </svg>
+            </div>
+            <div>
+                <div class="text-xl font-bold text-white font-outfit">${{ withdrawals_today|floatformat:0 }}</div>
+                <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Выводы сегодня</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-secondary text-light">
-                <div class="card-body">
-                    <h5 class="card-title">🎰 ${{ casino_ggr|floatformat:0 }}</h5>
-                    <p class="card-text">GGR Казино</p>
-                    <small class="text-muted">сегодня</small>
-                </div>
+
+        <div class="glass-card p-5 border-white/5 bg-white/[0.02] flex items-center space-x-4">
+            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-text-muted">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.7-3.7a1 1 0 000-1.4l-1.6-1.6a1 1 0 00-1.4 0l-3.7 3.7z">
+                    </path>
+                </svg>
+            </div>
+            <div>
+                <div class="text-xl font-bold text-white font-outfit">${{ casino_ggr|floatformat:0 }}</div>
+                <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">GGR Казино</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-secondary text-light">
-                <div class="card-body">
-                    <h5 class="card-title">⚠️ 3</h5>
-                    <p class="card-text">Подозрит. выводы</p>
-                    <small class="text-muted">нуждаются в проверке</small>
-                </div>
+
+        <div class="glass-card p-5 border-white/5 bg-white/[0.02] flex items-center space-x-4">
+            <div
+                class="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400 border border-rose-500/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
+            </div>
+            <div>
+                <div class="text-xl font-bold text-rose-400 font-outfit">3</div>
+                <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Алерт безопасности</div>
             </div>
         </div>
     </div>
 
-    <!-- Charts -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">💰 Доходы vs Расходы</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="revenue-chart" width="400" height="200"></canvas>
-                </div>
+    <!-- Analytics Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass-card p-6">
+            <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center">
+                <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+                Доходы vs Расходы
+            </h3>
+            <div class="h-64">
+                <canvas id="revenue-chart"></canvas>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">👥 Регистрации</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="registrations-chart" width="400" height="200"></canvas>
-                </div>
+
+        <div class="glass-card p-6">
+            <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center">
+                <svg class="w-4 h-4 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                    </path>
+                </svg>
+                Новые Регистрации
+            </h3>
+            <div class="h-64">
+                <canvas id="registrations-chart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Requires Attention -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">⚠️ Требует внимания</h6>
-                </div>
-                <div class="card-body">
+    <!-- Bottom Context Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Attention Panel -->
+        <div class="lg:col-span-1 space-y-4">
+            <div class="glass-card p-6 border-rose-500/20">
+                <h3 class="text-xs font-bold text-white uppercase tracking-widest mb-4 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                        </path>
+                    </svg>
+                    Требует внимания
+                </h3>
+                <div class="space-y-3">
                     {% if withdrawals_pending %}
-                    <div class="alert alert-danger">
-                        <strong>🔴 {{ withdrawals_pending }} вывода(ов)</strong> ожидают одобрения > 12 часов
+                    <div
+                        class="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center justify-between">
+                        <span class="text-xs text-rose-200">{{ withdrawals_pending }} вывода(ов) ожидают</span>
+                        <span class="text-[10px] font-bold text-rose-400 uppercase tracking-widest">> 12ч</span>
                     </div>
                     {% endif %}
                     {% if kyc_pending %}
-                    <div class="alert alert-warning">
-                        <strong>🟡 {{ kyc_pending }} KYC заявок</strong> ожидают > 24 часов
+                    <div
+                        class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-between">
+                        <span class="text-xs text-amber-200">{{ kyc_pending }} KYC заявок</span>
+                        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">> 24ч</span>
                     </div>
                     {% endif %}
-                    {% if tickets_sla_violated %}
-                    <div class="alert alert-warning">
-                        <strong>🟡 {{ tickets_sla_violated }} тикета(ов)</strong> с нарушенным SLA
-                    </div>
-                    {% endif %}
-                    <div class="alert alert-danger">
-                        <strong>🔴 1 подозрительный партнёр</strong> на проверке
-                    </div>
-                    <div class="alert alert-warning">
-                        <strong>🟡 3 маркета</strong> ожидают резолюции > 48 часов
+                    <div class="p-3 bg-white/5 border border-white/5 rounded-xl flex items-center justify-between">
+                        <span class="text-xs text-text-secondary">1 подозрительный партнёр</span>
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Recent Admin Actions -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">👤 Последние действия админов</h6>
-                </div>
-                <div class="card-body">
+            <!-- Admin Activity -->
+            <div class="glass-card p-6">
+                <h3 class="text-xs font-bold text-white uppercase tracking-widest mb-4">Админы: Лог</h3>
+                <div class="space-y-4">
                     {% for action in recent_actions %}
-                    <div class="mb-2">
-                        <small class="text-muted">{{ action.created_at|date:"H:i" }}</small>
-                        {% if action.admin_user %}
-                        <strong>{{ action.admin_user.username }}</strong>
-                        {% else %}
-                        <strong>Система</strong>
-                        {% endif %}
-                        {{ action.description }}
+                    <div class="flex items-start space-x-3 group">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-bold text-text-muted group-hover:bg-blue-500/20 group-hover:text-blue-400 transition-all">
+                            {{ action.admin_user.username|slice:":1"|upper|default:"S" }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-xs font-bold text-white truncate">{{ action.description }}</div>
+                            <div class="text-[10px] text-text-muted">{{ action.created_at|date:"H:i" }} • {{
+                                action.admin_user.username|default:"System" }}</div>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Financial Summary -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">💰 Финансовая сводка (сегодня)</h6>
+        <!-- Financial Breakdown -->
+        <div class="lg:col-span-2">
+            <div class="glass-card overflow-hidden">
+                <div class="px-6 py-4 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-white uppercase tracking-widest">Финансовая сводка (сегодня)</h3>
+                    <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Profit:
+                        $17,655</span>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-dark table-sm">
-                            <tbody>
-                                <tr>
-                                    <td>Депозиты:</td>
-                                    <td class="text-success">${{ deposits_today|floatformat:0 }}</td>
-                                    <td>Выводы:</td>
-                                    <td class="text-danger">${{ withdrawals_today|floatformat:0 }}</td>
-                                </tr>
-                                <tr>
-                                    <td>GGR Спорт:</td>
-                                    <td>${{ sports_ggr|floatformat:0 }}</td>
-                                    <td>GGR Казино:</td>
-                                    <td>${{ casino_ggr|floatformat:0 }}</td>
-                                </tr>
-                                <tr>
-                                    <td>GGR Predict:</td>
-                                    <td>${{ predictions_ggr|floatformat:0 }}</td>
-                                    <td>Комиссии:</td>
-                                    <td>$1,234</td>
-                                </tr>
-                                <tr class="table-active">
-                                    <td colspan="2"><strong>NGR (чистый доход): ${{ net_flow|floatformat:0 }}</strong></td>
-                                    <td colspan="2"><strong>Партнёрские выплаты: -$3,456</strong></td>
-                                </tr>
-                                <tr class="table-active">
-                                    <td colspan="2"><strong>Бонусы: -$1,234</strong></td>
-                                    <td colspan="2"><strong>Итого прибыль: <span class="text-success">$17,655 📈 +12% vs вчера</span></strong></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="p-6">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+                        <div class="space-y-1">
+                            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Депозиты</div>
+                            <div class="text-xl font-bold text-emerald-400 font-outfit">+${{
+                                deposits_today|floatformat:0 }}</div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Выводы</div>
+                            <div class="text-xl font-bold text-rose-400 font-outfit">-${{
+                                withdrawals_today|floatformat:0 }}</div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Комиссии</div>
+                            <div class="text-xl font-bold text-white font-outfit">$1,234</div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">GGR Спорт</div>
+                            <div class="text-xl font-bold text-blue-400 font-outfit">${{ sports_ggr|floatformat:0 }}
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">GGR Казино
+                            </div>
+                            <div class="text-xl font-bold text-purple-400 font-outfit">${{ casino_ggr|floatformat:0 }}
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest">GGR Predict
+                            </div>
+                            <div class="text-xl font-bold text-pink-400 font-outfit">${{ predictions_ggr|floatformat:0
+                                }}</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
+                            <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">NGR
+                                (Чистый доход)</div>
+                            <div class="text-2xl font-bold text-white font-outfit">${{ net_flow|floatformat:0 }}</div>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+                            <div class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Итого
+                                прибыль (+12%)</div>
+                            <div class="text-2xl font-bold text-white font-outfit">$17,655</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -239,111 +300,75 @@
 </div>
 
 <script>
-// Initialize charts after HTMX loads content
-document.addEventListener('DOMContentLoaded', function() {
-    initCharts();
-});
+    document.addEventListener('DOMContentLoaded', function () {
+        initCharts();
+    });
 
-function initCharts() {
-    // Revenue vs Expenses Chart
-    const revenueCtx = document.getElementById('revenue-chart');
-    if (revenueCtx) {
-        new Chart(revenueCtx, {
-            type: 'line',
-            data: {
-                labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
-                datasets: [{
-                    label: 'Доходы',
-                    data: [12000, 15000, 18000, 14000, 20000, 17000, 22000],
-                    borderColor: '#00e701',
-                    backgroundColor: 'rgba(0, 231, 1, 0.1)',
-                    tension: 0.4
-                }, {
-                    label: 'Расходы',
-                    data: [8000, 9000, 11000, 9500, 13000, 10000, 12000],
-                    borderColor: '#dc3545',
-                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                    tension: 0.4
-                }]
+    function initCharts() {
+        // Utility for chart defaults
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#ffffff'
-                        }
-                    }
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
+                    ticks: { padding: 10 }
                 },
-                scales: {
-                    y: {
-                        ticks: {
-                            color: '#cccccc',
-                            callback: function(value) {
-                                return '$' + value.toLocaleString();
-                            }
-                        },
-                        grid: {
-                            color: '#333'
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: '#cccccc'
-                        },
-                        grid: {
-                            color: '#333'
-                        }
-                    }
+                x: {
+                    grid: { display: false, drawBorder: false },
+                    ticks: { padding: 10 }
                 }
             }
-        });
-    }
+        };
 
-    // Registrations Chart
-    const registrationsCtx = document.getElementById('registrations-chart');
-    if (registrationsCtx) {
-        new Chart(registrationsCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
-                datasets: [{
-                    label: 'Регистрации',
-                    data: [45, 52, 38, 61, 55, 43, 67],
-                    backgroundColor: '#007bff',
-                    borderColor: '#0056b3',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#ffffff'
-                        }
-                    }
+        // Revenue Chart
+        const revenueCtx = document.getElementById('revenue-chart');
+        if (revenueCtx) {
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+                    datasets: [{
+                        label: 'Доходы',
+                        data: [12000, 15000, 18000, 14000, 20000, 17000, 22000],
+                        borderColor: '#3b82f6',
+                        background: 'linear-gradient(180deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0) 100%)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
+                    }]
                 },
-                scales: {
-                    y: {
-                        ticks: {
-                            color: '#cccccc'
-                        },
-                        grid: {
-                            color: '#333'
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: '#cccccc'
-                        },
-                        grid: {
-                            color: '#333'
-                        }
-                    }
-                }
-            }
-        });
+                options: commonOptions
+            });
+        }
+
+        // Registrations Chart
+        const registrationsCtx = document.getElementById('registrations-chart');
+        if (registrationsCtx) {
+            new Chart(registrationsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+                    datasets: [{
+                        label: 'Регистрации',
+                        data: [45, 52, 38, 61, 55, 43, 67],
+                        backgroundColor: '#6366f1',
+                        borderRadius: 8,
+                        maxBarThickness: 30
+                    }]
+                },
+                options: commonOptions
+            });
+        }
     }
-}
 </script>

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Таблица лидеров | Маркеты Предсказаний{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'predictions/css/predictions.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="leaderboard-container">
+    
+    <div class="container-lg">
+        <h1 class="page-title">🏆 Таблица лидеров</h1>
+
+        <!-- Фильтр периода -->
+        <div class="period-filter">
+            <a href="?period=7d" class="period-btn {% if period == '7d' %}active{% endif %}">
+                📊 За неделю
+            </a>
+            <a href="?period=30d" class="period-btn {% if period == '30d' %}active{% endif %}">
+                📈 За месяц
+            </a>
+            <a href="?period=365d" class="period-btn {% if period == '365d' %}active{% endif %}">
+                📉 За год
+            </a>
+            <a href="?period=all" class="period-btn {% if period == 'all' %}active{% endif %}">
+                🎯 За всё время
+            </a>
+        </div>
+
+        <!-- Топ 3 -->
+        <section class="leaderboard-podium">
+            {% if leaderboard.0 %}
+                <!-- 2nd Place -->
+                {% if leaderboard.1 %}
+                    <div class="podium-slot second">
+                        <div class="podium-badge">🥈</div>
+                        <div class="podium-rank">2</div>
+                        <div class="podium-height"></div>
+                        <div class="podium-user">
+                            <div class="user-avatar">
+                                {{ leaderboard.1.user.email|first|upper }}
+                            </div>
+                            <div class="user-info">
+                                <span class="user-name">{{ leaderboard.1.user.email|truncatechars:15 }}</span>
+                                <span class="user-pnl">
+                                    {% if leaderboard.1.total_pnl > 0 %}
+                                        +${{ leaderboard.1.total_pnl|floatformat:0 }}
+                                    {% else %}
+                                        -${{ leaderboard.1.total_pnl|floatformat:0|slice:"1:" }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- 1st Place -->
+                <div class="podium-slot first">
+                    <div class="podium-badge">🏆</div>
+                    <div class="podium-rank">1</div>
+                    <div class="podium-height"></div>
+                    <div class="podium-user">
+                        <div class="user-avatar gold">
+                            {{ leaderboard.0.user.email|first|upper }}
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">{{ leaderboard.0.user.email|truncatechars:15 }}</span>
+                            <span class="user-pnl">
+                                {% if leaderboard.0.total_pnl > 0 %}
+                                    +${{ leaderboard.0.total_pnl|floatformat:0 }}
+                                {% else %}
+                                    -${{ leaderboard.0.total_pnl|floatformat:0|slice:"1:" }}
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3rd Place -->
+                {% if leaderboard.2 %}
+                    <div class="podium-slot third">
+                        <div class="podium-badge">🥉</div>
+                        <div class="podium-rank">3</div>
+                        <div class="podium-height"></div>
+                        <div class="podium-user">
+                            <div class="user-avatar">
+                                {{ leaderboard.2.user.email|first|upper }}
+                            </div>
+                            <div class="user-info">
+                                <span class="user-name">{{ leaderboard.2.user.email|truncatechars:15 }}</span>
+                                <span class="user-pnl">
+                                    {% if leaderboard.2.total_pnl > 0 %}
+                                        +${{ leaderboard.2.total_pnl|floatformat:0 }}
+                                    {% else %}
+                                        -${{ leaderboard.2.total_pnl|floatformat:0|slice:"1:" }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </section>
+
+        <!-- Таблица -->
+        <section class="leaderboard-table">
+            {% if leaderboard %}
+                <div class="table-header">
+                    <div class="col rank">Место</div>
+                    <div class="col user">Пользователь</div>
+                    <div class="col trades">Сделок</div>
+                    <div class="col invested">Инвестировано</div>
+                    <div class="col current">Текущая<br>стоимость</div>
+                    <div class="col pnl">P&L</div>
+                    <div class="col roi">ROI</div>
+                    <div class="col trend">Тренд</div>
+                </div>
+                
+                <div class="table-body">
+                    {% for entry in leaderboard %}
+                        <div class="table-row rank-{{ forloop.counter }}">
+                            <div class="col rank">
+                                {% if forloop.counter == 1 %}🏆{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% else %}{{ forloop.counter }}{% endif %}
+                            </div>
+                            <div class="col user">
+                                <div class="user-info">
+                                    <div class="user-avatar">{{ entry.user.email|first|upper }}</div>
+                                    <div>
+                                        <span class="user-name">{{ entry.user.email|truncatechars:20 }}</span>
+                                        <span class="user-level">Уровень {{ entry.user.profile.trust_level }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col trades">{{ entry.trades_count }}</div>
+                            <div class="col invested">${{ entry.total_invested|floatformat:0 }}</div>
+                            <div class="col current">${{ entry.current_value|floatformat:0 }}</div>
+                            <div class="col pnl {% if entry.total_pnl > 0 %}positive{% else %}negative{% endif %}">
+                                {% if entry.total_pnl > 0 %}+{% endif %}${{ entry.total_pnl|floatformat:0 }}
+                            </div>
+                            <div class="col roi {% if entry.roi > 0 %}positive{% else %}negative{% endif %}">
+                                {% if entry.roi > 0 %}+{% endif %}{{ entry.roi|floatformat:1 }}%
+                            </div>
+                            <div class="col trend">
+                                {% if entry.trend > 0 %}📈{% elif entry.trend < 0 %}📉{% else %}➡️{% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <span class="icon">🏆</span>
+                    <h3>Пока нет данных</h3>
+                </div>
+            {% endif %}
+        </section>
+
+    </div>
+
+</div>
+{% endblock %}

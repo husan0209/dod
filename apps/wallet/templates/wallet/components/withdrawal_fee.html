@@ -1,0 +1,7 @@
+{% if amount > 0 %}
+  <div class="mt-2 text-xs text-text-secondary">
+    Комиссия: {{ fee_amount }} {{ currency.code }}<br>
+    Вы получите: {{ net_amount }} {{ currency.code }}
+  </div>
+{% endif %}
+

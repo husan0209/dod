@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\dashboard\decorators.py
+# hypothesis_version: 6.151.9
+
+[',', 'HTTP_X_FORWARDED_FOR', 'No admin profile', 'REMOTE_ADDR', 'admin_profile', 'permission_denied']

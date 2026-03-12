@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\sports\urls.py
+# hypothesis_version: 6.151.9
+
+['<slug:slug>/', 'api/bets/combo/', 'api/bets/single/', 'api_cashout', 'api_combo_bet', 'api_event_markets', 'api_single_bet', 'api_validate_slip', 'bet_detail', 'bets/', 'bets/<uuid:bet_id>/', 'event_detail', 'events/upcoming/', 'sport_detail', 'sports', 'sports_list', 'upcoming_events', 'user_bets']

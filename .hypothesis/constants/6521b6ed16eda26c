@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\wallet\admin.py
+# hypothesis_version: 6.151.9
+
+['Approved via bulk', 'Rejected via bulk', 'amount', 'available', 'bulk_approve', 'bulk_reject', 'code', 'country_of_issue', 'created_at', 'currency', 'description', 'document_back', 'document_front', 'document_type', 'from_amount', 'from_currency', 'frozen', 'full_name', 'ip_address', 'is_active', 'is_deposit_enabled', 'is_frozen', 'manual_review', 'min_deposit', 'min_withdrawal', 'name', 'pending', 'primary_currency', 'rate_to_usd', 'request_id', 'reviewed_by', 'risk_factors', 'risk_level', 'selfie_with_document', 'status', 'submitted_at', 'symbol', 'to_amount', 'to_currency', 'total_deposited', 'total_wagered', 'total_withdrawn', 'total_won', 'transaction_id', 'type', 'user', 'user__email', 'user__username', 'user_agent', 'wallet', 'wallet__user__email', 'Одобрить выбранные', 'Отклонить выбранные']

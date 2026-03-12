@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\dashboard\views\finance.py
+# hypothesis_version: 6.151.9
+
+[100, '-created_at', '0', 'amount_usd', 'completed', 'count', 'created_at', 'deposit', 'deposits_count', 'deposits_today', 'error', 'finance', 'id', 'net_flow', 'pending', 'total', 'transactions', 'view_transactions', 'withdrawal', 'withdrawals', 'withdrawals_count', 'withdrawals_today']

@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\sports\services\settlement_service.py
+# hypothesis_version: 6.151.9
+
+['0.00', '1.0', '12', '1x', '1x2', 'away', 'away_score', 'bet', 'both_to_score', 'cancelled', 'double_chance', 'draw', 'event_id', 'exact_score', 'finished', 'handicap', 'home', 'home_score', 'ht_away_score', 'ht_home_score', 'ht_result', 'lost', 'lost_count', 'message', 'no', 'other', 'over', 'pending', 'settled', 'settled_count', 'single', 'status', 'total', 'total_stake', 'under', 'void', 'void_count', 'voided_bets', 'won', 'won_count', 'x2', 'yes', 'Событие не найдено', 'Ставка аннулирована']

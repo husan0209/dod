@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\casino\models.py
+# hypothesis_version: 6.151.9
+
+[100, 5000, 10000, 1000000, '-created_at', '-started_at', '0.10', '3.00', '96.00', 'Casino Settings', 'Seed пользователя', 'active', 'bet_session', 'bets', 'busted', 'cancelled', 'cashed_out', 'cashout', 'casino_games', 'crashed', 'game_id', 'game_seed', 'game_type', 'lost', 'running', 'self', 'sort_order', 'started_at', 'status', 'user', 'waiting', 'wallet.Currency', 'wallet.Transaction', 'wallet.Wallet', 'win_session', 'won', 'Активна', 'В игре', 'Выигрыш', 'Забрал', 'Игровая сессия', 'Идёт', 'Кэшаут', 'Настройки казино', 'Не успел', 'Ожидание ставок', 'Отменена', 'Проигрыш', 'Раунд Crash', 'Ставка в Crash', 'Тип игры', 'Упал']

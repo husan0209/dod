@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\wallet\services\conversion_service.py
+# hypothesis_version: 6.151.9
+
+['1.0', '100', 'Conversion disabled', 'Currency inactive', 'completed', 'conversion', 'conversion_credit', 'conversion_debit', 'exchange_rate', 'fee_amount', 'fee_percent', 'from_amount', 'from_currency', 'net_from_amount', 'rate_expires_in', 'to_amount', 'to_currency']

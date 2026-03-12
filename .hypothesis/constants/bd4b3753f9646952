@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\sports\services\cashout_service.py
+# hypothesis_version: 6.151.9
+
+['0.00', 'amount', 'available', 'bet', 'bet_id', 'cashed_out', 'cashout', 'cashout_amount', 'currency', 'items_lost', 'items_pending', 'items_won', 'message', 'potential_win', 'profit', 'profit_if_cashout', 'profit_if_win', 'success', 'Кэшаут', 'Ставка не найдена', 'Это не ваша ставка']

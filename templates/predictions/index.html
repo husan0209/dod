@@ -1,83 +1,181 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Prediction Market{% endblock %}
+{% block title %}Prediction Market | DOD Platform{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Prediction Market</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div>
+            <h1
+                class="text-4xl font-bold font-outfit mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                Рынок предсказаний
+            </h1>
+            <p class="text-text-secondary">Торгуйте долями в исходах мировых событий</p>
+        </div>
 
-    <!-- Categories -->
-    <div class="mb-6">
-        <div class="flex flex-wrap gap-2 mb-4">
-            <a href="{% url 'predictions:index' %}" class="btn {% if not selected_category %}btn-primary{% else %}btn-outline{% endif %}">Все</a>
+        <form method="get" class="relative group max-w-md w-full">
+            <input type="text" name="q" value="{{ query }}" placeholder="Поиск событий..."
+                class="input-premium w-full pl-12 focus:ring-2 focus:ring-blue-500/20 transition-all">
+            <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-muted group-focus-within:text-blue-400 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <button type="submit" class="hidden">Поиск</button>
+        </form>
+    </div>
+
+    <!-- Categories Navigation -->
+    <div class="mb-10 overflow-x-auto pb-4 hide-scrollbar">
+        <div class="flex space-x-3">
+            <a href="{% url 'predictions:index' %}"
+                class="category-pill {% if not selected_category %}active{% endif %}">
+                <span>🌐</span> Все
+            </a>
             {% for category in categories %}
-            <a href="?category={{ category.id }}" class="btn {% if selected_category == category.id|stringformat:'s' %}btn-primary{% else %}btn-outline{% endif %}">
-                {{ category.icon }} {{ category.name }}
+            <a href="?category={{ category.id }}"
+                class="category-pill {% if selected_category == category.id|stringformat:'s' %}active{% endif %}">
+                <span>{{ category.icon|default:"🔹" }}</span> {{ category.name }}
             </a>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Filters and Search -->
-    <div class="mb-6">
-        <div class="flex flex-wrap gap-4 items-center">
-            <div class="flex gap-2">
-                <a href="?filter=trending" class="btn {% if filter_type == 'trending' %}btn-primary{% else %}btn-outline{% endif %}">🔥 Трендовые</a>
-                <a href="?filter=closing_soon" class="btn {% if filter_type == 'closing_soon' %}btn-primary{% else %}btn-outline{% endif %}">⏰ Закрываются скоро</a>
-                <a href="?filter=resolved" class="btn {% if filter_type == 'resolved' %}btn-primary{% else %}btn-outline{% endif %}">✅ Разрешённые</a>
-            </div>
-            <form method="get" class="flex gap-2">
-                <input type="text" name="q" value="{{ query }}" placeholder="Поиск..." class="input input-bordered">
-                <button type="submit" class="btn btn-primary">🔍</button>
-            </form>
+    <!-- Filters Bar -->
+    <div class="flex flex-wrap items-center gap-4 mb-10">
+        <div class="flex bg-dod-surface/50 p-1 rounded-xl border border-white/5">
+            <a href="?filter=trending"
+                class="px-4 py-2 rounded-lg text-sm font-medium transition-all {% if filter_type == 'trending' %}bg-dod-accent text-white shadow-lg{% else %}text-text-secondary hover:text-white{% endif %}">
+                🔥 Трендовые
+            </a>
+            <a href="?filter=closing_soon"
+                class="px-4 py-2 rounded-lg text-sm font-medium transition-all {% if filter_type == 'closing_soon' %}bg-dod-accent text-white shadow-lg{% else %}text-text-secondary hover:text-white{% endif %}">
+                ⏰ Скоро закроются
+            </a>
+            <a href="?filter=resolved"
+                class="px-4 py-2 rounded-lg text-sm font-medium transition-all {% if filter_type == 'resolved' %}bg-dod-accent text-white shadow-lg{% else %}text-text-secondary hover:text-white{% endif %}">
+                ✅ Разрешенные
+            </a>
         </div>
+
+        <label
+            class="flex items-center space-x-3 cursor-pointer group ml-auto bg-dod-surface/30 px-4 py-2 rounded-xl border border-white/5 hover:bg-dod-surface/50 transition-colors">
+            <input type="checkbox"
+                class="w-4 h-4 rounded border-white/10 text-dod-accent focus:ring-dod-accent/20 bg-dod-bg" checked>
+            <span class="text-sm text-text-secondary group-hover:text-white transition-colors">Активные только</span>
+        </label>
     </div>
 
     <!-- Markets Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="markets-list">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="markets-list">
         {% for market in markets %}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <div class="flex items-start justify-between">
-                    <div class="badge badge-outline">{{ market.category.name }}</div>
-                    {% if market.is_featured %}<div class="badge badge-primary">Featured</div>{% endif %}
+        <div class="glass-card flex flex-col group h-full">
+            <div class="p-6 flex flex-col h-full">
+                <!-- Market Metadata -->
+                <div class="flex items-center justify-between mb-4">
+                    <span class="badge-premium badge-blue">
+                        {{ market.category.name }}
+                    </span>
+                    {% if market.is_featured %}
+                    <span class="badge-premium bg-amber-500/10 text-amber-500 border-amber-500/20">Featured</span>
+                    {% endif %}
                 </div>
-                <h2 class="card-title text-lg">{{ market.question|truncatechars:80 }}</h2>
-                <div class="flex gap-4 mt-4">
-                    <div class="flex-1">
-                        <div class="text-sm text-green-600">🟢 YES</div>
-                        <div class="text-lg font-bold">${{ market.yes_price|floatformat:4 }} ({{ market.get_yes_probability|floatformat:1 }}%)</div>
+
+                <!-- Market Question -->
+                <a href="{% url 'predictions:market_detail' market.id %}" class="flex-grow">
+                    <h2
+                        class="text-xl font-bold font-outfit mb-6 line-clamp-3 group-hover:text-blue-400 transition-colors">
+                        {{ market.question }}
+                    </h2>
+                </a>
+
+                <!-- Odds Section -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div
+                        class="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4 transition-all hover:bg-emerald-500/10">
+                        <div class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">ДА</div>
+                        <div class="text-xl font-bold text-white">${{ market.yes_price|floatformat:2 }}</div>
+                        <div class="text-xs text-text-muted mt-1">{{ market.get_yes_probability|floatformat:0 }}%</div>
                     </div>
-                    <div class="flex-1">
-                        <div class="text-sm text-red-600">🔴 NO</div>
-                        <div class="text-lg font-bold">${{ market.no_price|floatformat:4 }} ({{ market.get_no_probability|floatformat:1 }}%)</div>
+                    <div
+                        class="bg-rose-500/5 border border-rose-500/10 rounded-2xl p-4 transition-all hover:bg-rose-500/10">
+                        <div class="text-[10px] font-bold text-rose-500 uppercase tracking-widest mb-1">НЕТ</div>
+                        <div class="text-xl font-bold text-white">${{ market.no_price|floatformat:2 }}</div>
+                        <div class="text-xs text-text-muted mt-1">{{ market.get_no_probability|floatformat:0 }}%</div>
                     </div>
                 </div>
-                <div class="flex justify-between text-sm text-gray-600 mt-2">
-                    <span>📊 ${{ market.volume_usd|floatformat:0 }}</span>
-                    <span>👥 {{ market.unique_traders }}</span>
-                    <span>⏰ {{ market.close_date|date:"M j" }}</span>
-                </div>
-                <div class="card-actions justify-end mt-4">
-                    <a href="{% url 'predictions:market_detail' market.id %}" class="btn btn-primary">Подробнее</a>
+
+                <!-- Stats Footer -->
+                <div class="flex items-center justify-between pt-6 border-t border-white/5 text-xs">
+                    <div class="flex space-x-4 text-text-secondary">
+                        <span class="flex items-center px-2 py-1 bg-white/5 rounded-md">
+                            <svg class="w-3 h-3 mr-1.5 opacity-50" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            ${{ market.volume_usd|floatformat:0 }}
+                        </span>
+                        <span class="flex items-center px-2 py-1 bg-white/5 rounded-md">
+                            <svg class="w-3 h-3 mr-1.5 opacity-50" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            {{ market.close_date|date:"j M" }}
+                        </span>
+                    </div>
+                    <a href="{% url 'predictions:market_detail' market.id %}"
+                        class="text-blue-400 font-bold hover:text-blue-300 transition-colors flex items-center">
+                        Прогноз
+                        <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </a>
                 </div>
             </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-20 text-center glass-card">
+            <div class="text-4xl mb-4 opacity-20">🔍</div>
+            <h3 class="text-xl font-bold mb-2">Маркеты не найдены</h3>
+            <p class="text-text-secondary">Попробуйте изменить параметры поиска или фильтры</p>
         </div>
         {% endfor %}
     </div>
 
     <!-- Pagination -->
     {% if is_paginated %}
-    <div class="flex justify-center mt-8">
-        <div class="btn-group">
+    <div class="flex justify-center mt-16">
+        <nav class="flex space-x-2 bg-dod-surface/50 p-1.5 rounded-2xl border border-white/5">
             {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="btn">«</a>
+            <a href="?page={{ page_obj.previous_page_number }}"
+                class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
             {% endif %}
-            <span class="btn">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+
+            <span class="px-6 flex items-center text-sm font-bold text-white">
+                {{ page_obj.number }} <span class="text-text-muted mx-2">и</span> {{ paginator.num_pages }}
+            </span>
+
             {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="btn">»</a>
+            <a href="?page={{ page_obj.next_page_number }}"
+                class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
             {% endif %}
-        </div>
+        </nav>
     </div>
     {% endif %}
 </div>

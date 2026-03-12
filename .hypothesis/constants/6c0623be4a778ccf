@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\miniapp\middleware.py
+# hypothesis_version: 6.151.9
+
+['/tg/', 'X-Telegram-Init-Data', 'X-Telegram-Version', 'app_opens_count', 'hash', 'initData', 'last_app_open']

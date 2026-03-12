@@ -3,10 +3,17 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.db import connection
 from django.core.cache import cache
 
 from apps.referral.services.referral_service import ReferralService
+
+def home_view(request):
+    """Главная страница - редирект на dashboard или login"""
+    if request.user.is_authenticated:
+        return redirect('dashboard:dashboard')
+    return redirect('accounts:login')
 
 def health_check(request):
     """
@@ -49,19 +56,30 @@ def referral_redirect_view(request, code):
     return ReferralService.process_referral_click(request, code)
 
 urlpatterns = [
+    path('', home_view, name='home'),
     path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),
-    path('dashboard/', include('apps.dashboard.urls')),
+    path('accounts/', include('apps.accounts.urls')),
+    path('allauth/', include('allauth.urls')),
+    path('admin-panel/', include('apps.dashboard.urls')),
     path('wallet/', include('apps.wallet.urls')),
     path('payments/', include('apps.payments.urls')),
     path('casino/', include('apps.casino.urls')),
+    path('sports/', include('apps.sports.urls')),
     path('predictions/', include('apps.predictions.urls')),
     path('partners/', include('apps.referral.urls')),
     path('support/', include('apps.support.urls')),
     path('telegram/', include('apps.telegram_bot.urls')),
-    path('admin-panel/', include('apps.dashboard.urls')),
     path('tg/', include('apps.miniapp.urls')),
     path('r/<str:code>/', referral_redirect_view, name='referral-redirect'),
+]
+
+# Webhook URLs at root level for cleaner provider integration
+from apps.payments import views as payment_views
+
+urlpatterns += [
+    path('webhooks/payments/rukassa/', payment_views.rukassa_webhook, name='webhook-rukassa'),
+    path('webhooks/payments/nowpayments/', payment_views.nowpayments_webhook, name='webhook-nowpayments'),
+    path('webhooks/payouts/nowpayments/', payment_views.nowpayments_payout_webhook, name='webhook-nowpayments-payout'),
 ]
 
 urlpatterns += [
@@ -70,7 +88,7 @@ urlpatterns += [
 
 # Monitoring (optional if package installed)
 if 'django_prometheus' in settings.INSTALLED_APPS:
-    urlpatterns.insert(0, path('', include('django_prometheus.urls')))
+    urlpatterns.append(path('metrics/', include('django_prometheus.urls')))
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

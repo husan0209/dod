@@ -1,0 +1,4 @@
+# file: C:\xampp\htdocs\DOD\apps\predictions\services\analytics_service.py
+# hypothesis_version: 6.151.9
+
+[100, 168, 720, 2160, '-updated_at', '0', '1M', '1d', '3M', '7d', 'Market not found', 'active_positions', 'all', 'avg_price', 'current_value', 'error', 'invested', 'is_settled', 'market', 'market_id', 'no_price', 'no_prices', 'pnl', 'pnl_percent', 'potential_payout', 'rank', 'realized_pnl', 'returned', 'sell', 'settled_positions', 'settlement_amount', 'shares', 'side', 'timestamp', 'timestamps', 'total_invested', 'total_pnl', 'total_pnl_percent', 'total_returned', 'total_trades', 'trades', 'unrealized_pnl', 'user', 'user_id', 'volume', 'volumes', 'win_rate', 'yes_price', 'yes_prices']

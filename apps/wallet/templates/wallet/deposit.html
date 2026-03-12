@@ -1,7 +1,96 @@
 {% extends "base.html" %}
 {% load wallet_tags %}
 
+{% block title %}Пополнение кошелька{% endblock %}
+
 {% block content %}
-<h1>Wallet Overview</h1>
-<!-- Placeholder -->
+<div class="max-w-3xl mx-auto px-4 py-6 space-y-6">
+  <h1 class="text-2xl font-bold text-white mb-4">📥 Пополнение</h1>
+
+  {% if error %}
+    <div class="rounded-lg bg-red-500/10 border border-red-500/40 px-4 py-3 text-sm text-red-200">
+      {{ error }}
+    </div>
+  {% endif %}
+  <form method="post" class="space-y-6 bg-dod-surface/70 rounded-2xl p-5">
+    {% csrf_token %}
+
+    <div>
+      <label class="block text-sm text-text-secondary mb-1">Валюта</label>
+      <div class="flex flex-wrap gap-2">
+        {% for cur in currencies %}
+          <button
+            type="submit"
+            name="currency"
+            value="{{ cur.code }}"
+            class="px-3 py-1.5 rounded-full text-xs border
+                   {% if cur.code == selected_currency.code %}
+                     bg-accent text-white border-accent
+                   {% else %}
+                     bg-black/40 text-text-secondary border-dod-surface hover:border-accent
+                   {% endif %}">
+            {{ cur.code }}
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm text-text-secondary mb-1">
+        Сумма (минимум: {{ selected_currency.min_deposit }} {{ selected_currency.code }})
+      </label>
+      <input
+        type="number"
+        step="0.00000001"
+        min="0"
+        name="amount"
+        class="w-full bg-black/40 border border-dod-surface rounded-lg px-3 py-2 text-sm text-white"
+      />
+      <div class="mt-2 flex flex-wrap gap-2 text-xs">
+        {% for quick in "10,25,50,100,500,1000".split(",") %}
+          <button type="button"
+                  class="px-2 py-1 rounded-full bg-dod-surface text-text-secondary hover:text-white"
+                  onclick="this.closest('form').elements['amount'].value='{{ quick }}'">
+            {{ quick }} {{ selected_currency.code }}
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm text-text-secondary mb-1">Способ оплаты</label>
+      {% if available_methods %}
+        <div class="space-y-3">
+          {% for group in available_methods %}
+            <div>
+              <p class="text-xs text-text-secondary mb-1">{{ group.provider_name }}</p>
+              <div class="flex flex-wrap gap-2">
+                {% for m in group.methods %}
+                  <label class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-dod-surface text-xs cursor-pointer hover:border-accent">
+                    <input type="radio" name="provider" value="{{ group.provider }}" class="hidden peer">
+                    <input type="radio" name="method" value="{{ m.code }}" class="hidden">
+                    <span>{{ m.icon }} {{ m.name }}</span>
+                    <span class="text-[11px] text-text-secondary">от {{ m.min }} до {{ m.max }} {{ m.currency }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-xs text-red-300">Нет доступных способов пополнения для выбранной валюты.</p>
+      {% endif %}
+    </div>
+
+    <div class="border-t border-dod-surface pt-4">
+      <button type="submit" class="btn-premium w-full text-sm">
+        Перейти к оплате
+      </button>
+      <p class="mt-2 text-xs text-text-secondary">
+        После нажатия вы будете перенаправлены на страницу платёжной системы.
+      </p>
+    </div>
+  </form>
+</div>
 {% endblock %}
+
