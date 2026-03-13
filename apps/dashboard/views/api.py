@@ -7,24 +7,9 @@ from decimal import Decimal
 from django.db import models
 
 from apps.accounts.models import User, AdminActionLog
-from apps.wallet.models import Transaction
+from apps.wallet.models import Transaction, WithdrawalRequest, KYCVerification
 from apps.dashboard.decorators import require_permission
-
-# Try to import optional models
-try:
-    from apps.support.models import Ticket
-except ImportError:
-    Ticket = None
-
-try:
-    from apps.payments.models import Withdrawal
-except ImportError:
-    Withdrawal = None
-
-try:
-    from apps.accounts.models import KYCRequest
-except ImportError:
-    KYCRequest = None
+from apps.support.models import Ticket
 
 
 @login_required
@@ -74,30 +59,22 @@ def stats_view(request):
     net_flow = (deposits_today['total'] or Decimal('0')) - (withdrawals_today['total'] or Decimal('0'))
     
     # Attention items
-    withdrawals_pending = 0
-    if Withdrawal:
-        withdrawals_pending = Withdrawal.objects.filter(
-            status='pending',
-            created_at__lt=now - timedelta(hours=12)
-        ).count()
+    withdrawals_pending = WithdrawalRequest.objects.filter(
+        status__in=["pending", "manual_review", "auto_approved", "approved", "processing"],
+        created_at__lt=now - timedelta(hours=12),
+    ).count()
     
-    kyc_pending = 0
-    if KYCRequest:
-        kyc_pending = KYCRequest.objects.filter(
-            status='pending',
-            created_at__lt=now - timedelta(hours=24)
-        ).count()
+    kyc_pending = KYCVerification.objects.filter(
+        status="pending",
+        created_at__lt=now - timedelta(hours=24),
+    ).count()
     
-    tickets_sla_violated = 0
-    if Ticket:
-        tickets_sla_violated = Ticket.objects.filter(
-            status__in=['open', 'in_progress'],
-            created_at__lt=now - timedelta(hours=24)
-        ).count()
+    tickets_sla_violated = Ticket.objects.filter(
+        status__in=['open', 'in_progress'],
+        created_at__lt=now - timedelta(hours=24)
+    ).count()
     
-    open_tickets = 0
-    if Ticket:
-        open_tickets = Ticket.objects.filter(status__in=['open', 'in_progress']).count()
+    open_tickets = Ticket.objects.filter(status__in=['open', 'in_progress']).count()
     
     # Recent admin actions
     recent_actions = AdminActionLog.objects.select_related('admin_user').order_by('-created_at')[:5]

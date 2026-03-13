@@ -8,6 +8,7 @@ python-dotenv==1.0.1
 Pillow==10.4.0
 django-allauth==65.0.0
 django-otp==1.5.0
+pyotp==2.9.0
 qrcode==7.4.2
 phonenumbers==8.13.0
 django-phonenumber-field==8.0.0

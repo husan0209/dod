@@ -23,7 +23,6 @@ from apps.accounts.forms import (
 from apps.accounts.services.auth_service import AuthService
 from apps.accounts.services.otp_service import OTPService
 from apps.accounts.services.sms_service import SMSService
-from apps.telegram_bot.services import TelegramBotService
 
 
 @require_http_methods(["GET", "POST"])

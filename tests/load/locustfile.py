@@ -1,4 +1,4 @@
-# tests/load/locustfile.py
+import uuid
 
 from locust import HttpUser, task, between
 
@@ -11,8 +11,9 @@ class DODUser(HttpUser):
 
     def on_start(self):
         """Логин перед тестами."""
+        self.user_id = uuid.uuid4().hex
         self.client.post('/accounts/login/', {
-            'email': f'loadtest_{self.id}@test.com',
+            'email': f'loadtest_{self.user_id}@test.com',
             'password': 'TestPassword123!',
         })
 

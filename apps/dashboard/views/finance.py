@@ -5,14 +5,8 @@ from decimal import Decimal
 from django.db import models
 
 from apps.accounts.models import AdminActionLog
-from apps.wallet.models import Transaction
+from apps.wallet.models import Transaction, WithdrawalRequest
 from apps.dashboard.decorators import require_permission
-
-# Try to import optional models
-try:
-    from apps.payments.models import Withdrawal
-except ImportError:
-    Withdrawal = None
 
 
 @require_permission('finance', 'view_transactions')
@@ -22,42 +16,40 @@ def finance_overview(request):
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     
     # Today's metrics
-    deposits_today = Transaction.objects.filter(
-        type='deposit',
-        status='completed',
-        created_at__gte=today_start
+    today_stats = Transaction.objects.filter(
+        status="completed",
+        created_at__gte=today_start,
+        type__in=["deposit", "withdrawal"],
     ).aggregate(
-        total=models.Sum('amount_usd'),
-        count=models.Count('id')
+        deposits_total=models.Sum("amount_usd", filter=models.Q(type="deposit")),
+        deposits_count=models.Count("id", filter=models.Q(type="deposit")),
+        withdrawals_total=models.Sum("amount_usd", filter=models.Q(type="withdrawal")),
+        withdrawals_count=models.Count("id", filter=models.Q(type="withdrawal")),
     )
-    
-    withdrawals_today = Transaction.objects.filter(
-        type='withdrawal',
-        status='completed',
-        created_at__gte=today_start
-    ).aggregate(
-        total=models.Sum('amount_usd'),
-        count=models.Count('id')
-    )
-    
-    net_flow = (deposits_today['total'] or Decimal('0')) - (withdrawals_today['total'] or Decimal('0'))
+    deposits_total = today_stats["deposits_total"] or Decimal("0")
+    withdrawals_total = today_stats["withdrawals_total"] or Decimal("0")
+    net_flow = deposits_total - withdrawals_total
     
     # Pending withdrawals
-    pending_withdrawals_count = 0
-    pending_withdrawals_amount = Decimal('0')
-    if Withdrawal:
-        pending = Withdrawal.objects.filter(status='pending').aggregate(
-            count=models.Count('id'),
-            total=models.Sum('amount_usd')
-        )
-        pending_withdrawals_count = pending['count'] or 0
-        pending_withdrawals_amount = pending['total'] or Decimal('0')
+    pending = WithdrawalRequest.objects.filter(
+        status__in=["pending", "manual_review", "auto_approved", "approved", "processing"]
+    ).aggregate(
+        count=models.Count("id"),
+        total=models.Sum(
+            models.ExpressionWrapper(
+                models.F("amount") * models.F("currency__rate_to_usd"),
+                output_field=models.DecimalField(max_digits=18, decimal_places=2),
+            )
+        ),
+    )
+    pending_withdrawals_count = pending["count"] or 0
+    pending_withdrawals_amount = pending["total"] or Decimal("0")
     
     context = {
-        'deposits_today': deposits_today['total'] or Decimal('0'),
-        'deposits_count': deposits_today['count'] or 0,
-        'withdrawals_today': withdrawals_today['total'] or Decimal('0'),
-        'withdrawals_count': withdrawals_today['count'] or 0,
+        'deposits_today': deposits_total,
+        'deposits_count': today_stats["deposits_count"] or 0,
+        'withdrawals_today': withdrawals_total,
+        'withdrawals_count': today_stats["withdrawals_count"] or 0,
         'net_flow': net_flow,
         'pending_withdrawals_count': pending_withdrawals_count,
         'pending_withdrawals_amount': pending_withdrawals_amount,
@@ -69,11 +61,14 @@ def finance_overview(request):
 @require_permission('finance', 'view_transactions')
 def withdrawals_queue(request):
     """Withdrawal approval queue"""
-    if not Withdrawal:
-        context = {'withdrawals': [], 'error': 'Withdrawal model not available'}
-        return render(request, 'dashboard/finance/withdrawals.html', context)
-    
-    withdrawals = Withdrawal.objects.filter(status='pending').order_by('created_at')
+    withdrawals = WithdrawalRequest.objects.filter(
+        status__in=["pending", "manual_review"]
+    ).select_related("user", "currency").annotate(
+        amount_usd=models.ExpressionWrapper(
+            models.F("amount") * models.F("currency__rate_to_usd"),
+            output_field=models.DecimalField(max_digits=18, decimal_places=2),
+        )
+    ).order_by("created_at")
     
     context = {
         'withdrawals': withdrawals,

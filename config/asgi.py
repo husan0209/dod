@@ -8,7 +8,10 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
 
 django_asgi_app = get_asgi_application()
 
-from apps.support.routing import websocket_urlpatterns
+from apps.support.routing import websocket_urlpatterns as support_websocket_urlpatterns
+from apps.casino.routing import websocket_urlpatterns as casino_websocket_urlpatterns
+
+websocket_urlpatterns = support_websocket_urlpatterns + casino_websocket_urlpatterns
 
 application = ProtocolTypeRouter({
     'http': django_asgi_app,

@@ -63,7 +63,7 @@ class CrashGameImpl(BaseGame):
         # Получить текущий раунд
         current_round = CrashGame.objects.filter(status='waiting').first()
         if not current_round:
-            current_round = CrashGameLogic.create_round()
+            current_round = CrashGameImpl.create_round()
         
         # Проверить что пользователь ещё не ставил
         if CrashBet.objects.filter(crash_game=current_round, user=user).exists():
