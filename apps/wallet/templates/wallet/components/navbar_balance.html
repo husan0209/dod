@@ -1,11 +1,10 @@
 {% load wallet_tags %}
-{% if wallet %}
-  <span class="text-xs text-text-secondary">Баланс</span>
-  <span class="text-sm font-bold text-accent-success">
-    {% user_balance request.user %}
-  </span>
-{% else %}
-  <span class="text-xs text-text-secondary">Баланс</span>
-  <span class="text-sm font-bold text-accent-success">$0.00</span>
-{% endif %}
-
+<div class="flex flex-col items-end">
+    <div class="text-[10px] font-black text-blue-400/80 uppercase tracking-widest leading-none mb-1">Баланс</div>
+    <div class="flex items-center gap-2">
+        <span class="text-xs font-black text-white px-2 py-0.5 rounded-lg bg-white/5 border border-white/5 shadow-inner">
+            {% format_currency wallet.get_primary_balance wallet.primary_currency_id %}
+        </span>
+        <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+    </div>
+</div>

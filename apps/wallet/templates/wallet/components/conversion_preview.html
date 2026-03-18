@@ -1,12 +1,37 @@
-{% load wallet_tags %}
-{% if preview %}
-  <div class="mt-4 p-3 rounded-lg bg-dod-surface/70 text-sm space-y-1">
-    <div>Курс: 1 {{ preview.from_currency }} = {{ preview.exchange_rate }} {{ preview.to_currency }}</div>
-    <div>Комиссия: {{ preview.fee_percent }}% ({{ preview.fee_amount }})</div>
-    <div>Вы отдаёте: {{ preview.from_amount }} {{ preview.from_currency }}</div>
-    <div>Вы получите: {{ preview.to_amount }} {{ preview.to_currency }}</div>
-  </div>
-{% elif error %}
-  <p class="mt-2 text-sm text-red-400">{{ error }}</p>
-{% endif %}
+<div class="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-6 space-y-4 animate-in fade-in slide-in-from-top-4">
+    <div class="flex justify-between items-center pb-4 border-b border-purple-500/10">
+        <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest">Предварительный расчёт</span>
+        <div class="flex items-center gap-1.5">
+            <div class="w-1 h-1 rounded-full bg-emerald-500"></div>
+            <span class="text-[9px] font-black text-emerald-400 uppercase">Курс обновлен</span>
+        </div>
+    </div>
 
+    <div class="grid grid-cols-2 gap-8 items-center">
+        <div>
+            <p class="text-[9px] font-bold text-gray-500 uppercase mb-1">Вы отдаете</p>
+            <p class="text-xl font-black text-white">
+                {{ preview.from_amount|floatformat:8 }} 
+                <span class="text-xs text-gray-600 uppercase">{{ preview.from_currency }}</span>
+            </p>
+        </div>
+        <div class="text-right">
+            <p class="text-[9px] font-bold text-gray-500 uppercase mb-1">Вы получите</p>
+            <p class="text-2xl font-black text-purple-400">
+                {{ preview.to_amount|floatformat:8 }} 
+                <span class="text-xs text-purple-500/60 uppercase">{{ preview.to_currency }}</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 pt-4">
+        <div class="p-3 rounded-xl bg-black/20 border border-white/5 text-center">
+            <p class="text-[8px] font-bold text-gray-500 uppercase mb-0.5">Курс обмена</p>
+            <p class="text-[10px] font-black text-white">1 {{ preview.from_currency }} = {{ preview.exchange_rate|floatformat:8 }} {{ preview.to_currency }}</p>
+        </div>
+        <div class="p-3 rounded-xl bg-black/20 border border-white/5 text-center">
+            <p class="text-[8px] font-bold text-gray-500 uppercase mb-0.5">Комиссия ({{ preview.fee_percent }}%)</p>
+            <p class="text-[10px] font-black text-red-400">{{ preview.fee_amount|floatformat:8 }} {{ preview.from_currency }}</p>
+        </div>
+    </div>
+</div>

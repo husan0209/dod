@@ -55,33 +55,95 @@
                 </div>
 
                 <div class="p-6 flex-grow flex flex-col">
-                    <h3 class="text-xl font-bold font-outfit mb-2 group-hover:text-blue-400 transition-colors">{{
-                        game.name }}</h3>
-                    <p class="text-text-secondary text-sm mb-6 flex-grow">
+                    <h3 class="text-xl font-bold font-outfit mb-2 group-hover:text-blue-400 transition-colors">{{ game.name }}</h3>
+                    <p class="text-text-secondary text-sm mb-5 flex-grow">
                         {{ game.description|truncatechars:80 }}
                     </p>
-                    <a href="{% url 'casino:'|add:game.code %}" class="btn-premium w-full text-center py-2.5 text-sm">
-                        Играть сейчас
-                    </a>
+                    <div class="grid grid-cols-2 gap-2 mt-auto">
+                        <a href="/casino/{{ game.code }}/" class="btn-premium w-full text-center py-2.5 text-sm font-semibold">
+                            Играть
+                        </a>
+                        <a href="/casino/{{ game.code }}/?demo=1" class="w-full text-center py-2.5 text-sm font-semibold border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors">
+                            Демо
+                        </a>
+                    </div>
                 </div>
             </div>
             {% empty %}
             <!-- Fallback/Mockup if no games provided by view yet -->
-            {% for mock in "1234"|make_list %}
-            <div class="glass-card flex flex-col h-full group">
-                <div class="aspect-video bg-dod-surface relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"></div>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-4xl font-bold text-slate-700">DOD</span>
+            
+            <!-- Game 1 -->
+            <div class="glass-card flex flex-col h-full group overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10">
+                <div class="aspect-video bg-dod-surface relative overflow-hidden flex items-center justify-center p-4">
+                    <!-- Image Placeholder Box -->
+                    <div class="w-full h-full bg-[#12151c] rounded-xl border border-white/5 flex items-center justify-center relative overflow-hidden group-hover:border-white/10 transition-colors">
+                        <svg class="w-12 h-12 text-slate-600 opacity-50 group-hover:scale-110 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
                 </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold font-outfit mb-2">Игра скоро..</h3>
-                    <p class="text-text-secondary text-sm mb-6">Готовим для вас что-то по-настоящему захватывающее.</p>
-                    <button class="btn-premium w-full opacity-50 cursor-not-allowed">Ожидается</button>
+                <div class="p-6 flex-grow flex flex-col pt-2">
+                    <h3 class="text-xl font-bold font-outfit mb-2 group-hover:text-blue-400 transition-colors">Crash</h3>
+                    <p class="text-text-secondary text-sm mb-5 flex-grow">Классическая игра на умножение. Успейте забрать выигрыш до крушения.</p>
+                    <div class="flex gap-3">
+                        <a href="{% url 'casino:crash' %}" class="btn-premium flex-1 text-center py-2.5 text-sm font-semibold shadow-sm">Играть</a>
+                        <a href="{% url 'casino:crash' %}?demo=1" class="flex-1 text-center py-2.5 text-sm font-semibold border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors">Демо</a>
+                    </div>
                 </div>
             </div>
-            {% endfor %}
+
+            <!-- Game 2 -->
+            <div class="glass-card flex flex-col h-full group overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10">
+                <div class="aspect-video bg-dod-surface relative overflow-hidden flex items-center justify-center p-4">
+                    <!-- Image Placeholder Box -->
+                    <div class="w-full h-full bg-[#12151c] rounded-xl border border-white/5 flex items-center justify-center relative overflow-hidden group-hover:border-white/10 transition-colors">
+                        <svg class="w-12 h-12 text-slate-600 opacity-50 group-hover:scale-110 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-md px-1.5 py-0.5 rounded text-[9px] font-bold text-emerald-400 border border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">PROVABLY FAIR</div>
+                    </div>
+                </div>
+                <div class="p-6 flex-grow flex flex-col pt-2">
+                    <h3 class="text-xl font-bold font-outfit mb-2 group-hover:text-emerald-400 transition-colors">Dice</h3>
+                    <p class="text-text-secondary text-sm mb-5 flex-grow">Делайте ставки на точный результат броска кубиков с честным алгоритмом.</p>
+                    <div class="flex gap-3">
+                        <a href="{% url 'casino:dice' %}" class="btn-premium flex-1 text-center py-2.5 text-sm font-semibold shadow-sm">Играть</a>
+                        <a href="{% url 'casino:dice' %}?demo=1" class="flex-1 text-center py-2.5 text-sm font-semibold border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors">Демо</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 3 -->
+            <div class="glass-card flex flex-col h-full group overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-rose-500/10">
+                <div class="aspect-video bg-dod-surface relative overflow-hidden flex items-center justify-center p-4">
+                    <!-- Image Placeholder Box -->
+                    <div class="w-full h-full bg-[#12151c] rounded-xl border border-white/5 flex items-center justify-center relative overflow-hidden group-hover:border-white/10 transition-colors">
+                        <svg class="w-12 h-12 text-slate-600 opacity-50 group-hover:scale-110 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                </div>
+                <div class="p-6 flex-grow flex flex-col pt-2">
+                    <h3 class="text-xl font-bold font-outfit mb-2 group-hover:text-rose-400 transition-colors">Mines</h3>
+                    <p class="text-text-secondary text-sm mb-5 flex-grow">Открывайте ячейки и избегайте мин, чтобы увеличить свой выигрыш.</p>
+                    <div class="flex gap-3">
+                        <a href="#" class="btn-premium flex-1 text-center py-2.5 text-sm font-semibold shadow-sm">Играть</a>
+                        <a href="#" class="flex-1 text-center py-2.5 text-sm font-semibold border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors">Демо</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 4 -->
+            <div class="glass-card flex flex-col h-full group overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/10">
+                <div class="aspect-video bg-dod-surface relative overflow-hidden flex items-center justify-center p-4">
+                    <!-- Image Placeholder Box -->
+                    <div class="w-full h-full bg-[#12151c] rounded-xl border border-white/5 flex items-center justify-center relative overflow-hidden group-hover:border-white/10 transition-colors">
+                        <svg class="w-12 h-12 text-slate-600 opacity-50 group-hover:scale-110 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                </div>
+                <div class="p-6 flex-grow flex flex-col pt-2">
+                    <h3 class="text-xl font-bold font-outfit mb-2 group-hover:text-amber-400 transition-colors">Plinko</h3>
+                    <p class="text-text-secondary text-sm mb-5 flex-grow">Бросайте шарик и смотрите, как он падает на множители. Случайность и азарт!</p>
+                    <div class="flex gap-3">
+                        <a href="#" class="btn-premium flex-1 text-center py-2.5 text-sm font-semibold shadow-sm">Играть</a>
+                        <a href="#" class="flex-1 text-center py-2.5 text-sm font-semibold border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors">Демо</a>
+                    </div>
+                </div>
+            </div>
             {% endfor %}
         </div>
     </div>

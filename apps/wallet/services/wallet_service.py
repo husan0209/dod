@@ -11,33 +11,41 @@ from apps.wallet.services.transaction_service import TransactionService
 class WalletService:
     @staticmethod
     def create_wallet(user) -> Wallet:
+        try:
+            usd_currency, _ = Currency.objects.get_or_create(
+                code="USD",
+                defaults={
+                    "name": "US Dollar",
+                    "symbol": "$",
+                    "type": "fiat",
+                    "decimal_places": 2,
+                    "rate_to_usd": Decimal("1.0"),
+                },
+            )
+        except Exception:
+            usd_currency = None
+        
         wallet, created = Wallet.objects.get_or_create(
             user=user,
             defaults={
-                "primary_currency": Currency.objects.get_or_create(
-                    code="USD",
-                    defaults={
-                        "name": "US Dollar",
-                        "symbol": "$",
-                        "type": "fiat",
-                        "decimal_places": 2,
-                        "rate_to_usd": Decimal("1.0"),
-                    },
-                )[0],
+                "primary_currency": usd_currency,
             },
         )
-        if created:
+        if created and usd_currency:
             WalletService.get_or_create_balance(wallet, "USD")
-            settings_obj = WalletSettings.get_settings()
-            if settings_obj.registration_bonus_amount > 0:
-                TransactionService.deposit(
-                    wallet,
-                    currency_code=settings_obj.registration_bonus_currency,
-                    amount=settings_obj.registration_bonus_amount,
-                    description="Registration bonus",
-                    txn_type="bonus",
-                    created_by=user,
-                )
+            try:
+                settings_obj = WalletSettings.get_settings()
+                if settings_obj.registration_bonus_amount > 0:
+                    TransactionService.deposit(
+                        wallet,
+                        currency_code=settings_obj.registration_bonus_currency,
+                        amount=settings_obj.registration_bonus_amount,
+                        description="Registration bonus",
+                        txn_type="bonus",
+                        created_by=user,
+                    )
+            except Exception:
+                pass
         return wallet
 
     @staticmethod

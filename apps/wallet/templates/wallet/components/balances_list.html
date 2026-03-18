@@ -1,23 +1,39 @@
 {% load wallet_tags %}
-<div class="space-y-2">
-  {% for b in balances %}
-    <div class="flex items-center justify-between bg-dod-surface/60 rounded-lg px-3 py-2">
-      <div>
-        <div class="text-sm font-semibold">
-          {% currency_icon b.currency %} {{ b.currency }}
-        </div>
-        <div class="text-xs text-text-secondary">
-          Доступно: {{ b.available }} • Заморожено: {{ b.frozen }}
-        </div>
-      </div>
-      <div class="text-right">
-        <div class="text-sm font-bold">
-          {{ b.symbol }}{{ b.total }}
-        </div>
-      </div>
-    </div>
-  {% empty %}
-    <p class="text-sm text-text-secondary">Балансов пока нет.</p>
-  {% endfor %}
-</div>
 
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {% for b in balances %}
+    <div class="group relative overflow-hidden bg-[#1a1d23]/80 backdrop-blur-sm border border-white/5 rounded-2xl p-5 hover:border-white/15 transition-all duration-300">
+        <!-- Background Glow -->
+        <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-colors"></div>
+
+        <div class="relative z-10 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    {{ b.currency_icon|default:b.currency }}
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <span class="text-xs font-black text-white uppercase tracking-wider">{{ b.currency }}</span>
+                        {% if b.currency == wallet.primary_currency_id %}
+                            <span class="px-1.5 py-0.5 rounded-md bg-blue-500/20 text-[8px] font-black text-blue-400 border border-blue-500/20 uppercase">Основная</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-sm font-black text-white">{% format_currency b.available b.currency %}</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-end gap-1">
+                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">≈ ${{ b.usd_value|floatformat:2 }}</p>
+                <div class="flex gap-1.5">
+                    <a href="{% url 'wallet:deposit' %}?currency={{ b.currency }}" class="w-6 h-6 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-text-muted hover:text-emerald-400 flex items-center justify-center transition-all">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                    </a>
+                    <a href="{% url 'wallet:withdraw' %}?currency={{ b.currency }}" class="w-6 h-6 rounded-lg bg-white/5 hover:bg-orange-500/20 text-text-muted hover:text-orange-400 flex items-center justify-center transition-all">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

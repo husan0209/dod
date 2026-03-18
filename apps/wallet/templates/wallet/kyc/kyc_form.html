@@ -1,61 +1,115 @@
 {% extends "base.html" %}
 
-{% block title %}KYC форма{% endblock %}
+{% block title %}Анкета верификации — DOD{% endblock %}
 
-{% block content %}
-<div class="max-w-2xl mx-auto px-4 py-6 space-y-4">
-  <h1 class="text-2xl font-bold text-white mb-4">🪪 Верификация личности</h1>
-
-  <div class="bg-dod-surface/70 rounded-2xl p-5 text-sm space-y-4">
-    <div class="flex items-center justify-between text-xs text-text-secondary">
-      <span>Шаг {{ step }} из 3</span>
-      <div class="flex gap-1">
-        <span class="w-10 h-1 rounded-full {% if step >= 1 %}bg-accent{% else %}bg-dod-surface{% endif %}"></span>
-        <span class="w-10 h-1 rounded-full {% if step >= 2 %}bg-accent{% else %}bg-dod-surface{% endif %}"></span>
-        <span class="w-10 h-1 rounded-full {% if step >= 3 %}bg-accent{% else %}bg-dod-surface{% endif %}"></span>
-      </div>
-    </div>
-
-    <form method="post" enctype="multipart/form-data" class="space-y-4">
-      {% csrf_token %}
-      <input type="hidden" name="step" value="{{ step }}">
-
-      {% for field in form %}
-        <div>
-          <label class="block text-xs text-text-secondary mb-1">
-            {{ field.label }}
-            {% if field.field.required %}<span class="text-red-400">*</span>{% endif %}
-          </label>
-          {{ field }}
-          {% if field.help_text %}
-            <p class="mt-1 text-[11px] text-text-secondary">{{ field.help_text }}</p>
-          {% endif %}
-          {% for error in field.errors %}
-            <p class="mt-1 text-[11px] text-red-400">{{ error }}</p>
-          {% endfor %}
-        </div>
-      {% endfor %}
-
-      {% if form.non_field_errors %}
-        <div class="text-xs text-red-400">
-          {{ form.non_field_errors }}
-        </div>
-      {% endif %}
-
-      <div class="pt-2 border-t border-dod-surface flex justify-between items-center">
-        {% if step > 1 %}
-          <a href="?step={{ step|add:"-1" }}" class="text-xs text-text-secondary hover:text-white">
-            ← Назад
-          </a>
-        {% else %}
-          <span></span>
-        {% endif %}
-        <button type="submit" class="btn-premium text-sm">
-          {% if step < 3 %}Далее →{% else %}Отправить на проверку{% endif %}
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+{% block extra_css %}
+<style>
+    /* Styled Django forms */
+    .kyc-form label { 
+        display: block; 
+        font-size: 10px; 
+        font-weight: 900; 
+        color: #6b7280; 
+        text-transform: uppercase; 
+        letter-spacing: 0.1em; 
+        margin-bottom: 0.5rem; 
+        margin-left: 0.25rem; 
+    }
+    .kyc-form input[type="text"], .kyc-form input[type="date"], .kyc-form select { 
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        color: white;
+        transition: all 0.2s;
+    }
+    .kyc-form input[type="text"]:focus, .kyc-form input[type="date"]:focus, .kyc-form select:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        border-color: rgba(59, 130, 246, 0.5);
+    }
+    .kyc-form input[type="file"] {
+        display: block;
+        width: 100%;
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+    .kyc-form input[type="file"]::file-selector-button {
+        margin-right: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        border: 0;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        background-color: rgba(59, 130, 246, 0.2);
+        color: #60a5fa;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    .kyc-form input[type="file"]::file-selector-button:hover {
+        background-color: rgba(59, 130, 246, 0.3);
+    }
+</style>
 {% endblock %}
 
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-12">
+    <div class="mb-10 text-center">
+        <h1 class="text-3xl font-black text-white tracking-tight mb-2">Верификация личности</h1>
+        <p class="text-text-secondary text-sm">Шаг {{ step }} из 3</p>
+        
+        <!-- Progress Bar -->
+        <div class="flex gap-2 mt-6 max-w-xs mx-auto">
+            <div class="flex-1 h-1.5 rounded-full {% if step >= 1 %}bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]{% else %}bg-white/10{% endif %}"></div>
+            <div class="flex-1 h-1.5 rounded-full {% if step >= 2 %}bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]{% else %}bg-white/10{% endif %}"></div>
+            <div class="flex-1 h-1.5 rounded-full {% if step >= 3 %}bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]{% else %}bg-white/10{% endif %}"></div>
+        </div>
+    </div>
+
+    <div class="bg-[#1a1d23]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 md:p-10 shadow-2xl">
+        <form method="post" enctype="multipart/form-data" class="kyc-form space-y-6">
+            {% csrf_token %}
+            <input type="hidden" name="step" value="{{ step }}">
+
+            <div class="space-y-6">
+                {% if form.non_field_errors %}
+                    <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+                        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="space-y-1">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="text-[9px] text-gray-500 ml-1">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            <p class="text-[10px] text-red-400 ml-1 mt-1 font-bold">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="pt-8 border-t border-white/5 flex gap-4">
+                {% if step > 1 %}
+                <button type="button" @click="window.history.back()" class="flex-1 py-4 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-widest hover:text-white transition-all">
+                    Назад
+                </button>
+                {% endif %}
+                <button type="submit" class="flex-[2] py-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-1 active:translate-y-0">
+                    {% if step == 3 %}Отправить на проверку{% else %}Продолжить{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <p class="text-center text-[10px] text-gray-500 mt-8 px-10">
+        Нажимая "Продолжить", вы соглашаетесь с Политикой конфиденциальности и даете согласие на обработку персональных данных.
+    </p>
+</div>
+{% endblock %}

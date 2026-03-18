@@ -78,7 +78,7 @@
                 <!-- Market Metadata -->
                 <div class="flex items-center justify-between mb-4">
                     <span class="badge-premium badge-blue">
-                        {{ market.category.name }}
+                        {{ market.category.name|default:"Без категории" }}
                     </span>
                     {% if market.is_featured %}
                     <span class="badge-premium bg-amber-500/10 text-amber-500 border-amber-500/20">Featured</span>

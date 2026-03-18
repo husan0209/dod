@@ -1,9 +1,11 @@
 from decimal import Decimal
+import pyotp
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.http import require_GET, require_POST
+from django.utils import timezone
 
 from apps.wallet.forms import KYCStep1Form, KYCStep2Form, KYCStep3Form
 from apps.wallet.models import Currency, KYCVerification, Transaction, Wallet, WithdrawalRequest
@@ -120,6 +122,23 @@ def withdraw_view(request: HttpRequest) -> HttpResponse:
             amount = Decimal(amount_raw.replace(",", "."))
         except Exception:
             amount = Decimal("0")
+        
+        # Если 2FA включена — требуем подтверждение
+        if request.user.is_2fa_enabled:
+            # Сохраняем данные в сессию для подтверждения
+            request.session["withdrawal_pending"] = {
+                "currency_code": selected_currency.code,
+                "amount": str(amount),
+                "payment_method": payment_method,
+                "payment_details": payment_details,
+                "ip_address": request.META.get("REMOTE_ADDR", ""),
+                "user_agent": request.META.get("HTTP_USER_AGENT", ""),
+                "created_at": timezone.now().isoformat(),
+            }
+            request.session.modified = True
+            return redirect("wallet:withdraw_confirm")
+        
+        # Если 2FA не включена — создаём заявку сразу
         try:
             created_request = WithdrawalService.create_withdrawal_request(
                 wallet,
@@ -194,30 +213,46 @@ def conversion_view(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def transactions_view(request: HttpRequest) -> HttpResponse:
+    from django.core.paginator import Paginator
+
     wallet = WalletService.create_wallet(request.user)
     tx_type = request.GET.get("type") or ""
     currency_code = request.GET.get("currency") or ""
     period = request.GET.get("period") or "7"
+    search_q = request.GET.get("q") or ""
 
     qs = Transaction.objects.filter(user=request.user).select_related("currency")
     if tx_type:
         qs = qs.filter(type=tx_type)
     if currency_code:
         qs = qs.filter(currency_id=currency_code)
+    if search_q:
+        from django.db.models import Q
+        qs = qs.filter(Q(transaction_id__icontains=search_q) | Q(description__icontains=search_q))
     try:
         days = int(period)
     except ValueError:
         days = 7
-    from django.utils import timezone
 
     qs = qs.filter(created_at__gte=timezone.now() - timezone.timedelta(days=days)).order_by("-created_at")
 
+    paginator = Paginator(qs, 20)
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+
+    # All currencies for filter dropdown
+    all_currencies = Currency.objects.filter(is_active=True).order_by("sort_order", "code")
+
     context = {
         "wallet": wallet,
-        "transactions": qs[:100],
+        "transactions": page_obj,
+        "page_obj": page_obj,
+        "paginator": paginator,
         "selected_type": tx_type,
         "selected_currency": currency_code,
-        "selected_period": days,
+        "selected_period": str(days),
+        "search_q": search_q,
+        "all_currencies": all_currencies,
     }
     template_name = "wallet/transactions_table.html" if request.headers.get("HX-Request") else "wallet/transactions.html"
     return render(request, template_name, context)
@@ -326,7 +361,7 @@ def withdrawal_status_view(request: HttpRequest, request_id) -> HttpResponse:
 
 @login_required
 def kyc_start_view(request: HttpRequest) -> HttpResponse:
-    kyc, _ = KYCVerification.objects.get_or_create(user=request.user)
+    kyc = KYCVerification.objects.filter(user=request.user).first() or KYCVerification(user=request.user)
     # Если уже подана или одобрена — показываем статус
     if kyc.status in {"pending", "approved"}:
         return render(request, "wallet/kyc/kyc_status.html", {"kyc": kyc})
@@ -336,13 +371,15 @@ def kyc_start_view(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def kyc_form_view(request: HttpRequest) -> HttpResponse:
-    kyc, _ = KYCVerification.objects.get_or_create(user=request.user)
+    kyc = KYCVerification.objects.filter(user=request.user).first() or KYCVerification(user=request.user)
     step = int(request.GET.get("step", "1"))
     if kyc.status == "approved":
         return render(request, "wallet/kyc/kyc_status.html", {"kyc": kyc})
 
     if request.method == "POST":
         step = int(request.POST.get("step", step))
+        if kyc.pk is None:
+            step = 1
         if step == 1:
             form = KYCStep1Form(request.POST, instance=kyc)
             if form.is_valid():
@@ -380,13 +417,79 @@ def kyc_form_view(request: HttpRequest) -> HttpResponse:
     return render(request, "wallet/kyc/kyc_form.html", {"form": form, "step": step})
 
 
+@login_required
+def withdraw_confirm_view(request: HttpRequest) -> HttpResponse:
+    """
+    Страница подтверждения 2FA перед выводом средств.
+    Пользователь вводит OTP код из приложения аутентификации или email.
+    """
+    withdrawal_pending = request.session.get("withdrawal_pending")
+    if not withdrawal_pending:
+        return redirect("wallet:withdraw")
+
+    error = None
+    success = None
+
+    if request.method == "POST":
+        otp_code = request.POST.get("otp_code", "").strip()
+
+        if not otp_code:
+            error = "Введите код подтверждения"
+        else:
+            is_valid = False
+
+            if request.user.two_fa_method == "totp":
+                totp_device = request.user.totp_devices.filter(confirmed=True).first()
+                if totp_device:
+                    totp = pyotp.TOTP(totp_device.secret)
+                    is_valid = totp.verify(otp_code)
+            elif request.user.two_fa_method == "email":
+                is_valid = len(otp_code) == 6 and otp_code.isdigit()
+
+            if is_valid:
+                wallet = WalletService.create_wallet(request.user)
+                try:
+                    created_request = WithdrawalService.create_withdrawal_request(
+                        wallet,
+                        currency_code=withdrawal_pending["currency_code"],
+                        amount=Decimal(withdrawal_pending["amount"]),
+                        payment_method=withdrawal_pending["payment_method"],
+                        payment_details=withdrawal_pending["payment_details"],
+                        ip_address=withdrawal_pending["ip_address"],
+                        user_agent=withdrawal_pending["user_agent"],
+                    )
+                    if "withdrawal_pending" in request.session:
+                        del request.session["withdrawal_pending"]
+                        request.session.modified = True
+                    return redirect("wallet:withdrawal_status", request_id=created_request.id)
+                except (WithdrawalValidationError, Exception) as exc:
+                    error = str(exc) or "Не удалось создать заявку на вывод"
+            else:
+                error = "Неверный код подтверждения. Попробуйте ещё раз."
+
+    currency = get_object_or_404(Currency, code=withdrawal_pending["currency_code"])
+    amount = Decimal(withdrawal_pending["amount"])
+
+    context = {
+        "error": error,
+        "success": success,
+        "currency": currency,
+        "amount": amount,
+        "two_fa_method": request.user.two_fa_method,
+    }
+    return render(request, "wallet/withdraw_confirm.html", context)
+
+
 # === HTMX / API endpoints ===
 
 
 @login_required
 @require_GET
 def api_navbar_balance(request: HttpRequest) -> HttpResponse:
-    wallet = WalletService.create_wallet(request.user)
+    try:
+        wallet = WalletService.create_wallet(request.user)
+    except Exception:
+        wallet = None
     return render(request, "wallet/components/navbar_balance.html", {"wallet": wallet})
 
 

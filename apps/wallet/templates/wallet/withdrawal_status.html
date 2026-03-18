@@ -1,38 +1,93 @@
 {% extends "base.html" %}
 {% load wallet_tags %}
 
-{% block title %}Статус вывода {{ withdrawal.request_id }}{% endblock %}
+{% block title %}Заявка #{{ withdrawal.id|truncatechars:8 }} — DOD{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-6 space-y-4">
-  <h1 class="text-2xl font-bold text-white mb-4">Статус заявки на вывод</h1>
+<div class="max-w-2xl mx-auto px-4 py-12">
+    <!-- Back btn -->
+    <a href="{% url 'wallet:overview' %}" class="inline-flex items-center text-xs font-bold text-text-secondary hover:text-white mb-6 transition-colors group">
+        <svg class="w-4 h-4 mr-1 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        В КОШЕЛЁК
+    </a>
 
-  <div class="bg-dod-surface/70 rounded-2xl p-5 space-y-2 text-sm">
-    <div class="flex justify-between">
-      <span class="text-text-secondary">ID заявки</span>
-      <span>{{ withdrawal.request_id }}</span>
+    <div class="bg-gradient-to-br from-[#1a1d23] to-[#12151c] rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden relative">
+        <!-- Status Decor -->
+        <div class="absolute top-0 right-0 w-32 h-32 opacity-10 blur-2xl 
+            {% if withdrawal.status == 'pending' %}bg-amber-500{% elif withdrawal.status == 'approved' or withdrawal.status == 'completed' %}bg-emerald-500{% elif withdrawal.status == 'rejected' or withdrawal.status == 'cancelled' %}bg-red-500{% else %}bg-blue-500{% endif %} rounded-full -mr-16 -mt-16"></div>
+
+        <!-- Status Header -->
+        <div class="p-8 text-center relative z-10 border-b border-white/5 bg-white/[0.01]">
+            <div class="w-20 h-20 rounded-[2rem] bg-white/5 flex items-center justify-center text-5xl mx-auto mb-5 border border-white/5 shadow-inner">
+                {% if withdrawal.status == 'pending' %}⏳
+                {% elif withdrawal.status == 'approved' or withdrawal.status == 'completed' %}✅
+                {% elif withdrawal.status == 'rejected' or withdrawal.status == 'cancelled' %}❌
+                {% else %}🔄{% endif %}
+            </div>
+            <h1 class="text-2xl font-black text-white mb-1 uppercase tracking-tight">{{ withdrawal.get_status_display }}</h1>
+            <p class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">ЗАЯВКА #{{ withdrawal.id }}</p>
+        </div>
+
+        <!-- Amounts Grid -->
+        <div class="p-10">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
+                <div class="text-center sm:text-left">
+                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">К выплате</p>
+                    <p class="text-4xl font-black text-white tracking-tighter">
+                        {{ withdrawal.net_amount|floatformat:8 }} 
+                        <span class="text-lg font-medium text-gray-600 uppercase">{{ withdrawal.currency.code }}</span>
+                    </p>
+                </div>
+                <div class="text-center sm:text-right">
+                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Комиссия системы</p>
+                    <p class="text-2xl font-black text-amber-500/80 tracking-tighter">
+                        {{ withdrawal.fee_amount|floatformat:8 }} 
+                        <span class="text-sm font-medium text-gray-600 uppercase">{{ withdrawal.currency.code }}</span>
+                    </p>
+                    <p class="text-[10px] font-bold text-gray-600 uppercase tracking-wider mt-1">Итого запрошено: {{ withdrawal.amount }}</p>
+                </div>
+            </div>
+
+            <!-- Details -->
+            <div class="bg-black/20 rounded-[2rem] border border-white/5 p-8 space-y-6">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Дата создания</span>
+                    <span class="text-gray-200 font-bold">{{ withdrawal.created_at|date:"d.m.Y, H:i" }}</span>
+                </div>
+                
+                <div class="flex justify-between items-center text-sm border-t border-white/5 pt-4">
+                    <span class="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Способ выплаты</span>
+                    <div class="text-right">
+                        <span class="text-gray-200 font-bold uppercase tracking-wider">{{ withdrawal.payment_method }}</span>
+                        <p class="text-[10px] font-mono text-gray-500 mt-1 select-all">{{ withdrawal.payment_details|truncatechars:40 }}</p>
+                    </div>
+                </div>
+
+                {% if withdrawal.reject_reason %}
+                <div class="pt-6 border-t border-red-500/10">
+                    <p class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Причина отказа
+                    </p>
+                    <div class="bg-red-500/5 rounded-xl p-4 border border-red-500/10">
+                        <p class="text-xs text-red-300 italic">"{{ withdrawal.reject_reason }}"</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Progress Tracker Mock (for visual only) -->
+        {% if withdrawal.status == 'pending' %}
+        <div class="bg-black/40 p-4 flex items-center justify-center gap-2">
+            <div class="flex gap-1">
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.3s]"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.15s]"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce"></div>
+            </div>
+            <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Проверка безопасности...</span>
+        </div>
+        {% endif %}
     </div>
-    <div class="flex justify-between">
-      <span class="text-text-secondary">Статус</span>
-      <span>{{ withdrawal.get_status_display }}</span>
-    </div>
-    <div class="flex justify-between">
-      <span class="text-text-secondary">Сумма</span>
-      <span>{{ withdrawal.amount }} {{ withdrawal.currency.code }}</span>
-    </div>
-    <div class="flex justify-between">
-      <span class="text-text-secondary">Комиссия</span>
-      <span>{{ withdrawal.fee_amount }} {{ withdrawal.currency.code }}</span>
-    </div>
-    <div class="flex justify-between">
-      <span class="text-text-secondary">К получению</span>
-      <span>{{ withdrawal.net_amount }} {{ withdrawal.currency.code }}</span>
-    </div>
-    <div class="flex justify-between">
-      <span class="text-text-secondary">Создана</span>
-      <span>{{ withdrawal.created_at|date:"d.m.Y H:i" }}</span>
-    </div>
-  </div>
 </div>
 {% endblock %}
-

@@ -1,131 +1,93 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Ставки на спорт - DOD{% endblock %}
+{% block title %}Ставки на спорт - DOD Platform{% endblock %}
 
 {% block content %}
-<div class="sports-container">
-    <!-- Заголовок -->
-    <div class="hero-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-        <div class="container">
-            <h1 class="display-4 text-white mb-2">⚽ Ставки на спорт</h1>
-            <p class="lead text-white-50">Более 1000+ событий ежедневно. Лучшие коэффициенты на рынке</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative min-h-screen">
+    <!-- Ambient glowing backgrounds -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-[10%] left-[20%] w-[50%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]"></div>
+        <div class="absolute top-[40%] right-[10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden rounded-3xl bg-slate-900 border border-white/5 mb-12 p-8 md:p-12 z-10 glass-card">
+        <div class="relative z-10 max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-semibold mb-6">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span> LIVE
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold font-outfit text-white mb-4">
+                Ставки на спорт
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl mb-8 leading-relaxed">
+                Более 1000+ событий ежедневно.<br>Лучшие коэффициенты на рынке.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="{% url 'sports:upcoming_events' %}" class="btn-premium px-8 py-3.5 text-sm font-semibold flex items-center gap-2 shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Все события
+                </a>
+                <a href="{% url 'sports:user_bets' %}" class="px-8 py-3.5 rounded-xl border border-white/10 bg-white/5 text-white font-medium hover:bg-white/10 transition-colors text-sm flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Мои ставки
+                </a>
+            </div>
+        </div>
+        <!-- Decorative abstract shape -->
+        <div class="absolute right-0 top-0 w-1/2 h-full opacity-30 pointer-events-none hidden md:block group-hover:opacity-40 transition-opacity">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-500 drop-shadow-2xl">
+                <path fill="currentColor" d="M42.7,-73.4C55.9,-65.4,67.6,-54.6,76.5,-41.8C85.4,-29,91.6,-14.5,90.5,-0.6C89.4,13.3,81.1,26.6,72.4,39.5C63.7,52.4,54.7,64.9,42.5,73.4C30.3,81.9,15.1,86.4,-0.4,87.1C-15.9,87.8,-31.8,84.7,-43.9,76.2C-56,67.7,-64.3,53.8,-71.4,39.6C-78.5,25.4,-84.4,11,-84.7,-3.6C-85,-18.2,-79.6,-32.9,-70.7,-44.6C-61.8,-56.3,-49.4,-65.1,-36.2,-73.1C-23,-81.1,-11.5,-88.3,1.9,-91.7C15.3,-95.1,30.6,-94.7,42.7,-73.4Z" transform="translate(100 100)" />
+            </svg>
         </div>
     </div>
 
-    <div class="container mt-4">
-        <!-- Избранные события -->
-        {% if featured_events %}
-        <section class="mb-5">
-            <h2 class="section-title mb-4">🔥 Топ события (избранное)</h2>
-            <div class="row">
-                {% for event in featured_events %}
-                <div class="col-md-6 col-lg-4 mb-4">
-                    {% include 'sports/includes/event_card_compact.html' %}
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-        {% endif %}
+    <!-- Featured Events -->
+    {% if featured_events %}
+    <div class="mb-12 relative z-10">
+        <h2 class="text-2xl font-bold font-outfit text-white mb-6 flex items-center">
+            <span class="w-1.5 h-6 bg-rose-500 rounded-full mr-3 shadow-[0_0_10px_rgba(244,63,94,0.8)]"></span>
+            Топ события
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for event in featured_events %}
+                {% include 'sports/includes/event_card_compact.html' %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
-        <!-- Виды спорта -->
-        <section class="mb-5">
-            <h2 class="section-title mb-4">🎯 Выберите вид спорта</h2>
-            <div class="sports-grid">
-                {% for sport in sports %}
-                <a href="{% url 'sports:sport_detail' sport.slug %}" class="sport-card">
-                    <div class="sport-card__icon">{{ sport.icon }}</div>
-                    <div class="sport-card__content">
-                        <h3>{{ sport.name }}</h3>
-                        <p class="text-muted small">{{ sport.events_count }} событий</p>
-                    </div>
-                    <div class="sport-card__arrow">→</div>
-                </a>
-                {% empty %}
-                <div class="alert alert-info w-100">
-                    Сейчас событий нет. Проверьте позже!
+    <!-- Sports Grid -->
+    <div class="mb-12 relative z-10">
+        <h2 class="text-2xl font-bold font-outfit text-white mb-6 flex items-center">
+            <span class="w-1.5 h-6 bg-blue-500 rounded-full mr-3 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></span>
+            Выберите вид спорта
+        </h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {% for sport in sports %}
+            <a href="{% url 'sports:sport_detail' sport.slug %}" class="glass-card flex items-center p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 transition-all duration-300 group shadow-sm">
+                <div class="w-14 h-14 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center text-3xl mr-4 group-hover:scale-110 transition-transform group-hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                    {{ sport.icon }}
                 </div>
-                {% endfor %}
+                <div class="flex-grow">
+                    <h3 class="text-lg font-bold text-white font-outfit group-hover:text-blue-400 transition-colors">{{ sport.name }}</h3>
+                    <p class="text-sm font-medium text-gray-400 mt-0.5">{{ sport.events_count }} событий</p>
+                </div>
+                <div class="text-slate-600 group-hover:text-white transition-colors">
+                    <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+            </a>
+            {% empty %}
+            <div class="col-span-full list-none glass-card p-12 rounded-3xl border border-white/5 bg-white/5 flex flex-col items-center justify-center text-center">
+                <div class="w-20 h-20 rounded-full bg-slate-800/50 flex items-center justify-center mb-4 text-blue-400">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Нет активных событий</h3>
+                <p class="text-gray-400 text-sm max-w-sm">В данный момент нет доступных спортивных событий для ставок. Пожалуйста, загляните позже.</p>
             </div>
-        </section>
-
-        <!-- Быстрые ссылки -->
-        <div class="quick-links mb-5">
-            <a href="{% url 'sports:upcoming_events' %}" class="btn btn-outline-primary">
-                Все предстоящие события
-            </a>
-            <a href="{% url 'sports:user_bets' %}" class="btn btn-outline-success">
-                Мои ставки
-            </a>
+            {% endfor %}
         </div>
     </div>
 </div>
-
-<style>
-.sports-container {
-    min-height: 100vh;
-    background: #f8f9fa;
-}
-
-.hero-section {
-    padding: 40px 0;
-    margin-bottom: 30px;
-}
-
-.section-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #2d3748;
-    border-bottom: 3px solid #667eea;
-    padding-bottom: 12px;
-    display: inline-block;
-}
-
-.sports-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-}
-
-.sport-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    text-decoration: none;
-    color: inherit;
-}
-
-.sport-card:hover {
-    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-    transform: translateY(-2px);
-}
-
-.sport-card__icon {
-    font-size: 48px;
-    margin-right: 15px;
-}
-
-.sport-card__content h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.sport-card__arrow {
-    color: #667eea;
-    font-size: 20px;
-    margin-left: auto;
-}
-
-.quick-links {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-</style>
 {% endblock %}

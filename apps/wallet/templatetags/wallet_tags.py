@@ -8,6 +8,17 @@ from apps.wallet.models import Currency, Wallet
 register = template.Library()
 
 
+@register.filter
+def split(value, delimiter=","):
+    """
+    Разбивает строку по разделителю.
+    Использование: {{ "10,25,50"|split:"," }}
+    """
+    if isinstance(value, str):
+        return value.split(delimiter)
+    return []
+
+
 @register.simple_tag
 def user_balance(user) -> str:
     """
@@ -96,3 +107,15 @@ def conversion_rate(from_code: str, to_code: str) -> str:
         return f"1 {from_code} = {rate_str} {to_code}"
     except Currency.DoesNotExist:
         return ""
+@register.filter
+def get_balance_by_code(wallet, code):
+    """
+    Возвращает баланс кошелька для конкретной валюты.
+    Использование: {{ wallet|get_balance_by_code:currency_code }}
+    """
+    if not wallet or not code:
+        return Decimal("0")
+    try:
+        return wallet.get_balance(code)
+    except Exception:
+        return Decimal("0")

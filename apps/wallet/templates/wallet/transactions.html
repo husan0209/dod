@@ -1,51 +1,82 @@
 {% extends "base.html" %}
 {% load wallet_tags %}
 
-{% block title %}История транзакций{% endblock %}
+{% block title %}История транзакций — DOD{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
-  <h1 class="text-2xl font-bold text-white mb-4">📋 История транзакций</h1>
-
-  <form method="get" class="bg-dod-surface/70 rounded-2xl p-4 mb-4 flex flex-wrap gap-3 items-end"
-        hx-get="."
-        hx-target="#transactions-table"
-        hx-swap="innerHTML">
-    <div>
-      <label class="block text-xs text-text-secondary mb-1">Тип</label>
-      <select name="type" class="bg-black/40 border border-dod-surface rounded-lg px-3 py-1.5 text-xs text-white">
-        <option value="">Все</option>
-        <option value="deposit">Пополнение</option>
-        <option value="withdrawal">Вывод</option>
-        <option value="bet">Ставка</option>
-        <option value="win">Выигрыш</option>
-        <option value="bonus">Бонус</option>
-      </select>
+<div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-white tracking-tight">История операций</h1>
+            <p class="text-text-secondary text-sm mt-1">Полный список ваших депозитов, выводов и игровых транзакций</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{% url 'wallet:transactions_export_csv' %}" class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-gray-300 hover:bg-white/10 transition-all flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                CSV
+            </a>
+            <a href="{% url 'wallet:transactions_export_xls' %}" class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-gray-300 hover:bg-white/10 transition-all flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                EXCEL
+            </a>
+        </div>
     </div>
-    <div>
-      <label class="block text-xs text-text-secondary mb-1">Валюта</label>
-      <input name="currency" class="bg-black/40 border border-dod-surface rounded-lg px-3 py-1.5 text-xs text-white" placeholder="USD / BTC / RUB" />
-    </div>
-    <div>
-      <label class="block text-xs text-text-secondary mb-1">Период (дней)</label>
-      <input type="number" name="period" value="{{ selected_period }}" min="1" max="365"
-             class="w-20 bg-black/40 border border-dod-surface rounded-lg px-3 py-1.5 text-xs text-white" />
-    </div>
-    <button type="submit" class="btn-secondary text-xs">Фильтровать</button>
-  </form>
 
-  <div id="transactions-table">
-    {% include "wallet/transactions_table.html" %}
-  </div>
+    <!-- Filters -->
+    <div class="bg-dod-surface/50 backdrop-blur-sm border border-white/5 rounded-3xl p-6">
+        <form method="get" 
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end"
+              hx-get="." 
+              hx-target="#transactions-table" 
+              hx-push-url="true"
+              hx-trigger="change from:select, keyup from:input delay:500ms">
+            
+            <div class="space-y-2">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Тип операции</label>
+                <select name="type" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500/20">
+                    <option value="">Все типы</option>
+                    <option value="deposit" {% if selected_type == 'deposit' %}selected{% endif %}>Пополнение</option>
+                    <option value="withdrawal" {% if selected_type == 'withdrawal' %}selected{% endif %}>Вывод</option>
+                    <option value="bet" {% if selected_type == 'bet' %}selected{% endif %}>Ставка</option>
+                    <option value="win" {% if selected_type == 'win' %}selected{% endif %}>Выигрыш</option>
+                    <option value="conversion" {% if selected_type == 'conversion' %}selected{% endif %}>Обмен</option>
+                </select>
+            </div>
 
-  <div class="flex gap-2 mt-3">
-    <a href="{% url 'wallet:transactions_export_csv' %}" class="btn-outline text-xs">
-      📥 Экспорт CSV
-    </a>
-    <a href="{% url 'wallet:transactions_export_xls' %}" class="btn-outline text-xs">
-      📊 Экспорт Excel
-    </a>
-  </div>
+            <div class="space-y-2">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Валюта</label>
+                <select name="currency" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500/20">
+                    <option value="">Все валюты</option>
+                    {% for c in all_currencies %}
+                        <option value="{{ c.code }}" {% if selected_currency == c.code %}selected{% endif %}>{{ c.code }} — {{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Период</label>
+                <select name="period" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:ring-2 focus:ring-blue-500/20">
+                    <option value="1" {% if selected_period == '1' %}selected{% endif %}>За 24 часа</option>
+                    <option value="7" {% if selected_period == '7' %}selected{% endif %}>За 7 дней</option>
+                    <option value="30" {% if selected_period == '30' %}selected{% endif %}>За 30 дней</option>
+                    <option value="90" {% if selected_period == '90' %}selected{% endif %}>За 3 месяца</option>
+                </select>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Поиск</label>
+                <div class="relative">
+                    <input type="text" name="q" value="{{ search_q }}" placeholder="ID или описание..." class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 pl-10 text-xs text-white focus:ring-2 focus:ring-blue-500/20">
+                    <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table Container -->
+    <div id="transactions-table" class="bg-dod-surface/50 backdrop-blur-sm border border-white/5 rounded-3xl overflow-hidden min-h-[400px]">
+        {% include "wallet/transactions_table.html" %}
+    </div>
 </div>
 {% endblock %}
-

@@ -1,19 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}Требуется KYC{% endblock %}
+{% block title %}Требуется верификация — DOD{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-6 space-y-4">
-  <h1 class="text-2xl font-bold text-white mb-4">🔐 Требуется верификация</h1>
+<div class="max-w-md mx-auto px-4 py-20 text-center">
+    <div class="bg-gradient-to-br from-[#1a1d23] to-[#12151c] rounded-[3rem] border border-white/10 p-10 shadow-2xl">
+        <div class="w-20 h-20 bg-red-500/20 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-6 border border-red-500/20 shadow-inner">
+            🔒
+        </div>
+        
+        <h1 class="text-2xl font-black text-white mb-3 uppercase tracking-tight">Доступ ограничен</h1>
+        <p class="text-sm text-text-secondary leading-relaxed mb-10 px-4">
+            Эта операция требует обязательного подтверждения личности. Пожалуйста, пройдите верификацию (KYC), чтобы продолжить.
+        </p>
 
-  <div class="bg-dod-surface/70 rounded-2xl p-5 text-sm space-y-3">
-    <p>
-      Для вывода запрошенной суммы требуется пройти KYC‑верификацию.
-    </p>
-    <a href="{% url 'wallet:kyc_form' %}" class="btn-premium inline-flex text-sm">
-      Пройти KYC →
-    </a>
-  </div>
+        <div class="space-y-4">
+            <a href="{% url 'wallet:kyc_start' %}" class="block w-full py-5 rounded-2xl bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all hover:-translate-y-1 active:translate-y-0">
+                Пройти верификацию
+            </a>
+            <a href="{% url 'wallet:overview' %}" class="block w-full py-5 rounded-2xl bg-white/5 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-widest hover:text-white transition-all">
+                Вернуться назад
+            </a>
+        </div>
+        
+        <div class="mt-8 pt-6 border-t border-white/5">
+            <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">DOD Compliance Security</p>
+        </div>
+    </div>
 </div>
 {% endblock %}
-

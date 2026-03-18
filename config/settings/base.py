@@ -106,7 +106,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-DATABASES = {
+from typing import Any
+
+DATABASES: dict[str, dict[str, Any]] = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
@@ -285,6 +287,11 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://0.0.0.0:8000',
+    'https://localhost:8000',
+    'https://127.0.0.1:8000',
     'http://localhost:9000',
     'http://127.0.0.1:9000',
     'http://0.0.0.0:9000',
@@ -321,3 +328,11 @@ PHONENUMBER_DEFAULT_FORMAT = 'E164'
 
 # Telegram Bot
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+
+# Site URL (used for webhooks, success/fail redirects)
+SITE_URL = os.getenv('SITE_URL', 'http://localhost:9000')
+
+# NOWPayments (Crypto)
+NOWPAYMENTS_API_KEY = os.getenv('NOWPAYMENTS_API_KEY', '')
+NOWPAYMENTS_IPN_SECRET = os.getenv('NOWPAYMENTS_IPN_SECRET', '')
+NOWPAYMENTS_API_URL = os.getenv('NOWPAYMENTS_API_URL', 'https://api.nowpayments.io')

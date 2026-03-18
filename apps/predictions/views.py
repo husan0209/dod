@@ -36,7 +36,10 @@ class IndexView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = PredictionMarket.objects.filter(status='active').select_related('category')
+        try:
+            queryset = PredictionMarket.objects.filter(status='active').select_related('category')
+        except Exception:
+            return PredictionMarket.objects.none()
 
         category = self.request.GET.get('category')
         if category:
@@ -63,14 +66,29 @@ class IndexView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categories'] = MarketCategory.objects.filter(is_active=True).order_by('sort_order')
+        try:
+            context['categories'] = MarketCategory.objects.filter(is_active=True).order_by('sort_order')
+        except Exception:
+            context['categories'] = []
         context['selected_category'] = self.request.GET.get('category')
         context['query'] = self.request.GET.get('q')
         context['filter_type'] = self.request.GET.get('filter')
-        context['total_volume'] = PredictionMarket.objects.aggregate(
-            total=Sum('volume_usd')
-        )['total'] or 0
+        try:
+            context['total_volume'] = PredictionMarket.objects.aggregate(
+                total=Sum('volume_usd')
+            )['total'] or 0
+        except Exception:
+            context['total_volume'] = 0
         return context
+
+    def get(self, request, *args, **kwargs):
+        try:
+            return super().get(request, *args, **kwargs)
+        except Exception:
+            # Handle invalid page numbers or other pagination errors
+            self.request.GET = self.request.GET.copy()
+            self.request.GET['page'] = '1'
+            return super().get(request, *args, **kwargs)
 
 
 class MarketDetailView(DetailView):

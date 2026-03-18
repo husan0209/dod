@@ -1,115 +1,182 @@
 {% extends "base.html" %}
 {% load wallet_tags %}
 
-{% block title %}Кошелёк{% endblock %}
+{% block title %}Кошелёк — DOD{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
-  <h1 class="text-2xl font-bold text-white mb-4">💰 Мой кошелёк</h1>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div class="md:col-span-2 bg-dod-surface/70 rounded-2xl p-4">
-      <div class="flex items-center justify-between mb-3">
+<div class="max-w-6xl mx-auto px-4 py-8 space-y-8" x-data="{ sideMenu: false }">
+    <!-- Header with Breadcrumbs -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <p class="text-sm text-text-secondary">Общий баланс (в USD экв.)</p>
-          <p class="text-2xl font-bold text-white">
-            ${{ wallet.get_total_balance_usd }}
-          </p>
+            <h1 class="text-3xl font-bold text-white tracking-tight">Мой кошелёк</h1>
+            <p class="text-text-secondary text-sm mt-1">Управление вашими активами и история операций</p>
         </div>
-        <div class="space-x-2">
-          <a href="{% url 'wallet:deposit' %}" class="btn-premium text-xs">Пополнить</a>
-          <a href="{% url 'wallet:withdraw' %}" class="btn-outline text-xs">Вывести</a>
-          <a href="{% url 'wallet:convert' %}" class="btn-secondary text-xs">Конвертировать</a>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'wallet:deposit' %}" class="btn-premium bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20 px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Пополнить
+            </a>
+            <a href="{% url 'wallet:withdraw' %}" class="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l-7-7 7-7m5 14l-7-7 7-7"></path></svg>
+                Вывести
+            </a>
         </div>
-      </div>
     </div>
 
-    <div class="bg-dod-surface/70 rounded-2xl p-4">
-      <p class="text-sm text-text-secondary mb-2">Основная валюта</p>
-      <form
-        hx-post="{% url 'wallet:api_primary_currency' %}"
-        hx-target="#navbar-balance"
-        hx-swap="innerHTML"
-        method="post"
-      >
-        {% csrf_token %}
-        <select name="currency_code" class="w-full bg-black/40 border border-dod-surface rounded-lg px-3 py-2 text-sm text-white">
-          {% for b in balances %}
-            <option value="{{ b.currency }}"{% if b.currency == wallet.primary_currency_id %} selected{% endif %}>
-              {{ b.currency }}
-            </option>
-          {% endfor %}
-        </select>
-        <p class="mt-2 text-xs text-text-secondary">
-          Баланс в шапке будет отображаться в выбранной валюте.
-        </p>
-      </form>
-    </div>
-  </div>
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Total Balance & Stats -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Total Balance Card -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#1e2230] to-[#12151c] rounded-[2rem] border border-white/10 p-8 shadow-2xl">
+                <!-- Background decor -->
+                <div class="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]"></div>
+                <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]"></div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div>
-      <h2 class="text-lg font-semibold text-white mb-3">Мои балансы</h2>
-      <div
-        id="wallet-balances"
-        hx-get="{% url 'wallet:api_balances' %}"
-        hx-trigger="load, every 30s"
-        hx-swap="innerHTML"
-      >
-        {% include "wallet/components/balances_list.html" with balances=balances wallet=wallet %}
-      </div>
-    </div>
+                <div class="relative z-10 flex flex-col md:flex-row justify-between gap-8">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Общий баланс</p>
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-5xl font-black text-white tracking-tighter">${{ wallet.get_total_balance_usd|floatformat:2 }}</span>
+                            <span class="text-xl font-medium text-gray-500 uppercase">USD</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-4">
+                            <span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                                +2.4%
+                            </span>
+                            <span class="text-[10px] text-gray-500">изменение за 24ч</span>
+                        </div>
+                    </div>
 
-    <div>
-      <h2 class="text-lg font-semibold text-white mb-3">Последние операции</h2>
-      <div class="bg-dod-surface/70 rounded-2xl divide-y divide-dod-surface">
-        {% for tx in recent_transactions %}
-          <div class="px-4 py-3 flex items-center justify-between text-sm">
-            <div class="flex flex-col">
-              <span class="text-xs text-text-secondary">
-                {{ tx.created_at|date:"d.m H:i" }}
-              </span>
-              <span class="text-white">
-                {{ tx.get_type_icon }} {{ tx.get_type_display }} • {{ tx.currency_id }}
-              </span>
-              {% if tx.description %}
-                <span class="text-xs text-text-secondary line-clamp-1">{{ tx.description }}</span>
-              {% endif %}
+                    <div class="flex flex-col justify-end">
+                        <div class="bg-black/20 backdrop-blur-md border border-white/5 rounded-2xl p-4 min-w-[200px]">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Основная валюта</p>
+                            <form hx-post="{% url 'wallet:api_primary_currency' %}" hx-target="#navbar-balance" hx-swap="innerHTML" method="post">
+                                {% csrf_token %}
+                                <select name="currency_code" 
+                                        @change="$el.form.dispatchEvent(new Event('submit'))"
+                                        class="w-full bg-transparent border-none p-0 text-sm font-bold text-white focus:ring-0 cursor-pointer">
+                                    {% for b in balances %}
+                                        <option value="{{ b.currency }}" {% if b.currency == wallet.primary_currency_id %}selected{% endif %} class="bg-[#1e2230]">
+                                            {{ b.currency }} — {% format_currency b.available b.currency %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action shortcuts -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-10 relative z-10">
+                    <a href="{% url 'wallet:convert' %}" class="flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all group">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-white">Обмен</span>
+                    </a>
+                    <a href="{% url 'wallet:transactions' %}" class="flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all group">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-white">История</span>
+                    </a>
+                    <a href="{% url 'wallet:kyc_start' %}" class="flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all group">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-white">Верификация</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all group opacity-50 cursor-not-allowed">
+                        <div class="w-10 h-10 rounded-xl bg-gray-500/20 flex items-center justify-center text-gray-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16V15"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-white">Настройки</span>
+                    </a>
+                </div>
             </div>
-            <div>
-              {% format_transaction_amount tx as amt_html %}
-              {{ amt_html|safe }}
-            </div>
-          </div>
-        {% empty %}
-          <p class="px-4 py-3 text-sm text-text-secondary">Операций пока нет.</p>
-        {% endfor %}
-      </div>
-      <div class="mt-3">
-        <a href="{% url 'wallet:transactions' %}" class="text-xs text-accent hover:underline">
-          Показать все транзакции →
-        </a>
-      </div>
-    </div>
-  </div>
 
-  {% if pending_withdrawals %}
-    <div>
-      <h2 class="text-lg font-semibold text-white mb-3">Ожидающие выводы</h2>
-      <div class="bg-dod-surface/70 rounded-2xl divide-y divide-dod-surface text-sm">
-        {% for w in pending_withdrawals %}
-          <div class="px-4 py-3 flex items-center justify-between">
-            <div>
-              <div class="font-medium">{{ w.currency.code }} {{ w.amount }}</div>
-              <div class="text-xs text-text-secondary">
-                {{ w.request_id }} • {{ w.get_status_display }}
-              </div>
+            <!-- Balances List -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        Мои балансы
+                        <span class="px-2 py-0.5 rounded-md bg-white/5 text-[10px] text-text-secondary border border-white/5">{{ balances|length }} активов</span>
+                    </h2>
+                    <button hx-get="{% url 'wallet:api_balances' %}" hx-target="#wallet-balances" class="text-xs text-blue-400 hover:text-blue-300 transition-colors">Обновить</button>
+                </div>
+                <div id="wallet-balances" hx-get="{% url 'wallet:api_balances' %}" hx-trigger="load, every 30s" hx-swap="innerHTML">
+                    <!-- Balances will be loaded here via component -->
+                    <div class="animate-pulse space-y-3">
+                        <div class="h-20 bg-white/5 rounded-2xl"></div>
+                        <div class="h-20 bg-white/5 rounded-2xl"></div>
+                    </div>
+                </div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
+        </div>
+
+        <!-- Right Column: Recent Activity & Pending Withdrawals -->
+        <div class="space-y-8">
+            <!-- Pending Withdrawals Pin -->
+            {% if pending_withdrawals %}
+            <div class="bg-amber-500/10 border border-amber-500/20 rounded-3xl p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500">
+                        <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h2 class="text-md font-bold text-amber-200">Ожидают вывода</h2>
+                </div>
+                <div class="space-y-3">
+                    {% for w in pending_withdrawals %}
+                    <div class="bg-black/20 rounded-2xl p-4 border border-white/5">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-sm font-bold text-white">{{ w.currency.code }} {{ w.amount|floatformat:isSelectedCrypto:8 }}</span>
+                            <span class="px-2 py-0.5 rounded-full bg-white/5 text-[9px] font-bold text-gray-400 uppercase">{{ w.get_status_display }}</span>
+                        </div>
+                        <p class="text-[10px] text-text-secondary truncate mb-3">ID: {{ w.request_id }}</p>
+                        <a href="{% url 'wallet:withdrawal_status' w.id %}" class="block text-center text-xs font-bold text-amber-400/80 hover:text-amber-400 transition-colors">Детали заявки</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recent Activity -->
+            <div class="bg-dod-surface/50 border border-white/5 rounded-[2rem] p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-bold text-white">Последние операции</h2>
+                    <a href="{% url 'wallet:transactions' %}" class="text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:text-blue-300 transition-colors">Все</a>
+                </div>
+                
+                <div class="space-y-1">
+                    {% for tx in recent_transactions %}
+                    <a href="{% url 'wallet:transaction_detail' tx.id %}" class="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/[0.03] transition-all group">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-lg group-hover:bg-white/10 transition-colors">
+                            {{ tx.get_type_icon }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-white truncate">{{ tx.get_type_display }}</p>
+                            <p class="text-[10px] text-text-secondary">{{ tx.created_at|date:"d M, H:i" }}</p>
+                        </div>
+                        <div class="text-right">
+                             <div class="text-sm font-bold {% if tx.type == 'withdrawal' or tx.type == 'bet' %}text-red-400{% else %}text-emerald-400{% endif %}">
+                                {% if tx.type == 'withdrawal' or tx.type == 'bet' %}-{% else %}+{% endif %}{{ tx.amount|floatformat:8 }}
+                             </div>
+                             <p class="text-[9px] text-text-secondary font-medium uppercase">{{ tx.currency_id }}</p>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 text-text-muted">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <p class="text-sm text-text-secondary">Операций пока нет</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
-  {% endif %}
 </div>
 {% endblock %}
-

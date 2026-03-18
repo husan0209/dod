@@ -57,6 +57,7 @@ def referral_redirect_view(request, code):
 
 urlpatterns = [
     path('', home_view, name='home'),
+    path('', home_view, name='index'),  # Alias for templates that reference 'index'
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls')),
     path('allauth/', include('allauth.urls')),

@@ -1,99 +1,203 @@
 {% extends "base.html" %}
 {% load wallet_tags %}
 
-{% block title %}Вывод средств{% endblock %}
+{% block title %}Вывод — DOD{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 py-6 space-y-6">
-  <h1 class="text-2xl font-bold text-white mb-4">📤 Вывод средств</h1>
-
-  {% if error %}
-    <div class="rounded-lg bg-red-500/10 border border-red-500/40 px-4 py-3 text-sm text-red-200">
-      {{ error }}
-    </div>
-  {% endif %}
-  {% if success %}
-    <div class="rounded-lg bg-emerald-500/10 border border-emerald-500/40 px-4 py-3 text-sm text-emerald-200">
-      {{ success }}
-    </div>
-  {% endif %}
-
-  <form method="post" class="space-y-6 bg-dod-surface/70 rounded-2xl p-5">
-    {% csrf_token %}
-
-    <div>
-      <label class="block text-sm text-text-secondary mb-1">Валюта</label>
-      <div class="flex flex-wrap gap-2">
-        {% for b in available_currencies %}
-          <button
-            type="submit"
-            name="currency"
-            value="{{ b.currency }}"
-            class="px-3 py-1.5 rounded-full text-xs border
-                   {% if b.currency == selected_currency.code %}
-                     bg-accent text-white border-accent
-                   {% else %}
-                     bg-black/40 text-text-secondary border-dod-surface hover:border-accent
-                   {% endif %}">
-            {{ b.currency }} ({{ b.available }})
-          </button>
-        {% empty %}
-          <p class="text-sm text-text-secondary">Нет валют с доступным балансом для вывода.</p>
-        {% endfor %}
-      </div>
-      <p class="mt-1 text-xs text-text-secondary">
-        Доступно: {{ wallet.get_balance(selected_currency.code) }} {{ selected_currency.code }}
-      </p>
+<div class="max-w-4xl mx-auto px-4 py-8" x-data="withdrawPage()">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% url 'wallet:overview' %}" class="inline-flex items-center text-xs font-bold text-text-secondary hover:text-white mb-4 transition-colors group">
+            <svg class="w-4 h-4 mr-1 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            НАЗАД В КОШЕЛЁК
+        </a>
+        <h1 class="text-3xl font-black text-white tracking-tight">Вывод средств</h1>
+        <p class="text-text-secondary text-sm mt-1">Минимальная комиссия и быстрая обработка заявок</p>
     </div>
 
-    <div>
-      <label class="block text-sm text-text-secondary mb-1">
-        Сумма вывода (мин: {{ selected_currency.min_withdrawal }} {{ selected_currency.code }})
-      </label>
-      <input
-        type="number"
-        step="0.00000001"
-        min="0"
-        name="amount"
-        hx-get="{% url 'wallet:api_withdrawal_fee' %}"
-        hx-target="#withdrawal-fee"
-        hx-trigger="change, keyup delay:300ms"
-        hx-include="[name='currency']"
-        class="w-full bg-black/40 border border-dod-surface rounded-lg px-3 py-2 text-sm text-white"
-      />
-      <div id="withdrawal-fee"></div>
-    </div>
+    <form method="post" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {% csrf_token %}
+        
+        <!-- Left: Currency & Amount -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Balance Selection -->
+            <div class="bg-[#1a1d23]/80 backdrop-blur-sm rounded-2xl border border-white/5 p-6">
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Доступные балансы</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {% for b in balances %}
+                        {% if b.available > 0 %}
+                        <button type="button" 
+                                @click="selectCurrency('{{ b.currency }}', {{ b.available|stringformat:'.8f' }}, '{{ b.currency_icon|default:b.currency }}')"
+                                :class="selectedCurrency === '{{ b.currency }}' ? 'border-orange-500 bg-orange-500/10 text-white' : 'border-white/5 bg-black/20 text-text-secondary hover:border-white/20'"
+                                class="flex items-center gap-4 p-4 rounded-2xl border transition-all duration-200 text-left">
+                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xl">
+                                {{ b.currency_icon|default:b.currency }}
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{{ b.currency }}</p>
+                                <p class="text-sm font-black text-white">{% format_currency b.available b.currency %}</p>
+                            </div>
+                        </button>
+                        {% endif %}
+                    {% empty %}
+                        <div class="col-span-2 p-6 text-center bg-black/20 rounded-2xl border border-dashed border-white/10">
+                            <p class="text-xs text-text-secondary">У вас нет активов с положительным балансом</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="currency" :value="selectedCurrency">
+            </div>
 
-    <div>
-      <label class="block text-sm text-text-secondary mb-1">Способ вывода</label>
-      <select name="payment_method" class="w-full bg-black/40 border border-dod-surface rounded-lg px-3 py-2 text-sm text-white">
-        <option value="card">Банковская карта</option>
-        <option value="crypto">Криптовалюта</option>
-        <option value="ewallet">Электронный кошелёк</option>
-      </select>
-      <p class="mt-1 text-xs text-text-secondary">
-        На этом этапе реквизиты носят демонстрационный характер.
-      </p>
-    </div>
+            <!-- Amount Input -->
+            <div class="bg-[#1a1d23]/80 backdrop-blur-sm rounded-2xl border border-white/5 p-6 space-y-4">
+                <div class="flex justify-between items-center">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest">Сумма вывода</label>
+                    <div class="flex gap-2">
+                        <template x-for="p in [25, 50, 75, 100]" :key="p">
+                            <button type="button" 
+                                    @click="setPercentage(p)"
+                                    class="px-2 py-0.5 rounded-md bg-white/5 hover:bg-white/10 text-[9px] font-bold text-gray-400 transition-colors"
+                                    x-text="p == 100 ? 'MAX' : p + '%'"></button>
+                        </template>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <input type="number" 
+                           name="amount" 
+                           x-model="amount"
+                           @input="updateFee()"
+                           step="0.00000001"
+                           placeholder="0.00"
+                           class="w-full bg-black/40 border border-white/10 rounded-2xl py-5 px-6 text-3xl font-black text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+                    <div class="absolute right-6 top-1/2 -translate-y-1/2 font-bold text-gray-500" x-text="selectedCurrency"></div>
+                </div>
+                
+                <!-- Fee Info (HTMX) -->
+                <div id="withdrawal-fee" 
+                     hx-get="{% url 'wallet:api_withdrawal_fee' %}" 
+                     hx-trigger="change from:[name='amount'], change from:[name='currency']" 
+                     hx-include="[name='amount'], [name='currency']">
+                    <!-- Loading fee info... -->
+                </div>
+            </div>
 
-    <div>
-      <label class="block text-sm text-text-secondary mb-1">Реквизиты (номер карты / адрес / кошелёк)</label>
-      <input
-        type="text"
-        name="card_number"
-        class="w-full bg-black/40 border border-dod-surface rounded-lg px-3 py-2 text-sm text-white"
-      />
-    </div>
+            <!-- Payment Method & Details -->
+            <div class="bg-[#1a1d23]/80 backdrop-blur-sm rounded-2xl border border-white/5 p-6 space-y-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Способ получения</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="payment_method" value="card" x-model="method" class="hidden">
+                            <div :class="method === 'card' ? 'border-orange-500 bg-orange-500/10' : 'border-white/5 bg-black/20'"
+                                 class="flex flex-col items-center gap-3 p-4 rounded-xl border transition-all">
+                                <svg class="w-6 h-6 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                                <span class="text-[11px] font-bold text-white uppercase tracking-wider">Карта</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="payment_method" value="crypto" x-model="method" class="hidden">
+                            <div :class="method === 'crypto' ? 'border-orange-500 bg-orange-500/10' : 'border-white/5 bg-black/20'"
+                                 class="flex flex-col items-center gap-3 p-4 rounded-xl border transition-all">
+                                <svg class="w-6 h-6 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16V15"></path></svg>
+                                <span class="text-[11px] font-bold text-white uppercase tracking-wider">Крипто</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="payment_method" value="ewallet" x-model="method" class="hidden">
+                            <div :class="method === 'ewallet' ? 'border-orange-500 bg-orange-500/10' : 'border-white/5 bg-black/20'"
+                                 class="flex flex-col items-center gap-3 p-4 rounded-xl border transition-all">
+                                <svg class="w-6 h-6 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                <span class="text-[11px] font-bold text-white uppercase tracking-wider">Кошелёк</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
 
-    <div class="border-t border-dod-surface pt-4">
-      <button type="submit" class="btn-premium w-full text-sm">
-        Создать заявку на вывод
-      </button>
-      <p class="mt-2 text-xs text-text-secondary">
-        Крупные суммы и высокорисковые заявки могут отправляться на ручную проверку.
-      </p>
-    </div>
-  </form>
+                <div x-show="method" x-collapse>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2" x-text="method === 'card' ? 'Номер карты' : (method === 'crypto' ? 'Адрес кошелька' : 'Реквизиты')"></label>
+                    <input type="text" 
+                           name="card_number" 
+                           :placeholder="method === 'card' ? '0000 0000 0000 0000' : (method === 'crypto' ? 'bc1q...' : 'Email или номер кошелька')"
+                           class="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-6 text-white font-mono focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all">
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Policy & Submit -->
+        <div class="space-y-6">
+            <div class="bg-gradient-to-br from-[#2a1d1a] to-[#12151c] rounded-3xl border border-white/10 p-6 shadow-2xl sticky top-8">
+                <h2 class="text-xl font-bold text-white mb-6">Подтверждение</h2>
+                
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-start gap-3 p-4 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                        <div class="text-amber-500 shrink-0 mt-0.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <p class="text-[10px] text-amber-200/70 leading-relaxed font-medium">
+                            Внимательно проверьте реквизиты. Мы не сможем вернуть средства, отправленные на неверный адрес или карту.
+                        </p>
+                    </div>
+
+                    {% if not user.kyc_verified %}
+                    <div class="p-4 rounded-xl bg-red-500/5 border border-red-500/10">
+                        <p class="text-[10px] text-red-400 font-bold uppercase tracking-wider mb-2">Требуется верификация</p>
+                        <p class="text-[10px] text-gray-400 mb-3">Ваш аккаунт не прошел KYC. Лимит на вывод: $0/день.</p>
+                        <a href="{% url 'wallet:kyc_start' %}" class="block text-center py-2 rounded-lg bg-red-500/10 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-all">Пройти KYC</a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if error %}
+                    <div class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <button type="submit" 
+                        :disabled="!amount || amount <= 0 || !method || {% if not user.kyc_verified %}true{% else %}false{% endif %}"
+                        class="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white shadow-lg shadow-orange-500/25 transition-all hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">
+                    Вывести средства
+                </button>
+                
+                <p class="mt-6 text-[10px] text-text-secondary text-center leading-relaxed">
+                    Обработка заявок занимает от 15 минут до 24 часов в зависимости от суммы и метода.
+                </p>
+            </div>
+        </div>
+    </form>
 </div>
-{% endblock %}
 
+<script>
+function withdrawPage() {
+    return {
+        selectedCurrency: '{{ selected_currency.code }}',
+        availableBalance: 0,
+        amount: '',
+        method: '',
+        
+        selectCurrency(code, balance, icon) {
+            this.selectedCurrency = code;
+            this.availableBalance = balance;
+            this.amount = '';
+            
+            // Update URL
+            const url = new URL(window.location);
+            url.searchParams.set('currency', code);
+            window.history.replaceState({}, '', url);
+        },
+        
+        setPercentage(p) {
+            if (this.availableBalance > 0) {
+                this.amount = (this.availableBalance * p / 100).toFixed(8);
+                this.updateFee();
+            }
+        },
+        
+        updateFee() {
+            // This is handled by HTMX mostly, but we could add local logic too
+        }
+    }
+}
+</script>
+{% endblock %}
