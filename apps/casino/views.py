@@ -438,3 +438,90 @@ def history(request):
         'result_filter': result_filter,
     }
     return render(request, 'casino/history.html', context)
+
+
+import uuid
+import requests
+from django.core.cache import cache
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+
+@login_required
+def local_game_play(request, game_id):
+    """Страница локальной игры (ViperPro/Canada)"""
+    game = get_object_or_404(GameType, code=game_id)
+    
+    # 1. Generate SSO Token for the PHP backend
+    sso_token = str(uuid.uuid4())
+    cache.set(f"casino_sso_{sso_token}", request.user.id, timeout=300) # 5 mins
+    
+    # 2. Determine base static path
+    from django.conf import settings
+    import os, json
+    config_path = r"D:\casino-full_stack\frontend\public\games-config.json"
+    game_url = ""
+    
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            games_data = json.load(f)
+            for g in games_data:
+                if g['id'] == game.code:
+                    game_url = f"/static/{g['gamePath']}"
+                    break
+    except Exception:
+        pass
+    
+    if not game_url:
+        if game.code.startswith('viperpro-'):
+            folder = game.code.replace('viperpro-', '')
+            game_url = f"/static/games/viperpro-games/{folder}/index.html"
+        elif game.code.startswith('canada-'):
+            folder = game.code.replace('canada-', '')
+            game_url = f"/static/games/canada-games/{folder}/index.html"
+    
+    # 3. Add SSO token and user mapping to context
+    # We will pass these to the wrapper so it can set them in the session/cookies of the iframe if needed
+    # or just pass it in the URL if the PHP engine expects it.
+    game_url_with_token = f"{game_url}?sessionId={sso_token}&user_id={request.user.id}"
+    
+    context = {
+        'game': game,
+        'game_url': game_url_with_token,
+        'sso_token': sso_token,
+        'user_id': request.user.id
+    }
+    return render(request, 'casino/local_game_wrapper.html', context)
+
+@csrf_exempt
+@login_required
+def game_proxy(request, game):
+    """
+    Proxies requests from the frontend game to the PHP Math Engine.
+    E.g. POST /game/Africa/server -> http://localhost:8001/game/Africa/server
+    """
+    engine_url = f"http://localhost:8001/game/{game}/server"
+    
+    # Forward the session ID (SSO Token)
+    session_id = request.GET.get('sessionId')
+    
+    try:
+        # Re-post to PHP engine
+        response = requests.post(
+            engine_url,
+            params=request.GET,
+            data=request.body,
+            headers={
+                'Content-Type': request.headers.get('Content-Type'),
+                'X-DOD-Proxy': 'true'
+            },
+            timeout=10
+        )
+        
+        return HttpResponse(
+            content=response.content,
+            status=response.status_code,
+            content_type=response.headers.get('Content-Type')
+        )
+    except Exception as e:
+        return JsonResponse({'error': f"Math Engine connection failed: {e}"}, status=502)
+

@@ -5,7 +5,7 @@
 {% block page_title %}Финансовый мониторинг{% endblock %}
 
 {% block page_actions %}
-<a href="#"
+<a href="{% url 'dashboard:finance_transactions_export' %}?period=month"
     class="btn-premium px-4 py-2 text-xs flex items-center bg-white/5 border-white/10 hover:bg-white/10 shadow-none transition-all">
     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -112,7 +112,7 @@
                             </div>
                         </div>
                     </div>
-                    <span class="badge-premium bg-rose-500/10 text-rose-400 border-rose-500/20">3 Alert</span>
+                    <span class="badge-premium bg-rose-500/10 text-rose-400 border-rose-500/20">{{ suspicious_count }} Alert</span>
                 </div>
 
                 <div class="flex items-center justify-between p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10">
@@ -130,7 +130,7 @@
                             </div>
                         </div>
                     </div>
-                    <span class="badge-premium bg-blue-500/10 text-blue-400 border-blue-500/20">2 High</span>
+                    <span class="badge-premium bg-blue-500/10 text-blue-400 border-blue-500/20">{{ large_count }} High</span>
                 </div>
             </div>
         </div>

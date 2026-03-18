@@ -1,10 +1,17 @@
 from django.urls import path
-from . import views
+from . import views, api
 
 app_name = 'casino'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    
+    # Internal API for External Engines
+    path('api/v1/sso-verify/', api.verify_sso, name='api_sso_verify'),
+    path('api/v1/balance/', api.get_balance, name='api_balance'),
+    path('api/v1/bet/', api.place_bet, name='api_bet'),
+    path('api/v1/win/', api.record_win, name='api_win'),
+    
     path('crash/', views.crash, name='crash'),
     path('crash/play/', views.crash_play, name='crash_play'),
     path('slots/', views.slots, name='slots'),
@@ -25,4 +32,6 @@ urlpatterns = [
     path('fairness/change-seed/', views.fairness_change_seed, name='fairness_change_seed'),
     path('fairness/change-client-seed/', views.fairness_change_client_seed, name='fairness_change_client_seed'),
     path('history/', views.history, name='history'),
+    path('game/<str:game>/server', views.game_proxy, name='game_proxy'),
+    path('<str:game_id>/', views.local_game_play, name='local_game_play'),
 ]

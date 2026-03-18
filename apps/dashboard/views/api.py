@@ -109,6 +109,7 @@ def global_search_view(request):
 
     user_results = []
     ticket_results = []
+    finance_results = []
     if query:
         # Search users
         users = User.objects.filter(
@@ -125,20 +126,31 @@ def global_search_view(request):
         # Search tickets (if available)
         if Ticket:
             tickets = Ticket.objects.filter(
-                models.Q(title__icontains=query) |
-                models.Q(description__icontains=query)
+                models.Q(id__icontains=query if len(query) > 30 else '00000000-0000-0000-0000-000000000000') |
+                models.Q(title__icontains=query)
             )[:3]
             for ticket in tickets:
                 ticket_results.append({
-                    'title': f'#{ticket.ticket_number}' if getattr(ticket, 'ticket_number', None) else f'Ticket #{ticket.id}',
+                    'title': f'Ticket #{ticket.id}'[:20],
                     'subtitle': ticket.title,
                     'url': f'/support/operator/tickets/{ticket.id}/'
                 })
+
+        # Search Finance
+        if len(query) >= 32:
+             txs = Transaction.objects.filter(id__icontains=query)[:3]
+             for tx in txs:
+                 finance_results.append({
+                     'title': f'Tx: {tx.type.upper()}',
+                     'subtitle': f'${tx.amount_usd} - {tx.status}',
+                     'url': '/admin-panel/finance/transactions/'
+                 })
     
     context = {
         'query': query,
         'user_results': user_results,
         'ticket_results': ticket_results,
+        'finance_results': finance_results,
     }
     
     html = render_to_string('dashboard/search_results.html', context)

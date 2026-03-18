@@ -1,77 +1,140 @@
 {% extends 'dashboard/base.html' %}
 
-{% block title %}Casino Overview | DOD Admin{% endblock %}
-{% block page_title %}Управление Казино{% endblock %}
+{% block title %}Казино | DOD Admin{% endblock %}
+{% block page_title %}Управление казино{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'dashboard:casino_rounds' %}"
+    class="btn-premium px-4 py-2 text-xs flex items-center bg-white/5 border-white/10 hover:bg-white/10 shadow-none transition-all">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+    </svg>
+    Все раунды
+</a>
+<a href="{% url 'dashboard:casino_crash' %}"
+    class="btn-premium px-4 py-2 text-xs flex items-center bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20 shadow-none transition-all">
+    💥 Crash History
+</a>
+{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="glass-card p-6 border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
-            <div class="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">GGR Казино (24ч)</div>
-            <div class="text-3xl font-bold text-white font-outfit">${{ ggr_casino|floatformat:2 }}</div>
-        </div>
-        <div class="glass-card p-6 border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-teal-500/10">
-            <div class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Активных игроков</div>
+<div class="space-y-8">
+    <!-- Top Metrics -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="glass-card p-6 bg-gradient-to-br from-purple-500/5 to-transparent border-purple-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest">Активных игроков</span>
+                <span class="text-2xl">🎮</span>
+            </div>
             <div class="text-3xl font-bold text-white font-outfit">{{ active_players }}</div>
+            <div class="text-[10px] text-text-muted uppercase mt-1">За последние 30 мин</div>
         </div>
-        <div class="glass-card p-6 border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10">
-            <div class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Раундов сыграно</div>
+
+        <div class="glass-card p-6 bg-gradient-to-br from-blue-500/5 to-transparent border-blue-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Раундов сегодня</span>
+                <span class="text-2xl">🎰</span>
+            </div>
             <div class="text-3xl font-bold text-white font-outfit">{{ rounds_today }}</div>
+            <div class="text-[10px] text-text-muted uppercase mt-1">${{ total_wagered|floatformat:0 }} оборот</div>
+        </div>
+
+        <div class="glass-card p-6 bg-gradient-to-br from-emerald-500/5 to-transparent border-emerald-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Статус казино</span>
+                <span class="text-2xl">{% if settings.is_enabled %}✅{% else %}🔴{% endif %}</span>
+            </div>
+            <div class="text-lg font-bold {% if settings.is_enabled %}text-emerald-400{% else %}text-rose-400{% endif %} font-outfit">
+                {% if settings.is_enabled %}Работает{% else %}Отключено{% endif %}
+            </div>
+            <div class="text-[10px] text-text-muted uppercase mt-1">Все системы</div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <!-- Analytics -->
-        <div class="lg:col-span-3">
-            <div class="glass-card h-full">
-                <div class="px-6 py-4 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
-                    <h3 class="text-xs font-bold text-white uppercase tracking-widest">GGR по играм</h3>
+    <!-- Games Grid -->
+    <div class="glass-card p-8">
+        <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Игры — статистика за сегодня</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for game in game_types %}
+            <div class="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <span class="text-xl mr-2">{{ game.icon }}</span>
+                        <span class="text-sm font-bold text-white">{{ game.name }}</span>
+                    </div>
+                    <span class="badge-premium text-[10px] {% if game.is_active %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20{% else %}bg-rose-500/10 text-rose-400 border-rose-500/20{% endif %}">
+                        {% if game.is_active %}ON{% else %}OFF{% endif %}
+                    </span>
                 </div>
-                <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="space-y-2">
-                        <div
-                            class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-text-muted">
-                            <span>Crash</span>
-                            <span class="text-white font-outfit">${{ crash_ggr|floatformat:2 }}</span>
-                        </div>
-                        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                            <div class="h-full bg-blue-500" style="width: 45%"></div>
-                        </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <div class="text-[10px] text-text-muted uppercase mb-1">Раундов</div>
+                        <div class="text-lg font-bold text-white">{{ game.today_rounds }}</div>
                     </div>
-                    <div class="space-y-2">
-                        <div
-                            class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-text-muted">
-                            <span>Mines</span>
-                            <span class="text-white font-outfit">${{ mines_ggr|floatformat:2 }}</span>
-                        </div>
-                        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                            <div class="h-full bg-purple-500" style="width: 35%"></div>
-                        </div>
-                    </div>
-                    <div class="space-y-2">
-                        <div
-                            class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-text-muted">
-                            <span>Dice</span>
-                            <span class="text-white font-outfit">${{ dice_ggr|floatformat:2 }}</span>
-                        </div>
-                        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                            <div class="h-full bg-emerald-500" style="width: 25%"></div>
-                        </div>
+                    <div>
+                        <div class="text-[10px] text-text-muted uppercase mb-1">Оборот</div>
+                        <div class="text-lg font-bold text-white">${{ game.today_wagered|floatformat:0 }}</div>
                     </div>
                 </div>
+                <div class="mt-3 flex items-center justify-between text-[10px] text-text-muted">
+                    <span>RTP: {{ game.rtp }}%</span>
+                    <span>House Edge: {{ game.house_edge }}%</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-3 text-center text-text-muted py-8">Нет настроенных игр</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Big Wins Today -->
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">🏆 Крупные выигрыши</h3>
+            <div class="space-y-3">
+                {% for win in big_wins %}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                    <div class="flex items-center">
+                        <span class="text-lg mr-3">{{ win.game_type.icon }}</span>
+                        <div>
+                            <div class="text-sm font-bold text-white">{{ win.user.username }}</div>
+                            <div class="text-[10px] text-text-muted">{{ win.game_type.name }} • x{{ win.win_multiplier|floatformat:2 }}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-bold text-amber-400">${{ win.bet_amount_usd|floatformat:2 }} → ${{ win.win_amount|floatformat:2 }}</div>
+                        <div class="text-[10px] text-text-muted">{{ win.started_at|date:"H:i" }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-text-muted py-8">Нет крупных выигрышей сегодня</div>
+                {% endfor %}
             </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="lg:col-span-1 space-y-4">
-            <div class="glass-card p-6 h-full flex flex-col justify-between">
-                <h3 class="text-xs font-bold text-white uppercase tracking-widest mb-4">Управление</h3>
-                <div class="space-y-3">
-                    <button class="w-full btn-premium py-2 text-[10px]">🎨 Дизайн карточек</button>
-                    <button class="w-full btn-premium py-2 text-[10px]">⚙️ RTP Конфиг</button>
-                    <button class="w-full btn-premium py-2 text-[10px]">🔍 Лог раундов</button>
+        <!-- Recent Crash Rounds -->
+        <div class="glass-card p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest">💥 Последние Crash раунды</h3>
+                <a href="{% url 'dashboard:casino_crash' %}" class="text-xs text-blue-400 hover:text-blue-300">Все →</a>
+            </div>
+            <div class="grid grid-cols-5 gap-2">
+                {% for crash in recent_crashes %}
+                <div class="p-3 rounded-xl text-center
+                    {% if crash.crash_point >= 10 %}bg-amber-500/10 border border-amber-500/20
+                    {% elif crash.crash_point >= 2 %}bg-emerald-500/10 border border-emerald-500/20
+                    {% else %}bg-rose-500/10 border border-rose-500/20{% endif %}">
+                    <div class="text-sm font-bold
+                        {% if crash.crash_point >= 10 %}text-amber-400
+                        {% elif crash.crash_point >= 2 %}text-emerald-400
+                        {% else %}text-rose-400{% endif %}">
+                        {{ crash.crash_point }}x
+                    </div>
+                    <div class="text-[8px] text-text-muted mt-1">{{ crash.players_count }}p</div>
                 </div>
+                {% empty %}
+                <div class="col-span-5 text-center text-text-muted py-4">Нет данных</div>
+                {% endfor %}
             </div>
         </div>
     </div>

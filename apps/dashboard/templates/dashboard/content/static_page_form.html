@@ -1,0 +1,47 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{% if page %}Редактировать страницу{% else %}Создать страницу{% endif %} | DOD Admin{% endblock %}
+{% block page_title %}{% if page %}Редактировать: {{ page.title }}{% else %}Новая страница{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <div class="glass-card p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-text-muted uppercase block">Заголовок страницы</label>
+                <input type="text" name="title" value="{{ page.title|default:'' }}" required
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-text-muted uppercase block">Slug (URL часть)</label>
+                <input type="text" name="slug" value="{{ page.slug|default:'' }}" 
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-blue-400 font-mono focus:outline-none">
+                <p class="text-[10px] text-text-muted italic">Оставьте пустым для автогенерации из заголовка</p>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-text-muted uppercase block">Контент (HTML)</label>
+                <textarea name="content" rows="15" required
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none font-mono">{{ page.content|default:'' }}</textarea>
+            </div>
+
+            <div class="flex items-center space-x-6 pt-4">
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="is_active" class="sr-only peer" {% if not page or page.is_active %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    <span class="ms-3 text-sm font-bold text-white uppercase tracking-tighter">Опубликована</span>
+                </label>
+            </div>
+
+            <div class="flex justify-between items-center pt-8 border-t border-white/5">
+                <a href="{% url 'dashboard:static_pages_list' %}" class="text-sm text-text-muted hover:text-white transition-colors">← Назад к списку</a>
+                <button type="submit" class="btn-premium px-12 py-3 text-sm font-bold">
+                    {% if page %}Сохранить изменения{% else %}Создать страницу{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

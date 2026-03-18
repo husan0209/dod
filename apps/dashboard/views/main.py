@@ -112,19 +112,45 @@ def verify_2fa_view(request):
 def logs_view(request):
     module = (request.GET.get('module') or '').strip()
     is_successful = (request.GET.get('ok') or '').strip()
+    admin_id = request.GET.get('admin')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
 
     qs = AdminActionLog.objects.select_related('admin_user', 'target_user').order_by('-created_at')
+    
     if module:
         qs = qs.filter(module=module)
     if is_successful in {'1', '0'}:
         qs = qs.filter(is_successful=(is_successful == '1'))
+    if admin_id:
+        qs = qs.filter(admin_user_id=admin_id)
+    if date_from:
+        qs = qs.filter(created_at__date__gte=date_from)
+    if date_to:
+        qs = qs.filter(created_at__date__lte=date_to)
 
     paginator = Paginator(qs, 50)
     page_obj = paginator.get_page(request.GET.get('page'))
+
+    # For filter dropdown
+    admins = User.objects.filter(is_staff=True).only('id', 'username')
 
     context = {
         'page_obj': page_obj,
         'module_filter': module,
         'ok_filter': is_successful,
+        'admin_filter': admin_id,
+        'date_from_filter': date_from,
+        'date_to_filter': date_to,
+        'admins': admins,
     }
     return render(request, 'dashboard/logs/overview.html', context)
+
+
+@login_required
+@require_permission('logs', 'view_admin_logs')
+def log_detail(request, log_id):
+    """Detailed view of an admin action log."""
+    from django.shortcuts import get_object_or_404
+    log = get_object_or_404(AdminActionLog, id=log_id)
+    return render(request, 'dashboard/logs/log_detail.html', {'log': log})

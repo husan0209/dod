@@ -1,0 +1,48 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Статичные страницы | DOD Admin{% endblock %}
+{% block page_title %}Контент-менеджмент: Страницы{% endblock %}
+
+{% block content %}
+<div class="glass-card overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-white/5 bg-white/5">
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Название</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Slug (URL)</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Статус</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Обновлено</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest text-right">Действия</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+                {% for page in pages %}
+                <tr class="hover:bg-white/[0.02] transition-colors group">
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-bold text-white">{{ page.title }}</div>
+                    </td>
+                    <td class="px-6 py-4 text-[10px] text-blue-400 font-mono">/page/{{ page.slug }}/</td>
+                    <td class="px-6 py-4">
+                        {% if page.is_active %}
+                        <span class="badge-premium bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]">Опубликована</span>
+                        {% else %}
+                        <span class="badge-premium bg-amber-500/10 text-amber-400 border-amber-500/20 text-[10px]">Черновик</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-[10px] text-text-muted uppercase tracking-tighter">{{ page.updated_at|date:"d.m.Y H:i" }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'dashboard:static_page_edit' page.id %}" class="btn-premium px-3 py-1.5 text-[10px] bg-white/5 border-white/10 hover:bg-white/10 shadow-none">
+                            Редактировать
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-text-muted italic">Страниц пока нет</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

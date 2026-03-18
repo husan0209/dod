@@ -1,108 +1,176 @@
 {% extends 'dashboard/base.html' %}
 
-{% block title %}Sports Overview | DOD Admin{% endblock %}
-{% block page_title %}Управление Спортом{% endblock %}
+{% block title %}Спорт | DOD Admin{% endblock %}
+{% block page_title %}Управление спортом{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'dashboard:sports_events' %}"
+    class="btn-premium px-4 py-2 text-xs flex items-center bg-white/5 border-white/10 hover:bg-white/10 shadow-none transition-all">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+    </svg>
+    Все события
+</a>
+<a href="{% url 'dashboard:sports_bets' %}"
+    class="btn-premium px-4 py-2 text-xs flex items-center bg-white/5 border-white/10 hover:bg-white/10 shadow-none transition-all">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+    </svg>
+    Все ставки
+</a>
+{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="glass-card p-6 border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10">
-            <div class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Активные события</div>
+<div class="space-y-8">
+    <!-- Top Metrics -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glass-card p-6 bg-gradient-to-br from-emerald-500/5 to-transparent border-emerald-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Активных событий</span>
+                <span class="text-2xl">⚽</span>
+            </div>
             <div class="text-3xl font-bold text-white font-outfit">{{ active_events }}</div>
+            <div class="text-[10px] text-text-muted uppercase mt-1">Live: {{ live_matches }}</div>
         </div>
-        <div class="glass-card p-6 border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-teal-500/10">
-            <div class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Ставок сегодня</div>
+
+        <div class="glass-card p-6 bg-gradient-to-br from-blue-500/5 to-transparent border-blue-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Ставок сегодня</span>
+                <span class="text-2xl">🎯</span>
+            </div>
             <div class="text-3xl font-bold text-white font-outfit">{{ bets_today }}</div>
+            <div class="text-[10px] text-text-muted uppercase mt-1">${{ bets_stake_today|floatformat:0 }} объём</div>
         </div>
-        <div class="glass-card p-6 border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
-            <div class="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">GGR Спорт</div>
-            <div class="text-3xl font-bold text-white font-outfit">${{ ggr_sports|floatformat:2 }}</div>
+
+        <div class="glass-card p-6 bg-gradient-to-br from-amber-500/5 to-transparent border-amber-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">GGR Спорт</span>
+                <span class="text-2xl">💰</span>
+            </div>
+            <div class="text-3xl font-bold {% if ggr_sports >= 0 %}text-emerald-400{% else %}text-rose-400{% endif %} font-outfit">
+                ${{ ggr_sports|floatformat:2 }}
+            </div>
+            <div class="text-[10px] text-text-muted uppercase mt-1">Сегодня</div>
         </div>
-        <div class="glass-card p-6 border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-orange-500/10">
-            <div class="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-1">Live Матчи</div>
-            <div class="text-3xl font-bold text-white font-outfit">{{ live_matches }}</div>
+
+        <div class="glass-card p-6 bg-gradient-to-br from-rose-500/5 to-transparent border-rose-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-rose-400 uppercase tracking-widest">Ожидают расчёта</span>
+                <span class="text-2xl">⏳</span>
+            </div>
+            <div class="text-3xl font-bold text-white font-outfit">{{ pending_settlement }}</div>
+            <div class="text-[10px] text-text-muted uppercase mt-1">Завершённых событий</div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Main Actions -->
-        <div class="lg:col-span-1 space-y-4">
-            <div class="glass-card p-6">
-                <h3 class="text-xs font-bold text-white uppercase tracking-widest mb-4">Управление</h3>
-                <div class="space-y-2">
-                    <button class="w-full btn-premium py-3 text-xs flex items-center justify-between">
-                        <span>🏆 Менеджер турниров</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-                    <button class="w-full btn-premium py-3 text-xs flex items-center justify-between">
-                        <span>📈 Настройка коэффициентов</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-                    <button class="w-full btn-premium py-3 text-xs flex items-center justify-between">
-                        <span>🛡️ Анти-фрод лимиты</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Sports Summary -->
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Виды спорта</h3>
+            <div class="space-y-3">
+                {% for sport in sports_list %}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+                    <div class="flex items-center">
+                        <span class="text-xl mr-3">{{ sport.icon }}</span>
+                        <div>
+                            <div class="text-sm font-bold text-white">{{ sport.name }}</div>
+                            <div class="text-[10px] text-text-muted uppercase">{{ sport.active_events }} событий</div>
+                        </div>
+                    </div>
+                    <span class="badge-premium bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px]">
+                        {{ sport.today_bets }} ставок
+                    </span>
                 </div>
+                {% empty %}
+                <div class="text-center text-text-muted py-8">Нет активных видов спорта</div>
+                {% endfor %}
             </div>
         </div>
 
-        <!-- Recent Markets -->
-        <div class="lg:col-span-2">
-            <div class="glass-card h-full">
-                <div class="px-6 py-4 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
-                    <h3 class="text-xs font-bold text-white uppercase tracking-widest">Активные рынки</h3>
-                    <button
-                        class="text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:text-white transition-colors">Смотреть
-                        все</button>
-                </div>
-                <div class="p-0">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr
-                                class="text-[9px] font-bold text-text-muted uppercase tracking-widest border-b border-white/5">
-                                <th class="px-6 py-3">Событие</th>
-                                <th class="px-6 py-3">Объем</th>
-                                <th class="px-6 py-3">Статус</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-                            <tr class="hover:bg-white/[0.02] transition-colors">
-                                <td class="px-6 py-4">
-                                    <div class="text-xs font-bold text-white uppercase">UCL: Man City vs Real Madrid
-                                    </div>
-                                    <div class="text-[10px] text-text-muted">Football • Tomorrow, 21:00</div>
-                                </td>
-                                <td class="px-6 py-4 text-xs text-white font-outfit">$45,200</td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        class="badge-premium bg-blue-500/10 text-blue-400 border-blue-500/20">PRE-MATCH</span>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-white/[0.02] transition-colors">
-                                <td class="px-6 py-4">
-                                    <div class="text-xs font-bold text-white uppercase">NBA: Lakers vs Warriors</div>
-                                    <div class="text-[10px] text-text-muted">Basketball • Live</div>
-                                </td>
-                                <td class="px-6 py-4 text-xs text-white font-outfit">$12,800</td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        class="badge-premium bg-emerald-500/10 text-emerald-400 border-emerald-500/20">LIVE</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Recent Events -->
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Последние события</h3>
+            <div class="space-y-3">
+                {% for event in recent_events %}
+                <a href="{% url 'dashboard:sports_event_detail' event.id %}"
+                    class="block p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all group">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-[10px] text-text-muted uppercase">{{ event.league.short_name }}</span>
+                        <span class="text-[10px] font-bold uppercase
+                            {% if event.status == 'live' %}text-emerald-400
+                            {% elif event.status == 'finished' %}text-text-muted
+                            {% else %}text-blue-400{% endif %}">
+                            {% if event.status == 'live' %}🔴 LIVE{% else %}{{ event.get_status_display }}{% endif %}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">
+                            {{ event.home_team.short_name }} — {{ event.away_team.short_name }}
+                        </div>
+                        <div class="text-sm font-bold text-white">
+                            {% if event.home_score is not None %}
+                            {{ event.home_score }} : {{ event.away_score }}
+                            {% else %}
+                            {{ event.start_time|date:"H:i" }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="text-center text-text-muted py-8">Нет событий</div>
+                {% endfor %}
             </div>
+        </div>
+    </div>
+
+    <!-- Recent Bets -->
+    <div class="glass-card p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest">Последние ставки</h3>
+            <a href="{% url 'dashboard:sports_bets' %}" class="text-xs text-blue-400 hover:text-blue-300 transition-colors">Все ставки →</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-white/5">
+                        <th class="text-left text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">ID</th>
+                        <th class="text-left text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Игрок</th>
+                        <th class="text-left text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Тип</th>
+                        <th class="text-right text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Ставка</th>
+                        <th class="text-right text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Коэфф</th>
+                        <th class="text-center text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bet in recent_bets %}
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-all">
+                        <td class="py-3 px-2 text-xs text-text-muted font-mono">{{ bet.bet_id|truncatechars:12 }}</td>
+                        <td class="py-3 px-2 text-sm text-white">{{ bet.user.username }}</td>
+                        <td class="py-3 px-2">
+                            <span class="badge-premium text-[10px]
+                                {% if bet.bet_type == 'single' %}bg-blue-500/10 text-blue-400 border-blue-500/20
+                                {% elif bet.bet_type == 'combo' %}bg-purple-500/10 text-purple-400 border-purple-500/20
+                                {% else %}bg-amber-500/10 text-amber-400 border-amber-500/20{% endif %}">
+                                {{ bet.get_bet_type_display }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-2 text-sm font-bold text-white text-right">${{ bet.stake_usd|floatformat:2 }}</td>
+                        <td class="py-3 px-2 text-sm text-text-secondary text-right">x{{ bet.total_odd }}</td>
+                        <td class="py-3 px-2 text-center">
+                            <span class="badge-premium text-[10px]
+                                {% if bet.status == 'won' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20
+                                {% elif bet.status == 'lost' %}bg-rose-500/10 text-rose-400 border-rose-500/20
+                                {% elif bet.status == 'pending' %}bg-amber-500/10 text-amber-400 border-amber-500/20
+                                {% else %}bg-white/10 text-text-muted border-white/10{% endif %}">
+                                {{ bet.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="py-8 text-center text-text-muted">Нет ставок</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

@@ -1,0 +1,69 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Новый баннер | DOD Admin{% endblock %}
+{% block page_title %}Создание баннера{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <div class="glass-card p-8">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-text-muted uppercase block">Заголовок</label>
+                <input type="text" name="title" required
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-text-muted uppercase block">Подзаголовок</label>
+                <input type="text" name="subtitle"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50">
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Расположение</label>
+                    <select name="location" class="w-full bg-dod-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none">
+                        <option value="main">Главная</option>
+                        <option value="sports">Спорт</option>
+                        <option value="casino">Казино</option>
+                        <option value="miniapp">Mini App</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Порядок</label>
+                    <input type="number" name="sort_order" value="0"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-text-muted uppercase block">Ссылка (URL)</label>
+                <input type="text" name="link" placeholder="https://..."
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-blue-400 focus:outline-none">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-text-muted uppercase block">Изображение</label>
+                <input type="file" name="image" required
+                    class="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20">
+            </div>
+
+            <div class="pt-4">
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="is_active" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    <span class="ms-3 text-sm font-bold text-white uppercase tracking-tighter">Активен сразу</span>
+                </label>
+            </div>
+
+            <div class="flex justify-between items-center pt-8 border-t border-white/5">
+                <a href="{% url 'dashboard:banners_list' %}" class="text-sm text-text-muted hover:text-white transition-colors">Отмена</a>
+                <button type="submit" class="btn-premium px-12 py-3 text-sm font-bold">
+                    Создать баннер
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

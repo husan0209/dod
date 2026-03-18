@@ -52,17 +52,35 @@
                     <div class="flex flex-col justify-end">
                         <div class="bg-black/20 backdrop-blur-md border border-white/5 rounded-2xl p-4 min-w-[200px]">
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Основная валюта</p>
-                            <form hx-post="{% url 'wallet:api_primary_currency' %}" hx-target="#navbar-balance" hx-swap="innerHTML" method="post">
+                            <form hx-post="{% url 'wallet:api_primary_currency' %}" hx-target="#navbar-balance" hx-swap="innerHTML" method="post" id="currency-form-mobile">
                                 {% csrf_token %}
-                                <select name="currency_code" 
-                                        @change="$el.form.dispatchEvent(new Event('submit'))"
-                                        class="w-full bg-transparent border-none p-0 text-sm font-bold text-white focus:ring-0 cursor-pointer">
-                                    {% for b in balances %}
-                                        <option value="{{ b.currency }}" {% if b.currency == wallet.primary_currency_id %}selected{% endif %} class="bg-[#1e2230]">
-                                            {{ b.currency }} — {% format_currency b.available b.currency %}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                <div class="relative" x-data="{ open: false }">
+                                    <button @click="open = !open" @click.away="open = false" type="button" class="w-full flex items-center justify-between bg-transparent border-none p-0 text-sm font-bold text-white focus:outline-none focus:ring-0 cursor-pointer">
+                                        <span>{{ wallet.primary_currency_id|default:'USD' }} — {% format_currency wallet.get_primary_balance wallet.primary_currency_id|default:'USD' %}</span>
+                                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                    <div x-show="open" style="display: none;"
+                                         x-transition:enter="transition ease-out duration-100"
+                                         x-transition:enter-start="transform opacity-0 scale-95"
+                                         x-transition:enter-end="transform opacity-100 scale-100"
+                                         x-transition:leave="transition ease-in duration-75"
+                                         x-transition:leave-start="transform opacity-100 scale-100"
+                                         x-transition:leave-end="transform opacity-0 scale-95"
+                                         class="absolute left-0 mt-3 w-full min-w-[220px] origin-top-left rounded-2xl bg-[#1e2230] border border-white/10 shadow-2xl z-50 overflow-hidden">
+                                        
+                                        <input type="hidden" name="currency_code" x-ref="currencyInput">
+                                        <div class="py-2 max-h-[300px] overflow-y-auto">
+                                            {% for b in balances %}
+                                            <button type="button" 
+                                                    @click="$refs.currencyInput.value = '{{ b.currency }}'; open = false; document.getElementById('currency-form-mobile').dispatchEvent(new Event('submit', {cancelable: true})); setTimeout(() => window.location.reload(), 300);"
+                                                    class="w-full text-left px-5 py-3 text-sm hover:bg-white/5 transition-colors flex items-center justify-between {% if b.currency == wallet.primary_currency_id %}bg-blue-500/10 text-blue-400 font-bold border-l-2 border-blue-500{% else %}text-white border-l-2 border-transparent{% endif %}">
+                                                <span>{{ b.currency }}</span>
+                                                <span class="text-xs text-gray-400">{% format_currency b.available b.currency %}</span>
+                                            </button>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>

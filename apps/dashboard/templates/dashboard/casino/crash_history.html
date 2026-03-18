@@ -1,0 +1,93 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Crash History | DOD Admin{% endblock %}
+{% block page_title %}💥 Crash — История раундов{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Today Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="glass-card p-4 text-center">
+            <div class="text-[10px] font-bold text-text-muted uppercase mb-1">Раундов</div>
+            <div class="text-xl font-bold text-white font-outfit">{{ total_rounds }}</div>
+        </div>
+        <div class="glass-card p-4 text-center">
+            <div class="text-[10px] font-bold text-text-muted uppercase mb-1">Средний Crash</div>
+            <div class="text-xl font-bold text-blue-400 font-outfit">{{ avg_crash|floatformat:2 }}x</div>
+        </div>
+        <div class="glass-card p-4 text-center">
+            <div class="text-[10px] font-bold text-text-muted uppercase mb-1">Максимальный</div>
+            <div class="text-xl font-bold text-amber-400 font-outfit">{{ max_crash|floatformat:2 }}x</div>
+        </div>
+        <div class="glass-card p-4 text-center">
+            <div class="text-[10px] font-bold text-text-muted uppercase mb-1">Минимальный</div>
+            <div class="text-xl font-bold text-rose-400 font-outfit">{{ min_crash|floatformat:2 }}x</div>
+        </div>
+        <div class="glass-card p-4 text-center">
+            <div class="text-[10px] font-bold text-text-muted uppercase mb-1">Ставок</div>
+            <div class="text-xl font-bold text-white font-outfit">${{ total_bet|floatformat:0 }}</div>
+        </div>
+        <div class="glass-card p-4 text-center">
+            <div class="text-[10px] font-bold text-text-muted uppercase mb-1">Выплачено</div>
+            <div class="text-xl font-bold text-emerald-400 font-outfit">${{ total_payout|floatformat:0 }}</div>
+        </div>
+    </div>
+
+    <!-- Crash Rounds Grid -->
+    <div class="glass-card p-6">
+        <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Все раунды</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-white/5">
+                        <th class="text-left text-[10px] font-bold text-text-muted uppercase py-3 px-2">Round ID</th>
+                        <th class="text-center text-[10px] font-bold text-text-muted uppercase py-3 px-2">Crash Point</th>
+                        <th class="text-center text-[10px] font-bold text-text-muted uppercase py-3 px-2">Игроки</th>
+                        <th class="text-right text-[10px] font-bold text-text-muted uppercase py-3 px-2">Ставок</th>
+                        <th class="text-right text-[10px] font-bold text-text-muted uppercase py-3 px-2">Выплат</th>
+                        <th class="text-right text-[10px] font-bold text-text-muted uppercase py-3 px-2">GGR</th>
+                        <th class="text-right text-[10px] font-bold text-text-muted uppercase py-3 px-2">Время</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for crash in page_obj %}
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-all">
+                        <td class="py-3 px-2 text-xs text-text-muted font-mono">{{ crash.round_id|truncatechars:16 }}</td>
+                        <td class="py-3 px-2 text-center">
+                            <span class="text-lg font-bold
+                                {% if crash.crash_point >= 10 %}text-amber-400
+                                {% elif crash.crash_point >= 2 %}text-emerald-400
+                                {% else %}text-rose-400{% endif %}">
+                                {{ crash.crash_point }}x
+                            </span>
+                        </td>
+                        <td class="py-3 px-2 text-sm text-white text-center">{{ crash.players_count }}</td>
+                        <td class="py-3 px-2 text-sm text-white text-right">${{ crash.total_bet|floatformat:2 }}</td>
+                        <td class="py-3 px-2 text-sm text-white text-right">${{ crash.total_payout|floatformat:2 }}</td>
+                        <td class="py-3 px-2 text-sm font-bold text-right
+                            {% if crash.total_bet > crash.total_payout %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                            ${{ crash.total_bet|floatformat:2 }}
+                        </td>
+                        <td class="py-3 px-2 text-xs text-text-muted text-right">{{ crash.crashed_at|date:"d.m H:i:s" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="py-12 text-center text-text-muted">Нет раундов</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center space-x-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 rounded-xl bg-white/5 text-sm text-white hover:bg-white/10 transition-all">Назад</a>
+        {% endif %}
+        <span class="px-4 py-2 rounded-xl bg-blue-500/10 text-sm font-bold text-blue-400 border border-blue-500/20">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 rounded-xl bg-white/5 text-sm text-white hover:bg-white/10 transition-all">Вперёд</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

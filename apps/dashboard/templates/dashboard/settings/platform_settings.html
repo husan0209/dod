@@ -1,0 +1,82 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Настройки платформы | DOD Admin{% endblock %}
+{% block page_title %}Настройки платформы{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+        
+        <!-- General Settings -->
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Основные настройки</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Название сайта</label>
+                    <input type="text" name="site_name" value="{{ settings.site_name }}" 
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors">
+                </div>
+                <div class="space-y-2 pt-6">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="is_maintenance_mode" class="sr-only peer" {% if settings.is_maintenance_mode %}checked{% endif %}>
+                        <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
+                        <span class="ms-3 text-sm font-bold text-white uppercase tracking-tighter">Режим техработ</span>
+                    </label>
+                </div>
+                <div class="md:col-span-2 space-y-2">
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Сообщение при техработах</label>
+                    <textarea name="maintenance_message" rows="3"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors">{{ settings.maintenance_message }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Finance Settings -->
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Финансы и Лимиты</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Реф. комиссия (%)</label>
+                    <input type="number" step="0.01" name="referral_commission" value="{{ settings.referral_commission_percent }}"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Мин. вывод ($)</label>
+                    <input type="number" step="0.01" name="min_withdrawal" value="{{ settings.min_withdrawal_usd }}"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                </div>
+                <div class="space-y-2 pt-6">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="require_kyc" class="sr-only peer" {% if settings.require_kyc_for_withdrawal %}checked{% endif %}>
+                        <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        <span class="ms-3 text-sm font-bold text-white uppercase tracking-tighter">Обязательный KYC для вывода</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support -->
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Поддержка</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Email поддержки</label>
+                    <input type="email" name="support_email" value="{{ settings.support_email }}"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Telegram Support Link</label>
+                    <input type="url" name="telegram_support" value="{{ settings.telegram_support_link }}"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end">
+            <button type="submit" class="btn-premium px-12 py-4 text-sm font-bold">
+                Сохранить все настройки
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

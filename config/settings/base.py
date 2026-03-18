@@ -17,6 +17,7 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,localhost:9000,1
 SERVER_PORT = 9000
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     'apps.support',
     'apps.dashboard',
     'apps.miniapp',
+    'apps.core',
     # 'apps.telegram_bot',
 ]
 

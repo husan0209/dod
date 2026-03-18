@@ -1,0 +1,104 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ market.question|truncatechars:50 }} | DOD Admin{% endblock %}
+{% block page_title %}{{ market.question|truncatechars:50 }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'dashboard:predictions_markets' %}" class="btn-premium px-4 py-2 text-xs bg-white/5 border-white/10 hover:bg-white/10 shadow-none">← Назад</a>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <div class="glass-card p-8">
+        <div class="flex items-center mb-4">
+            <span class="badge-premium text-[10px] mr-3
+                {% if market.status == 'active' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20
+                {% elif market.status == 'resolved' %}bg-blue-500/10 text-blue-400 border-blue-500/20
+                {% else %}bg-rose-500/10 text-rose-400 border-rose-500/20{% endif %}">
+                {{ market.get_status_display|default:market.status }}
+            </span>
+            <span class="text-[10px] text-text-muted uppercase">{{ market.category.name|default:"—" }}</span>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-2">{{ market.question }}</h2>
+        <p class="text-sm text-text-secondary mb-4">{{ market.description }}</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="p-3 rounded-xl bg-white/5">
+                <div class="text-[10px] text-text-muted uppercase mb-1">Объём</div>
+                <div class="text-lg font-bold text-white">${{ total_volume|floatformat:0 }}</div>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5">
+                <div class="text-[10px] text-text-muted uppercase mb-1">Сделок</div>
+                <div class="text-lg font-bold text-white">{{ total_trades }}</div>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5">
+                <div class="text-[10px] text-text-muted uppercase mb-1">Трейдеров</div>
+                <div class="text-lg font-bold text-white">{{ unique_traders }}</div>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5">
+                <div class="text-[10px] text-text-muted uppercase mb-1">Дедлайн</div>
+                <div class="text-sm font-bold text-white">{{ market.close_date|date:"d.m.Y H:i"|default:"—" }}</div>
+            </div>
+        </div>
+    </div>
+
+    {% if market.status == 'active' %}
+    <div class="glass-card p-8 border-amber-500/20 bg-amber-500/5">
+        <h3 class="text-sm font-bold text-amber-400 uppercase tracking-widest mb-4">⚡ Резолюция маркета</h3>
+        <form method="post" action="{% url 'dashboard:predictions_market_resolve' market.id %}">
+            {% csrf_token %}
+            <div class="flex flex-wrap gap-4 items-end">
+                <div class="flex-1 min-w-[200px]">
+                    <label class="text-[10px] font-bold text-text-muted uppercase block mb-2">Исход</label>
+                    <select name="outcome" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                        <option value="">Выберите исход</option>
+                        <option value="yes">Да (Yes)</option>
+                        <option value="no">Нет (No)</option>
+                        <option value="cancelled">Отменён</option>
+                    </select>
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <label class="text-[10px] font-bold text-text-muted uppercase block mb-2">Комментарий</label>
+                    <input type="text" name="comment" placeholder="Причина/источник..."
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                </div>
+                <button type="submit" class="btn-premium px-6 py-2.5 text-sm font-bold bg-amber-500/20 text-amber-400 border-amber-500/30 hover:bg-amber-500/30">
+                    Резолвить
+                </button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Позиции</h3>
+            <div class="space-y-2">
+                {% for pos in positions %}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                    <div class="text-sm text-white">{{ pos.user.username }}</div>
+                    <div class="text-sm font-bold text-white">${{ pos.amount|floatformat:2 }}</div>
+                </div>
+                {% empty %}
+                <div class="text-center text-text-muted py-4">Нет позиций</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Последние сделки</h3>
+            <div class="space-y-2">
+                {% for trade in recent_trades %}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                    <div>
+                        <div class="text-sm text-white">{{ trade.user.username }}</div>
+                        <div class="text-[10px] text-text-muted">{{ trade.created_at|date:"d.m H:i" }}</div>
+                    </div>
+                    <div class="text-sm font-bold text-white">${{ trade.amount_usd|floatformat:2 }}</div>
+                </div>
+                {% empty %}
+                <div class="text-center text-text-muted py-4">Нет сделок</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

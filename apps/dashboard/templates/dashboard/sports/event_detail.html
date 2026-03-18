@@ -1,0 +1,155 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ event.name }} | DOD Admin{% endblock %}
+{% block page_title %}{{ event.home_team.short_name }} — {{ event.away_team.short_name }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'dashboard:sports_events' %}"
+    class="btn-premium px-4 py-2 text-xs flex items-center bg-white/5 border-white/10 hover:bg-white/10 shadow-none transition-all">
+    ← Назад к событиям
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Event Header -->
+    <div class="glass-card p-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div class="flex items-center mb-4 md:mb-0">
+                <span class="text-4xl mr-4">{{ event.sport.icon }}</span>
+                <div>
+                    <div class="text-[10px] text-text-muted uppercase tracking-widest mb-1">
+                        {{ event.league.name }} • {{ event.start_time|date:"d.m.Y H:i" }}
+                    </div>
+                    <div class="text-2xl font-bold text-white font-outfit">
+                        {{ event.home_team.name }} — {{ event.away_team.name }}
+                    </div>
+                    <div class="flex items-center mt-2 space-x-3">
+                        <span class="badge-premium text-[10px]
+                            {% if event.status == 'live' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20
+                            {% elif event.status == 'finished' %}bg-blue-500/10 text-blue-400 border-blue-500/20
+                            {% else %}bg-white/10 text-text-muted border-white/10{% endif %}">
+                            {{ event.get_status_display }}
+                        </span>
+                        <span class="text-xs text-text-muted">Ставок: {{ bets_count }} • Объём: ${{ total_stake|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if event.home_score is not None %}
+            <div class="text-center">
+                <div class="text-5xl font-bold text-white font-outfit">
+                    {{ event.home_score }} : {{ event.away_score }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if event.status == 'finished' and not event.settled_at %}
+    <!-- Settlement Form -->
+    <div class="glass-card p-8 border-amber-500/20 bg-amber-500/5">
+        <h3 class="text-sm font-bold text-amber-400 uppercase tracking-widest mb-4">⚠️ Ввод результата</h3>
+        <form method="post" action="{% url 'dashboard:sports_event_settle' event.id %}" class="flex items-end gap-4">
+            {% csrf_token %}
+            <div>
+                <label class="text-[10px] font-bold text-text-muted uppercase block mb-2">{{ event.home_team.short_name }}</label>
+                <input type="number" name="home_score" min="0" value="{{ event.home_score|default:'' }}"
+                    class="w-24 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white text-center focus:border-amber-500/50 focus:outline-none">
+            </div>
+            <span class="text-lg text-text-muted pb-2">:</span>
+            <div>
+                <label class="text-[10px] font-bold text-text-muted uppercase block mb-2">{{ event.away_team.short_name }}</label>
+                <input type="number" name="away_score" min="0" value="{{ event.away_score|default:'' }}"
+                    class="w-24 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white text-center focus:border-amber-500/50 focus:outline-none">
+            </div>
+            <button type="submit" class="btn-premium px-6 py-2.5 text-sm font-bold bg-amber-500/20 text-amber-400 border-amber-500/30 hover:bg-amber-500/30">
+                Рассчитать ставки
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Markets -->
+    <div class="glass-card p-8">
+        <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Маркеты ({{ markets|length }})</h3>
+        <div class="space-y-4">
+            {% for market in markets %}
+            <div class="p-4 rounded-xl bg-white/5" x-data="{ open: false }">
+                <div class="flex items-center justify-between cursor-pointer" @click="open = !open">
+                    <div class="flex items-center">
+                        <span class="text-sm font-bold text-white">{{ market.name }}</span>
+                        <span class="ml-3 badge-premium text-[10px]
+                            {% if market.status == 'open' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20
+                            {% elif market.status == 'settled' %}bg-blue-500/10 text-blue-400 border-blue-500/20
+                            {% else %}bg-white/10 text-text-muted border-white/10{% endif %}">
+                            {{ market.get_status_display }}
+                        </span>
+                    </div>
+                    <svg class="w-4 h-4 text-text-muted transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div x-show="open" x-transition class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-3" style="display:none;">
+                    {% for outcome in market.outcomes.all %}
+                    <div class="p-3 rounded-lg bg-white/5 border border-white/5 text-center">
+                        <div class="text-xs text-text-muted mb-1">{{ outcome.name }}</div>
+                        <div class="text-lg font-bold text-white">{{ outcome.odd }}</div>
+                        <div class="text-[10px] text-text-muted mt-1">
+                            {% if outcome.result != 'pending' %}
+                            <span class="{% if outcome.result == 'won' %}text-emerald-400{% elif outcome.result == 'lost' %}text-rose-400{% endif %}">
+                                {{ outcome.get_result_display }}
+                            </span>
+                            {% else %}
+                            {{ outcome.bets_count }} ставок
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-text-muted py-8">Нет маркетов</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Bets on this event -->
+    <div class="glass-card p-8">
+        <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Ставки на событие</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-white/5">
+                        <th class="text-left text-[10px] font-bold text-text-muted uppercase py-3 px-2">Игрок</th>
+                        <th class="text-left text-[10px] font-bold text-text-muted uppercase py-3 px-2">Исход</th>
+                        <th class="text-right text-[10px] font-bold text-text-muted uppercase py-3 px-2">Коэфф</th>
+                        <th class="text-right text-[10px] font-bold text-text-muted uppercase py-3 px-2">Ставка</th>
+                        <th class="text-center text-[10px] font-bold text-text-muted uppercase py-3 px-2">Результат</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in bets %}
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                        <td class="py-3 px-2 text-sm text-white">{{ item.bet.user.username }}</td>
+                        <td class="py-3 px-2 text-xs text-text-secondary">{{ item.outcome_name }}</td>
+                        <td class="py-3 px-2 text-sm text-white text-right">{{ item.odd_at_placement }}</td>
+                        <td class="py-3 px-2 text-sm font-bold text-white text-right">${{ item.bet.stake_usd|floatformat:2 }}</td>
+                        <td class="py-3 px-2 text-center">
+                            <span class="badge-premium text-[10px]
+                                {% if item.result == 'won' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20
+                                {% elif item.result == 'lost' %}bg-rose-500/10 text-rose-400 border-rose-500/20
+                                {% else %}bg-amber-500/10 text-amber-400 border-amber-500/20{% endif %}">
+                                {{ item.get_result_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="py-8 text-center text-text-muted">Нет ставок</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

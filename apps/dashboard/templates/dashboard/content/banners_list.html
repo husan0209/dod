@@ -1,0 +1,68 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Баннеры | DOD Admin{% endblock %}
+{% block page_title %}Управление баннерами{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'dashboard:banner_create' %}" class="btn-premium px-4 py-2 text-xs flex items-center shadow-none">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+    </svg>
+    Добавить баннер
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="glass-card overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-white/5 bg-white/5">
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Превью</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Информация</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Расположение</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Статус</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Порядок</th>
+                    <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest text-right">Действия</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+                {% for banner in banners %}
+                <tr class="hover:bg-white/[0.02] transition-colors group">
+                    <td class="px-6 py-4">
+                        {% if banner.image %}
+                        <img src="{{ banner.image.url }}" class="w-24 h-12 object-cover rounded-lg border border-white/10">
+                        {% else %}
+                        <div class="w-24 h-12 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center text-[10px] text-text-muted italic">No image</div>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-bold text-white">{{ banner.title }}</div>
+                        <div class="text-[10px] text-text-muted truncate max-w-xs">{{ banner.subtitle }}</div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-text-secondary uppercase text-[10px]">{{ banner.get_location_display }}</td>
+                    <td class="px-6 py-4">
+                        {% if banner.is_active %}
+                        <span class="badge-premium bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]">Активен</span>
+                        {% else %}
+                        <span class="badge-premium bg-rose-500/10 text-rose-400 border-rose-500/20 text-[10px]">Выключен</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-white font-mono">{{ banner.sort_order }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="#" class="text-text-muted hover:text-white transition-colors">
+                            <svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-text-muted italic">Баннеров пока нет</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Ставки | DOD Admin{% endblock %}
+{% block page_title %}Все ставки{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Summary -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="glass-card p-5">
+            <div class="text-[10px] font-bold text-text-muted uppercase mb-1">Всего ставок</div>
+            <div class="text-2xl font-bold text-white font-outfit">{{ total_count }}</div>
+        </div>
+        <div class="glass-card p-5">
+            <div class="text-[10px] font-bold text-text-muted uppercase mb-1">Общая сумма</div>
+            <div class="text-2xl font-bold text-white font-outfit">${{ total_stake|floatformat:2 }}</div>
+        </div>
+        <div class="glass-card p-5">
+            <div class="text-[10px] font-bold text-text-muted uppercase mb-1">Выплаты</div>
+            <div class="text-2xl font-bold text-white font-outfit">${{ total_win|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="glass-card p-6">
+        <form method="get" class="flex flex-wrap gap-4 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="text-[10px] font-bold text-text-muted uppercase block mb-2">Поиск</label>
+                <input type="text" name="q" value="{{ search_query }}" placeholder="ID, игрок..."
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-text-muted focus:border-blue-500/50 focus:outline-none">
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-text-muted uppercase block mb-2">Период</label>
+                <select name="period" class="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                    <option value="today" {% if period_filter == 'today' %}selected{% endif %}>Сегодня</option>
+                    <option value="week" {% if period_filter == 'week' %}selected{% endif %}>7 дней</option>
+                    <option value="month" {% if period_filter == 'month' %}selected{% endif %}>30 дней</option>
+                    <option value="all" {% if period_filter == 'all' %}selected{% endif %}>Все</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-text-muted uppercase block mb-2">Статус</label>
+                <select name="status" class="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                    <option value="">Все</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Ожидает</option>
+                    <option value="won" {% if status_filter == 'won' %}selected{% endif %}>Выиграла</option>
+                    <option value="lost" {% if status_filter == 'lost' %}selected{% endif %}>Проиграла</option>
+                    <option value="void" {% if status_filter == 'void' %}selected{% endif %}>Аннулирована</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-text-muted uppercase block mb-2">Тип</label>
+                <select name="type" class="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                    <option value="">Все</option>
+                    <option value="single" {% if type_filter == 'single' %}selected{% endif %}>Одиночная</option>
+                    <option value="combo" {% if type_filter == 'combo' %}selected{% endif %}>Экспресс</option>
+                    <option value="system" {% if type_filter == 'system' %}selected{% endif %}>Система</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-premium px-6 py-2.5 text-sm font-bold">Найти</button>
+        </form>
+    </div>
+
+    <!-- Bets Table -->
+    <div class="glass-card p-6 overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-white/5">
+                    <th class="text-left text-[10px] font-bold text-text-muted uppercase py-3 px-2">ID</th>
+                    <th class="text-left text-[10px] font-bold text-text-muted uppercase py-3 px-2">Игрок</th>
+                    <th class="text-center text-[10px] font-bold text-text-muted uppercase py-3 px-2">Тип</th>
+                    <th class="text-right text-[10px] font-bold text-text-muted uppercase py-3 px-2">Ставка</th>
+                    <th class="text-right text-[10px] font-bold text-text-muted uppercase py-3 px-2">Коэфф</th>
+                    <th class="text-right text-[10px] font-bold text-text-muted uppercase py-3 px-2">Потенц. выигрыш</th>
+                    <th class="text-center text-[10px] font-bold text-text-muted uppercase py-3 px-2">Статус</th>
+                    <th class="text-right text-[10px] font-bold text-text-muted uppercase py-3 px-2">Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bet in page_obj %}
+                <tr class="border-b border-white/5 hover:bg-white/5 transition-all">
+                    <td class="py-3 px-2 text-xs text-text-muted font-mono">{{ bet.bet_id|truncatechars:14 }}</td>
+                    <td class="py-3 px-2 text-sm text-white">
+                        <a href="{% url 'dashboard:user_detail' bet.user.id %}" class="hover:text-blue-400 transition-colors">{{ bet.user.username }}</a>
+                    </td>
+                    <td class="py-3 px-2 text-center">
+                        <span class="badge-premium text-[10px]
+                            {% if bet.bet_type == 'single' %}bg-blue-500/10 text-blue-400 border-blue-500/20
+                            {% elif bet.bet_type == 'combo' %}bg-purple-500/10 text-purple-400 border-purple-500/20
+                            {% else %}bg-amber-500/10 text-amber-400 border-amber-500/20{% endif %}">
+                            {{ bet.get_bet_type_display }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-2 text-sm font-bold text-white text-right">${{ bet.stake_usd|floatformat:2 }}</td>
+                    <td class="py-3 px-2 text-sm text-text-secondary text-right">x{{ bet.total_odd }}</td>
+                    <td class="py-3 px-2 text-sm text-white text-right">${{ bet.potential_win|floatformat:2 }}</td>
+                    <td class="py-3 px-2 text-center">
+                        <span class="badge-premium text-[10px]
+                            {% if bet.status == 'won' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20
+                            {% elif bet.status == 'lost' %}bg-rose-500/10 text-rose-400 border-rose-500/20
+                            {% elif bet.status == 'pending' %}bg-amber-500/10 text-amber-400 border-amber-500/20
+                            {% else %}bg-white/10 text-text-muted border-white/10{% endif %}">
+                            {{ bet.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-2 text-xs text-text-muted text-right">{{ bet.created_at|date:"d.m H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="py-12 text-center text-text-muted">Нет ставок</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center space-x-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&period={{ period_filter }}&status={{ status_filter }}&type={{ type_filter }}&q={{ search_query }}"
+            class="px-4 py-2 rounded-xl bg-white/5 text-sm text-white hover:bg-white/10 transition-all">Назад</a>
+        {% endif %}
+        <span class="px-4 py-2 rounded-xl bg-blue-500/10 text-sm font-bold text-blue-400 border border-blue-500/20">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&period={{ period_filter }}&status={{ status_filter }}&type={{ type_filter }}&q={{ search_query }}"
+            class="px-4 py-2 rounded-xl bg-white/5 text-sm text-white hover:bg-white/10 transition-all">Вперёд</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

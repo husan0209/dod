@@ -1,0 +1,67 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Маркеты | DOD Admin{% endblock %}
+{% block page_title %}Prediction Markets{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="glass-card p-6">
+        <form method="get" class="flex flex-wrap gap-4 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="text-[10px] font-bold text-text-muted uppercase block mb-2">Поиск</label>
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Название..."
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-text-muted focus:border-blue-500/50 focus:outline-none">
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-text-muted uppercase block mb-2">Статус</label>
+                <select name="status" class="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                    <option value="">Все</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Активный</option>
+                    <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Резолвлен</option>
+                    <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Отменён</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-premium px-6 py-2.5 text-sm font-bold">Найти</button>
+        </form>
+    </div>
+
+    <div class="space-y-4">
+        {% for market in page_obj %}
+        <a href="{% url 'dashboard:predictions_market_detail' market.id %}" class="block glass-card p-6 hover:bg-white/10 transition-all group">
+            <div class="flex items-start justify-between">
+                <div class="flex-1 mr-4">
+                    <div class="flex items-center mb-2">
+                        <span class="badge-premium text-[10px] mr-3
+                            {% if market.status == 'active' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20
+                            {% elif market.status == 'resolved' %}bg-blue-500/10 text-blue-400 border-blue-500/20
+                            {% else %}bg-rose-500/10 text-rose-400 border-rose-500/20{% endif %}">
+                            {{ market.get_status_display|default:market.status }}
+                        </span>
+                        <span class="text-[10px] text-text-muted uppercase">{{ market.category.name|default:"—" }}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">{{ market.question|truncatechars:80 }}</h3>
+                    <p class="text-xs text-text-muted mt-1">{{ market.description|truncatechars:120 }}</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                    <div class="text-sm font-bold text-white">${{ market.volume_usd|floatformat:0|default:"0" }}</div>
+                    <div class="text-[10px] text-text-muted">{{ market.close_date|date:"d.m.Y"|default:"—" }}</div>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="glass-card p-12 text-center text-text-muted">Нет маркетов</div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center space-x-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}&q={{ search_query }}" class="px-4 py-2 rounded-xl bg-white/5 text-sm text-white hover:bg-white/10">Назад</a>
+        {% endif %}
+        <span class="px-4 py-2 rounded-xl bg-blue-500/10 text-sm font-bold text-blue-400 border border-blue-500/20">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}&q={{ search_query }}" class="px-4 py-2 rounded-xl bg-white/5 text-sm text-white hover:bg-white/10">Вперёд</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

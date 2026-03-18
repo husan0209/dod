@@ -1,0 +1,99 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}События | DOD Admin{% endblock %}
+{% block page_title %}Спортивные события{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Filters -->
+    <div class="glass-card p-6">
+        <form method="get" class="flex flex-wrap gap-4 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest block mb-2">Поиск</label>
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Название, команда..." 
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-text-muted focus:border-blue-500/50 focus:outline-none transition-all">
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest block mb-2">Статус</label>
+                <select name="status" class="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-blue-500/50 focus:outline-none">
+                    <option value="">Все</option>
+                    <option value="scheduled" {% if status_filter == 'scheduled' %}selected{% endif %}>Запланирован</option>
+                    <option value="prematch" {% if status_filter == 'prematch' %}selected{% endif %}>Премматч</option>
+                    <option value="live" {% if status_filter == 'live' %}selected{% endif %}>Live</option>
+                    <option value="finished" {% if status_filter == 'finished' %}selected{% endif %}>Завершён</option>
+                    <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Отменён</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest block mb-2">Вид спорта</label>
+                <select name="sport" class="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-blue-500/50 focus:outline-none">
+                    <option value="">Все</option>
+                    {% for sport in sports %}
+                    <option value="{{ sport.id }}" {% if sport_filter == sport.id|stringformat:"s" %}selected{% endif %}>{{ sport.icon }} {{ sport.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-premium px-6 py-2.5 text-sm font-bold">Найти</button>
+        </form>
+    </div>
+
+    <!-- Events Table -->
+    <div class="glass-card p-6 overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-white/5">
+                    <th class="text-left text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Событие</th>
+                    <th class="text-left text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Лига</th>
+                    <th class="text-center text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Время</th>
+                    <th class="text-center text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Счёт</th>
+                    <th class="text-center text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Статус</th>
+                    <th class="text-right text-[10px] font-bold text-text-muted uppercase tracking-widest py-3 px-2">Ставки</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in page_obj %}
+                <tr class="border-b border-white/5 hover:bg-white/5 transition-all cursor-pointer" onclick="window.location='{% url 'dashboard:sports_event_detail' event.id %}'">
+                    <td class="py-3 px-2">
+                        <div class="flex items-center">
+                            <span class="text-lg mr-2">{{ event.sport.icon }}</span>
+                            <div>
+                                <div class="text-sm font-medium text-white">{{ event.home_team.short_name }} — {{ event.away_team.short_name }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-2 text-xs text-text-muted">{{ event.league.short_name }}</td>
+                    <td class="py-3 px-2 text-xs text-text-muted text-center">{{ event.start_time|date:"d.m H:i" }}</td>
+                    <td class="py-3 px-2 text-sm font-bold text-white text-center">{{ event.get_formatted_score }}</td>
+                    <td class="py-3 px-2 text-center">
+                        <span class="badge-premium text-[10px]
+                            {% if event.status == 'live' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20
+                            {% elif event.status == 'finished' %}bg-blue-500/10 text-blue-400 border-blue-500/20
+                            {% elif event.status == 'cancelled' %}bg-rose-500/10 text-rose-400 border-rose-500/20
+                            {% else %}bg-white/10 text-text-muted border-white/10{% endif %}">
+                            {{ event.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-2 text-sm text-white text-right">{{ event.bets_count }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="py-12 text-center text-text-muted">Нет событий</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center space-x-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}&sport={{ sport_filter }}&q={{ search_query }}"
+            class="px-4 py-2 rounded-xl bg-white/5 text-sm text-white hover:bg-white/10 transition-all">Назад</a>
+        {% endif %}
+        <span class="px-4 py-2 rounded-xl bg-blue-500/10 text-sm font-bold text-blue-400 border border-blue-500/20">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}&sport={{ sport_filter }}&q={{ search_query }}"
+            class="px-4 py-2 rounded-xl bg-white/5 text-sm text-white hover:bg-white/10 transition-all">Вперёд</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

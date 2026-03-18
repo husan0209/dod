@@ -1,0 +1,83 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Детали лога #{{ log.id }} | DOD Admin{% endblock %}
+{% block page_title %}Детали действия администратора{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <div class="mb-4">
+        <a href="{% url 'dashboard:logs' %}" class="text-sm text-text-muted hover:text-white transition-colors">← Назад к списку</a>
+    </div>
+
+    <div class="glass-card p-8 space-y-8">
+        <!-- Header Info -->
+        <div class="flex justify-between items-start">
+            <div>
+                <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Время события</div>
+                <div class="text-lg text-white font-mono">{{ log.created_at|date:"d.m.Y H:i:s.u" }}</div>
+            </div>
+            <div class="text-right">
+                <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">Статус</div>
+                {% if log.is_successful %}
+                <span class="badge-premium bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-4 py-1">Успешно</span>
+                {% else %}
+                <span class="badge-premium bg-rose-500/10 text-rose-400 border-rose-500/20 px-4 py-1">Ошибка</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 border-y border-white/5">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Администратор</label>
+                    <div class="text-sm text-white font-bold">{{ log.admin_user.username|default:"System" }}</div>
+                    <div class="text-[10px] text-text-muted">{{ log.admin_user.email|default:"" }}</div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Модуль / Тип действия</label>
+                    <div class="text-sm text-blue-400 font-mono">{{ log.module }} / {{ log.action_type }}</div>
+                </div>
+            </div>
+            <div class="space-y-4 text-right">
+                <div>
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">IP Адрес / User-Agent</label>
+                    <div class="text-sm text-white font-mono">{{ log.ip_address }}</div>
+                    <div class="text-[10px] text-text-muted truncate max-w-sm ml-auto">{{ log.user_agent }}</div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-text-muted uppercase block">Категория</label>
+                    <div class="text-sm text-text-secondary uppercase tracking-tighter">{{ log.action_category }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <label class="text-[10px] font-bold text-text-muted uppercase block">Описание действия</label>
+            <div class="glass-card bg-white/5 p-4 text-sm text-white leading-relaxed">
+                {{ log.description }}
+            </div>
+        </div>
+
+        {% if log.data_before or log.data_after %}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-rose-400 uppercase block">Было (Before)</label>
+                <pre class="glass-card bg-rose-500/5 p-4 text-[11px] text-rose-200/70 overflow-x-auto custom-scrollbar font-mono">{{ log.data_before|pprint }}</pre>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-emerald-400 uppercase block">Стало (After)</label>
+                <pre class="glass-card bg-emerald-500/5 p-4 text-[11px] text-emerald-200/70 overflow-x-auto custom-scrollbar font-mono">{{ log.data_after|pprint }}</pre>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if log.error_message %}
+        <div class="space-y-2">
+            <label class="text-[10px] font-bold text-rose-500 uppercase block">Текст ошибки</label>
+            <div class="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-sm text-rose-200 font-mono">
+                {{ log.error_message }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -5,25 +5,35 @@
 
 {% block content %}
 <div class="space-y-6">
+    <!-- Search and Filters -->
     <div class="glass-card p-6">
-        <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div class="space-y-1">
-                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Модуль</label>
-                <input type="text" name="module" value="{{ module_filter }}" placeholder="users / finance / security ..."
-                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
-            </div>
-            <div class="space-y-1">
-                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Результат</label>
-                <select name="ok"
-                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
-                    <option value="" {% if ok_filter == "" %}selected{% endif %}>Все</option>
-                    <option value="1" {% if ok_filter == "1" %}selected{% endif %}>Успешно</option>
-                    <option value="0" {% if ok_filter == "0" %}selected{% endif %}>Ошибки</option>
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Админ</label>
+                <select name="admin" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                    <option value="">Все админы</option>
+                    {% for admin in admins %}
+                    <option value="{{ admin.id }}" {% if admin_filter == admin.id|stringformat:"s" %}selected{% endif %}>{{ admin.username }}</option>
+                    {% endfor %}
                 </select>
             </div>
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">Модуль</label>
+                <input type="text" name="module" value="{{ module_filter }}" placeholder="users / finance ..."
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+            </div>
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">От даты</label>
+                <input type="date" name="date_from" value="{{ date_from_filter }}"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+            </div>
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-text-muted uppercase tracking-widest pl-1">До даты</label>
+                <input type="date" name="date_to" value="{{ date_to_filter }}"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+            </div>
             <div class="flex items-end">
-                <button type="submit"
-                    class="w-full btn-premium py-2 text-sm font-bold bg-blue-600 hover:bg-blue-500 shadow-blue-500/20">Фильтр</button>
+                <button type="submit" class="w-full btn-premium py-2 text-sm font-bold">Фильтр</button>
             </div>
         </form>
     </div>
@@ -35,26 +45,31 @@
                     <tr class="border-b border-white/5 bg-white/[0.02]">
                         <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Время</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Админ</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Модуль</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Действие</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Модуль / Тип</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest">Описание</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest text-right">Статус</th>
+                        <th class="px-6 py-4 text-center text-[10px] font-bold text-text-muted uppercase tracking-widest">Статус</th>
+                        <th class="px-6 py-4 text-right"></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                     {% for log in page_obj %}
-                    <tr class="hover:bg-white/[0.02] transition-colors">
-                        <td class="px-6 py-4 text-xs text-text-muted">{{ log.created_at|date:"d.m H:i:s" }}</td>
+                    <tr class="hover:bg-white/[0.02] transition-colors group">
+                        <td class="px-6 py-4 text-xs text-text-muted">{{ log.created_at|date:"d.m H:i" }}</td>
                         <td class="px-6 py-4 text-xs text-white font-bold">{{ log.admin_user.username|default:"System" }}</td>
-                        <td class="px-6 py-4 text-xs text-text-secondary">{{ log.module }}</td>
-                        <td class="px-6 py-4 text-xs text-text-secondary">{{ log.action_type }}</td>
-                        <td class="px-6 py-4 text-xs text-white max-w-[520px] truncate" title="{{ log.description }}">{{ log.description }}</td>
-                        <td class="px-6 py-4 text-right">
+                        <td class="px-6 py-4">
+                            <div class="text-[10px] text-blue-400 font-mono uppercase">{{ log.module }}</div>
+                            <div class="text-[10px] text-text-muted truncate max-w-[120px]">{{ log.action_type }}</div>
+                        </td>
+                        <td class="px-6 py-4 text-xs text-white max-w-[400px] truncate" title="{{ log.description }}">{{ log.description }}</td>
+                        <td class="px-6 py-4 text-center">
                             {% if log.is_successful %}
-                            <span class="badge-premium bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]">OK</span>
+                            <span class="text-emerald-400">●</span>
                             {% else %}
-                            <span class="badge-premium bg-rose-500/10 text-rose-400 border-rose-500/20 text-[10px]">FAIL</span>
+                            <span class="text-rose-400">●</span>
                             {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="{% url 'dashboard:log_detail' log.id %}" class="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:text-blue-300">Детали →</a>
                         </td>
                     </tr>
                     {% empty %}
@@ -71,12 +86,10 @@
             <div class="text-xs text-text-muted uppercase tracking-widest font-bold">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</div>
             <div class="flex space-x-2">
                 {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if module_filter %}&module={{ module_filter }}{% endif %}{% if ok_filter %}&ok={{ ok_filter }}{% endif %}"
-                    class="px-3 py-1.5 glass-card text-xs text-white hover:bg-white/10 transition-all font-bold">Назад</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if module_filter %}&module={{ module_filter }}{% endif %}" class="px-4 py-2 glass-card text-[10px] font-bold text-white uppercase">Назад</a>
                 {% endif %}
                 {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if module_filter %}&module={{ module_filter }}{% endif %}{% if ok_filter %}&ok={{ ok_filter }}{% endif %}"
-                    class="px-3 py-1.5 glass-card text-xs text-white hover:bg-white/10 transition-all font-bold">Вперед</a>
+                <a href="?page={{ page_obj.next_page_number }}{% if module_filter %}&module={{ module_filter }}{% endif %}" class="px-4 py-2 glass-card text-[10px] font-bold text-white uppercase">Вперед</a>
                 {% endif %}
             </div>
         </div>

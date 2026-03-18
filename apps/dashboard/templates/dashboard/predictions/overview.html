@@ -1,34 +1,137 @@
 {% extends 'dashboard/base.html' %}
 
-{% block title %}Predictions Overview | DOD Admin{% endblock %}
-{% block page_title %}DOD Predictions{% endblock %}
+{% block title %}Predictions | DOD Admin{% endblock %}
+{% block page_title %}Prediction Markets{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'dashboard:predictions_markets' %}"
+    class="btn-premium px-4 py-2 text-xs flex items-center bg-white/5 border-white/10 hover:bg-white/10 shadow-none transition-all">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+    </svg>
+    Все маркеты
+</a>
+{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-    <div class="glass-card p-12 text-center max-w-2xl mx-auto">
-        <div class="w-20 h-20 bg-blue-500/10 text-blue-400 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
-                </path>
-            </svg>
-        </div>
-        <h2 class="text-2xl font-bold text-white font-outfit mb-2">Predictions Module</h2>
-        <p class="text-xs text-text-muted uppercase tracking-widest font-bold mb-8">Модуль находится в разработке</p>
-
-        <div class="grid grid-cols-2 gap-4">
-            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                <div class="text-lg font-bold text-white font-outfit">$0.00</div>
-                <div class="text-[9px] font-bold text-text-muted uppercase tracking-widest">Профит модуля</div>
+<div class="space-y-8">
+    <!-- Top Metrics -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glass-card p-6 bg-gradient-to-br from-indigo-500/5 to-transparent border-indigo-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Активных маркетов</span>
+                <span class="text-2xl">📊</span>
             </div>
-            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                <div class="text-lg font-bold text-white font-outfit">0</div>
-                <div class="text-[9px] font-bold text-text-muted uppercase tracking-widest">Активные юзеры</div>
+            <div class="text-3xl font-bold text-white font-outfit">{{ active_markets }}</div>
+        </div>
+
+        <div class="glass-card p-6 bg-gradient-to-br from-amber-500/5 to-transparent border-amber-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">Ожидают резолюции</span>
+                <span class="text-2xl">⏳</span>
+            </div>
+            <div class="text-3xl font-bold {% if awaiting_resolution > 0 %}text-amber-400{% else %}text-white{% endif %} font-outfit">
+                {{ awaiting_resolution }}
             </div>
         </div>
 
-        <button class="mt-8 btn-premium px-8 py-3 text-xs opacity-50 cursor-not-allowed">🛠️ Перейти в
-            конфигуратор</button>
+        <div class="glass-card p-6 bg-gradient-to-br from-emerald-500/5 to-transparent border-emerald-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Сделок сегодня</span>
+                <span class="text-2xl">💹</span>
+            </div>
+            <div class="text-3xl font-bold text-white font-outfit">{{ trades_today }}</div>
+            <div class="text-[10px] text-text-muted uppercase mt-1">${{ volume_today|floatformat:0 }} объём</div>
+        </div>
+
+        <div class="glass-card p-6 bg-gradient-to-br from-blue-500/5 to-transparent border-blue-500/10">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Резолвлено (7д)</span>
+                <span class="text-2xl">✅</span>
+            </div>
+            <div class="text-3xl font-bold text-white font-outfit">{{ recently_resolved }}</div>
+        </div>
+    </div>
+
+    {% if needs_resolution %}
+    <!-- Needs Resolution Alert -->
+    <div class="glass-card p-6 border-amber-500/20 bg-amber-500/5">
+        <div class="flex items-center mb-4">
+            <span class="text-lg mr-3">⚠️</span>
+            <h3 class="text-sm font-bold text-amber-400 uppercase tracking-widest">Маркеты ожидают резолюции</h3>
+        </div>
+        <div class="space-y-3">
+            {% for market in needs_resolution %}
+            <a href="{% url 'dashboard:predictions_market_detail' market.id %}"
+                class="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all group">
+                <div>
+                    <div class="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">{{ market.question|truncatechars:80 }}</div>
+                    <div class="text-[10px] text-text-muted uppercase">
+                        {{ market.category.name }} • Дедлайн: {{ market.close_date|date:"d.m.Y H:i" }}
+                    </div>
+                </div>
+                <span class="badge-premium bg-amber-500/10 text-amber-400 border-amber-500/20 text-[10px]">
+                    Резолвить →
+                </span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Categories -->
+        <div class="glass-card p-8">
+            <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest mb-6">Категории</h3>
+            <div class="space-y-3">
+                {% for cat in category_stats %}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                    <div class="text-sm font-medium text-white">{{ cat.category__name|default:"Без категории" }}</div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-xs text-text-muted">{{ cat.count }} маркетов</span>
+                        <span class="text-sm font-bold text-white">${{ cat.total_volume|floatformat:0|default:"0" }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-text-muted py-4">Нет категорий</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Active Markets -->
+        <div class="glass-card p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-sm font-bold text-text-muted uppercase tracking-widest">Активные маркеты</h3>
+                <a href="{% url 'dashboard:predictions_markets' %}" class="text-xs text-blue-400 hover:text-blue-300">Все →</a>
+            </div>
+            <div class="space-y-3">
+                {% for market in markets %}
+                <a href="{% url 'dashboard:predictions_market_detail' market.id %}"
+                    class="block p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all group">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-[10px] text-text-muted uppercase">
+                            {{ market.category.name|default:"—" }}
+                        </span>
+                        <span class="badge-premium text-[10px]
+                            {% if market.status == 'active' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20
+                            {% elif market.status == 'paused' %}bg-amber-500/10 text-amber-400 border-amber-500/20
+                            {% else %}bg-white/10 text-text-muted border-white/10{% endif %}">
+                            {{ market.get_status_display|default:market.status }}
+                        </span>
+                    </div>
+                    <div class="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">
+                        {{ market.question|truncatechars:80 }}
+                    </div>
+                    <div class="mt-2 flex items-center space-x-4 text-[10px] text-text-muted">
+                        <span>Объём: ${{ market.volume_usd|floatformat:0|default:"0" }}</span>
+                        <span>Дедлайн: {{ market.close_date|date:"d.m.Y"|default:"—" }}</span>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="text-center text-text-muted py-8">Нет активных маркетов</div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
