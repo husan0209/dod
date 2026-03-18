@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Слоты — Казино | DOD Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <a href="{% url 'casino:index' %}" class="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-2">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Назад в казино
+            </a>
+            <h1 class="text-3xl font-bold text-white">🎰 Слоты</h1>
+            <p class="text-gray-400 mt-1">Крутите барабаны и выигрывайте джекпоты</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-xs font-bold border border-green-500/20">PROVABLY FAIR</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Game Area -->
+        <div class="lg:col-span-2">
+            <div class="bg-[#12151c] border border-white/10 rounded-2xl overflow-hidden">
+                <!-- Slot Machine -->
+                <div class="p-8 bg-gradient-to-b from-purple-900/20 to-transparent">
+                    <div class="relative">
+                        <!-- Reels Container -->
+                        <div class="flex justify-center gap-2 mb-6">
+                            <div class="slot-reel w-32 h-40 bg-[#0b0e11] rounded-xl border-4 border-yellow-500/30 flex items-center justify-center overflow-hidden shadow-lg shadow-yellow-500/10">
+                                <div id="reel-1" class="text-6xl transition-transform duration-300">🍒</div>
+                            </div>
+                            <div class="slot-reel w-32 h-40 bg-[#0b0e11] rounded-xl border-4 border-yellow-500/30 flex items-center justify-center overflow-hidden shadow-lg shadow-yellow-500/10">
+                                <div id="reel-2" class="text-6xl transition-transform duration-300">🍋</div>
+                            </div>
+                            <div class="slot-reel w-32 h-40 bg-[#0b0e11] rounded-xl border-4 border-yellow-500/30 flex items-center justify-center overflow-hidden shadow-lg shadow-yellow-500/10">
+                                <div id="reel-3" class="text-6xl transition-transform duration-300">🍇</div>
+                            </div>
+                        </div>
+
+                        <!-- Win Line Indicator -->
+                        <div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50"></div>
+                    </div>
+
+                    <!-- Result Display -->
+                    <div id="result-display" class="text-center py-4 rounded-xl bg-[#0b0e11] border border-white/5 mb-6">
+                        <p class="text-gray-400">Сделайте ставку и крутите!</p>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="space-y-4">
+                        <!-- Bet Amount -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Сумма ставки</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="bet-amount" value="1.00" min="0.01" step="0.01"
+                                       class="flex-1 px-4 py-3 bg-[#0b0e11] border border-white/10 rounded-xl text-white text-center text-lg font-mono focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button onclick="setBet(0.1)" class="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm hover:bg-white/10">0.1</button>
+                                <button onclick="setBet(1)" class="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm hover:bg-white/10">1</button>
+                                <button onclick="setBet(5)" class="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm hover:bg-white/10">5</button>
+                                <button onclick="setBet(10)" class="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm hover:bg-white/10">10</button>
+                            </div>
+                        </div>
+
+                        <!-- Spin Button -->
+                        <button id="spin-btn" onclick="spin()" class="w-full py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold text-lg rounded-xl hover:from-yellow-400 hover:to-orange-400 transition-all shadow-lg shadow-yellow-500/25">
+                            🎰 КРУТИТЬ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Paytable -->
+            <div class="bg-[#12151c] border border-white/10 rounded-2xl p-6">
+                <h3 class="text-lg font-bold text-white mb-4">💰 Таблица выплат</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between items-center py-2 border-b border-white/5">
+                        <span class="text-2xl">💎💎💎</span>
+                        <span class="text-yellow-400 font-bold">x100</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-white/5">
+                        <span class="text-2xl">7️⃣7️⃣7️⃣</span>
+                        <span class="text-yellow-400 font-bold">x50</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-white/5">
+                        <span class="text-2xl">🍒🍒🍒</span>
+                        <span class="text-yellow-400 font-bold">x25</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-white/5">
+                        <span class="text-2xl">🍇🍇🍇</span>
+                        <span class="text-yellow-400 font-bold">x15</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-white/5">
+                        <span class="text-2xl">🍋🍋🍋</span>
+                        <span class="text-yellow-400 font-bold">x10</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-white/5">
+                        <span class="text-2xl">🍊🍊🍊</span>
+                        <span class="text-yellow-400 font-bold">x5</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-2xl">🍒🍒</span>
+                        <span class="text-yellow-400 font-bold">x2</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Wins -->
+            <div class="bg-[#12151c] border border-white/10 rounded-2xl p-6">
+                <h3 class="text-lg font-bold text-white mb-4">🏆 Последние выигрыши</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between items-center py-2 border-b border-white/5">
+                        <span class="text-gray-400">user***123</span>
+                        <span class="text-green-400 font-bold">+$125.00</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-white/5">
+                        <span class="text-gray-400">player***</span>
+                        <span class="text-green-400 font-bold">+$45.50</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-white/5">
+                        <span class="text-gray-400">gamer***</span>
+                        <span class="text-green-400 font-bold">+$12.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Info -->
+            <div class="bg-[#12151c] border border-white/10 rounded-2xl p-6">
+                <h3 class="text-lg font-bold text-white mb-4">ℹ️ Как играть</h3>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li>1. Выберите сумму ставки</li>
+                    <li>2. Нажмите кнопку "Крутить"</li>
+                    <li>3. Соберите 3 одинаковых символа для выигрыша</li>
+                    <li>4. 2 одинаковых символа = x2 множитель</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const symbols = ['🍒', '🍋', '🍇', '🍊', '💎', '7️⃣'];
+let isSpinning = false;
+
+function setBet(amount) {
+    document.getElementById('bet-amount').value = amount.toFixed(2);
+}
+
+function spin() {
+    if (isSpinning) return;
+    isSpinning = true;
+    
+    const betAmount = parseFloat(document.getElementById('bet-amount').value);
+    if (betAmount <= 0) {
+        alert('Введите сумму ставки');
+        isSpinning = false;
+        return;
+    }
+    
+    const spinBtn = document.getElementById('spin-btn');
+    spinBtn.disabled = true;
+    spinBtn.textContent = '🎰 КРУТИМ...';
+    
+    // Animate reels
+    const reels = [
+        document.getElementById('reel-1'),
+        document.getElementById('reel-2'),
+        document.getElementById('reel-3')
+    ];
+    
+    let spins = 0;
+    const maxSpins = 20;
+    
+    const interval = setInterval(() => {
+        reels.forEach(reel => {
+            reel.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        });
+        spins++;
+        
+        if (spins >= maxSpins) {
+            clearInterval(interval);
+            
+            // Final result
+            const results = reels.map(() => symbols[Math.floor(Math.random() * symbols.length)]);
+            reels.forEach((reel, i) => reel.textContent = results[i]);
+            
+            // Check win
+            checkWin(results, betAmount);
+            
+            spinBtn.disabled = false;
+            spinBtn.textContent = '🎰 КРУТИТЬ';
+            isSpinning = false;
+        }
+    }, 100);
+}
+
+function checkWin(results, bet) {
+    const resultDisplay = document.getElementById('result-display');
+    
+    if (results[0] === results[1] && results[1] === results[2]) {
+        // Three of a kind
+        const multipliers = {
+            '💎': 100,
+            '7️⃣': 50,
+            '🍒': 25,
+            '🍇': 15,
+            '🍋': 10,
+            '🍊': 5
+        };
+        const mult = multipliers[results[0]] || 5;
+        const win = bet * mult;
+        resultDisplay.innerHTML = `<p class="text-2xl text-green-400 font-bold">🎉 ВЫИГРЫШ! +$${win.toFixed(2)}</p>`;
+    } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+        // Two of a kind
+        const win = bet * 2;
+        resultDisplay.innerHTML = `<p class="text-xl text-yellow-400 font-bold">✨ Дубль! +$${win.toFixed(2)}</p>`;
+    } else {
+        resultDisplay.innerHTML = `<p class="text-gray-400">Попробуйте ещё раз!</p>`;
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Настройка 2FA — DOD Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% url 'accounts:security_settings' %}" class="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors mb-4">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Назад к настройкам безопасности
+        </a>
+        <h1 class="text-2xl font-bold text-white">Двухфакторная аутентификация</h1>
+        <p class="text-gray-400 mt-1">Защитите свой аккаунт с помощью дополнительного уровня безопасности</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-6 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-500/10 border border-green-500/20 text-green-400{% elif message.tags == 'error' %}bg-red-500/10 border border-red-500/20 text-red-400{% else %}bg-blue-500/10 border border-blue-500/20 text-blue-400{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Steps -->
+    <div class="space-y-6">
+        <!-- Step 1: Download App -->
+        <div class="bg-[#12151c] border border-white/10 rounded-2xl p-6">
+            <div class="flex items-start">
+                <div class="w-8 h-8 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-400 font-bold mr-4 flex-shrink-0">1</div>
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Установите приложение-аутентификатор</h3>
+                    <p class="text-gray-400 text-sm mb-4">Скачайте одно из приложений на свой смартфон:</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank" class="flex items-center p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                            <img src="https://www.gstatic.com/images/branding/product/2x/ga_48dp.png" alt="Google Authenticator" class="w-8 h-8 mr-3">
+                            <div>
+                                <div class="text-sm font-medium text-white">Google Authenticator</div>
+                                <div class="text-xs text-gray-500">Android / iOS</div>
+                            </div>
+                        </a>
+                        <a href="https://authy.com/" target="_blank" class="flex items-center p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                            <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-white font-bold text-xs">A</span>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-white">Authy</div>
+                                <div class="text-xs text-gray-500">Android / iOS / Desktop</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Scan QR Code -->
+        <div class="bg-[#12151c] border border-white/10 rounded-2xl p-6">
+            <div class="flex items-start">
+                <div class="w-8 h-8 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-400 font-bold mr-4 flex-shrink-0">2</div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-white mb-2">Отсканируйте QR-код</h3>
+                    <p class="text-gray-400 text-sm mb-4">Откройте приложение и отсканируйте этот код:</p>
+                    
+                    <div class="bg-white p-4 rounded-xl inline-block mb-4">
+                        {% if qr_code %}
+                            <img src="{{ qr_code }}" alt="QR Code" class="w-48 h-48">
+                        {% else %}
+                            <div class="w-48 h-48 bg-gray-100 flex items-center justify-center text-gray-400">
+                                QR-код загружается...
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Manual Key -->
+                    <div class="bg-[#0b0e11] border border-white/5 rounded-xl p-4">
+                        <p class="text-xs text-gray-500 mb-2">Или введите ключ вручную:</p>
+                        <code class="text-sm text-blue-400 font-mono break-all select-all">{{ secret }}</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Verify Code -->
+        <div class="bg-[#12151c] border border-white/10 rounded-2xl p-6">
+            <div class="flex items-start">
+                <div class="w-8 h-8 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-400 font-bold mr-4 flex-shrink-0">3</div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-white mb-2">Введите код подтверждения</h3>
+                    <p class="text-gray-400 text-sm mb-4">Введите 6-значный код из приложения:</p>
+                    
+                    <form method="post" class="space-y-4">
+                        {% csrf_token %}
+                        <div class="max-w-xs">
+                            <input type="text" name="totp_code" id="id_totp_code" maxlength="6"
+                                   class="w-full px-4 py-4 bg-[#0b0e11] border border-white/10 rounded-xl text-white text-center text-2xl tracking-[0.5em] font-mono placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                   placeholder="000000" autocomplete="off" inputmode="numeric" pattern="[0-9]{6}" required>
+                            {% if form.totp_code.errors %}
+                                <p class="mt-2 text-sm text-red-400 text-center">{{ form.totp_code.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25">
+                            Включить двухфакторную аутентификацию
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Backup Codes -->
+        {% if backup_codes %}
+        <div class="bg-[#12151c] border border-amber-500/20 rounded-2xl p-6">
+            <div class="flex items-start">
+                <div class="w-8 h-8 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-400 font-bold mr-4 flex-shrink-0">!</div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-white mb-2">Резервные коды</h3>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Сохраните эти коды в безопасном месте. Они позволят вам войти в аккаунт, если вы потеряете доступ к приложению-аутентификатору.
+                    </p>
+                    
+                    <div class="bg-[#0b0e11] border border-white/5 rounded-xl p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-2 font-mono text-sm">
+                            {% for code in backup_codes %}
+                                <div class="text-gray-300 bg-white/5 px-3 py-2 rounded text-center">{{ code }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button onclick="copyBackupCodes()" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white hover:bg-white/10 transition-colors">
+                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            Копировать
+                        </button>
+                        <button onclick="downloadBackupCodes()" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white hover:bg-white/10 transition-colors">
+                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Скачать
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function copyBackupCodes() {
+    const codes = [{% for code in backup_codes %}'{{ code }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+    navigator.clipboard.writeText(codes.join('\n'));
+    alert('Коды скопированы!');
+}
+
+function downloadBackupCodes() {
+    const codes = [{% for code in backup_codes %}'{{ code }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+    const text = 'DOD Platform - Резервные коды\n\n' + codes.join('\n') + '\n\nСохраните этот файл в безопасном месте!';
+    const blob = new Blob([text], {type: 'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'dod-backup-codes.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Auto-format TOTP input
+document.addEventListener('DOMContentLoaded', function() {
+    const totpInput = document.getElementById('id_totp_code');
+    totpInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+});
+</script>
+{% endblock %}

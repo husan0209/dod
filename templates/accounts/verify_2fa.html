@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Двухфакторная аутентификация — DOD Platform{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <a href="/" class="inline-flex items-center space-x-2">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span class="text-white font-bold text-2xl font-outfit">D</span>
+                </div>
+                <span class="text-3xl font-bold font-outfit tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">DOD</span>
+            </a>
+            <h2 class="mt-6 text-2xl font-bold text-white">Двухфакторная аутентификация</h2>
+            <p class="mt-2 text-sm text-gray-400">
+                Введите код из приложения-аутентификатора
+            </p>
+        </div>
+
+        <!-- 2FA Card -->
+        <div class="bg-[#12151c] border border-white/10 rounded-2xl shadow-2xl p-8">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-3 rounded-lg {% if message.tags == 'success' %}bg-green-500/10 border border-green-500/20 text-green-400{% elif message.tags == 'error' %}bg-red-500/10 border border-red-500/20 text-red-400{% else %}bg-blue-500/10 border border-blue-500/20 text-blue-400{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- TOTP Code -->
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto mb-4 bg-indigo-500/10 rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <p class="text-gray-400 text-sm">
+                    Откройте Google Authenticator, Authy или другое приложение и введите 6-значный код
+                </p>
+            </div>
+
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                
+                <!-- TOTP Code Input -->
+                <div>
+                    <label for="id_totp_code" class="block text-sm font-medium text-gray-300 mb-2 text-center">Код подтверждения</label>
+                    <input type="text" name="totp_code" id="id_totp_code" maxlength="6"
+                           class="w-full px-4 py-4 bg-[#0b0e11] border border-white/10 rounded-xl text-white text-center text-2xl tracking-[0.5em] font-mono placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                           placeholder="000000" autocomplete="off" inputmode="numeric" pattern="[0-9]{6}">
+                    {% if form.totp_code.errors %}
+                        <p class="mt-1 text-sm text-red-400 text-center">{{ form.totp_code.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[#12151c] transition-all shadow-lg shadow-blue-500/25">
+                    Подтвердить
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-white/10"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-4 bg-[#12151c] text-gray-500">или используйте</span>
+                </div>
+            </div>
+
+            <!-- Backup Code Option -->
+            <div class="text-center">
+                <p class="text-sm text-gray-400 mb-3">Нет доступа к приложению?</p>
+                <button onclick="toggleBackupCode()" class="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+                    Использовать резервный код
+                </button>
+            </div>
+
+            <!-- Backup Code Form (Hidden by default) -->
+            <div id="backup-code-form" class="hidden mt-4">
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label for="id_backup_code" class="block text-sm font-medium text-gray-300 mb-2 text-center">Резервный код</label>
+                        <input type="text" name="backup_code" id="id_backup_code"
+                               class="w-full px-4 py-3 bg-[#0b0e11] border border-white/10 rounded-xl text-white text-center text-lg tracking-wider font-mono placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                               placeholder="XXXX-XXXX-XXXX" autocomplete="off">
+                    </div>
+                    <button type="submit" class="w-full py-3 px-4 bg-white/5 border border-white/10 text-white font-medium rounded-xl hover:bg-white/10 transition-colors">
+                        Войти с резервным кодом
+                    </button>
+                </form>
+            </div>
+
+            <!-- Help Link -->
+            <div class="mt-6 text-center">
+                <a href="{% url 'support:home' %}" class="text-sm text-gray-500 hover:text-gray-400 transition-colors">
+                    Проблемы со входом? Обратитесь в поддержку
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleBackupCode() {
+    const form = document.getElementById('backup-code-form');
+    form.classList.toggle('hidden');
+}
+
+// Auto-focus and format TOTP input
+document.addEventListener('DOMContentLoaded', function() {
+    const totpInput = document.getElementById('id_totp_code');
+    totpInput.focus();
+    
+    totpInput.addEventListener('input', function(e) {
+        // Only allow numbers
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+});
+</script>
+{% endblock %}

@@ -309,6 +309,7 @@ def setup_2fa(request):
         # Генерируем новый secret если его ещё нет
         secret = request.session.get('totp_secret')
         backup_codes = request.session.get('backup_codes')
+        qr_code = request.session.get('qr_code')
         
         if not secret:
             otp_data, error = OTPService.setup_totp(request.user)
@@ -318,17 +319,13 @@ def setup_2fa(request):
             
             secret = otp_data['secret']
             backup_codes = otp_data['backup_codes']
+            qr_code = otp_data['qr_code']
             
             request.session['totp_secret'] = secret
             request.session['backup_codes'] = backup_codes
+            request.session['qr_code'] = qr_code
         
         form = Enable2FAForm()
-    
-    qr_code = request.session.get('qr_code', '')
-    if not qr_code:
-        otp_data, _ = OTPService.setup_totp(request.user)
-        qr_code = otp_data.get('qr_code', '')
-        request.session['qr_code'] = qr_code
     
     return render(request, 'accounts/setup_2fa.html', {
         'form': form,

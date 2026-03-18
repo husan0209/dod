@@ -1,0 +1,439 @@
+/* Mini App CSS */
+/* static/miniapp/css/miniapp.css */
+
+:root {
+  /* Telegram theme variables (set by JavaScript) */
+  --tg-bg: #1a1a2e;
+  --tg-text: #ffffff;
+  --tg-hint: #999999;
+  --tg-link: #00e701;
+  --tg-btn: #00e701;
+  --tg-btn-text: #ffffff;
+  --tg-secondary: #16213e;
+  --tg-header: #0f3460;
+  --tg-section: #16213e;
+
+  /* Layout dimensions */
+  --header-height: 48px;
+  --bottom-nav-height: 60px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Reset and base styles */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--tg-bg);
+  color: var(--tg-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  line-height: 1.4;
+}
+
+/* Content area */
+.content-area {
+  padding-top: calc(var(--header-height) + var(--safe-top));
+  padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom));
+  min-height: 100vh;
+  min-height: var(--tg-viewport-stable-height, 100vh);
+}
+
+/* Header styles */
+header {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.nav-tab.active {
+  color: var(--tg-link) !important;
+}
+
+.nav-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: var(--tg-link);
+  border-radius: 1px;
+}
+
+/* Cards */
+.tg-card {
+  background: var(--tg-section);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 8px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.tg-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+/* Buttons */
+.tg-btn {
+  background: var(--tg-btn);
+  color: var(--tg-btn-text);
+  border: none;
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  min-height: 48px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.tg-btn:hover {
+  opacity: 0.9;
+}
+
+.tg-btn:active {
+  transform: scale(0.98);
+  opacity: 0.8;
+}
+
+.tg-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tg-btn-primary {
+  background: var(--tg-link);
+  color: #ffffff;
+}
+
+.tg-btn-secondary {
+  background: var(--tg-secondary);
+  color: var(--tg-text);
+}
+
+.tg-btn-outline {
+  background: transparent;
+  border: 1px solid var(--tg-link);
+  color: var(--tg-link);
+}
+
+/* List items */
+.tg-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  min-height: 56px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.tg-list-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tg-list-item:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Form elements */
+.tg-input {
+  background: var(--tg-section);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--tg-text);
+  font-size: 16px;
+  width: 100%;
+  min-height: 48px;
+  transition: border-color 0.2s ease;
+}
+
+.tg-input:focus {
+  outline: none;
+  border-color: var(--tg-link);
+  box-shadow: 0 0 0 2px rgba(0, 231, 1, 0.2);
+}
+
+.tg-input::placeholder {
+  color: var(--tg-hint);
+}
+
+.tg-select {
+  background: var(--tg-section);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--tg-text);
+  font-size: 16px;
+  min-height: 48px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Pull to refresh */
+.pull-to-refresh {
+  text-align: center;
+  padding: 10px;
+  color: var(--tg-hint);
+  font-size: 14px;
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--tg-section) 25%,
+    rgba(255, 255, 255, 0.05) 50%,
+    var(--tg-section) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Swipeable elements */
+.swipeable {
+  touch-action: pan-y;
+  overflow-x: hidden;
+}
+
+/* Modal (bottom sheet) */
+.tg-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+  backdrop-filter: blur(4px);
+}
+
+.tg-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--tg-secondary);
+  border-radius: 16px 16px 0 0;
+  padding: 16px;
+  padding-bottom: calc(16px + var(--safe-bottom));
+  z-index: 101;
+  animation: slideUp 0.3s ease-out;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tg-modal-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--tg-hint);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+  opacity: 0.5;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tg-link);
+  color: white;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  min-width: 20px;
+  height: 20px;
+}
+
+.badge-notification {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff4444;
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 6px;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Progress bars */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--tg-link);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Grid layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+
+.p-0 { padding: 0; }
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-3 { padding: 12px; }
+.p-4 { padding: 16px; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.space-x-2 > * + * { margin-left: 8px; }
+.space-x-4 > * + * { margin-left: 16px; }
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .tg-card {
+    margin: 4px 8px;
+    padding: 12px;
+  }
+
+  .tg-btn {
+    font-size: 15px;
+    padding: 12px 20px;
+    min-height: 44px;
+  }
+
+  .tg-list-item {
+    padding: 10px 12px;
+    min-height: 48px;
+  }
+}
+
+/* Dark theme optimizations */
+@media (prefers-color-scheme: dark) {
+  /* Additional dark theme styles if needed */
+}
+
+/* Print styles (hide for printing) */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .tg-modal-backdrop,
+  #bottom-nav,
+  header {
+    display: none !important;
+  }
+}

@@ -10,15 +10,17 @@ class TicketCreateForm(forms.ModelForm):
         fields = ['category', 'subject', 'description']
         widgets = {
             'subject': forms.TextInput(attrs={
-                'class': 'form-control',
+                'class': 'w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all',
                 'placeholder': 'Кратко опишите проблему'
             }),
             'description': forms.Textarea(attrs={
-                'class': 'form-control',
+                'class': 'w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all resize-none',
                 'rows': 5,
                 'placeholder': 'Подробно опишите проблему, шаги воспроизведения, ожидаемый результат'
             }),
-            'category': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={
+                'class': 'w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all cursor-pointer'
+            }),
         }
 
     def clean_subject(self):

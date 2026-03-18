@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ближайшие события - DOD Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative min-h-screen">
+    <!-- Ambient glowing backgrounds -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-[10%] left-[20%] w-[50%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]"></div>
+        <div class="absolute top-[40%] right-[10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="relative z-10 mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold font-outfit text-white mb-2">
+                    Ближайшие события
+                </h1>
+                <p class="text-gray-400">Все спортивные события на ближайшую неделю</p>
+            </div>
+            <a href="{% url 'sports:sports_list' %}" class="btn-secondary px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Назад к видам спорта
+            </a>
+        </div>
+    </div>
+
+    <!-- Events by Date -->
+    {% if events_by_date %}
+        {% for date, date_events in events_by_date.items %}
+        <div class="mb-8 relative z-10">
+            <h2 class="text-xl font-bold font-outfit text-white mb-4 flex items-center">
+                <span class="w-1.5 h-6 bg-blue-500 rounded-full mr-3 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></span>
+                {{ date|date:"l, d F" }}
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for event in date_events %}
+                    {% include 'sports/includes/event_card_compact.html' %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="relative z-10">
+            <div class="glass-card p-12 rounded-3xl border border-white/5 bg-white/5 flex flex-col items-center justify-center text-center">
+                <div class="w-20 h-20 rounded-full bg-slate-800/50 flex items-center justify-center mb-4 text-blue-400">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Нет ближайших событий</h3>
+                <p class="text-gray-400 text-sm max-w-sm">На ближайшую неделю не запланировано спортивных событий. Загляните позже.</p>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="relative z-10 mt-8 flex justify-center">
+        <div class="flex items-center gap-2">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors text-sm">
+                    ← Назад
+                </a>
+            {% endif %}
+            <span class="px-4 py-2 text-gray-400 text-sm">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+            </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors text-sm">
+                    Вперёд →
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

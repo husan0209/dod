@@ -4,20 +4,33 @@
 {% block title %}Создать тикет - DOD{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-2xl mx-auto">
-        <h1 class="text-3xl font-bold text-center mb-8">📋 Новое обращение</h1>
+<div class="max-w-2xl mx-auto px-4 py-12 relative min-h-screen">
+    <!-- Ambient Background Glow -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[120px]"></div>
+        <div class="absolute top-[40%] -left-[10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="relative z-10">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold font-outfit text-white mb-2">Новое обращение</h1>
+            <p class="text-gray-400">Опишите вашу проблему, и мы поможем в ближайшее время</p>
+        </div>
 
         <!-- FAQ Suggestions -->
         <div id="faq-suggestions" class="mb-6">
             {% if suggested_faqs %}
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 class="font-semibold text-blue-800 mb-2">💡 Возможно вам поможет:</h3>
+            <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-5 mb-6">
+                <h3 class="font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                    Возможно вам поможет:
+                </h3>
                 <ul class="space-y-2">
                     {% for faq in suggested_faqs %}
                     <li>
                         <a href="{% url 'support:faq_detail' faq.category.slug faq.slug %}"
-                           class="text-blue-600 hover:text-blue-800">
+                           class="text-blue-400 hover:text-blue-300 transition-colors text-sm flex items-center gap-2 group">
+                            <svg class="w-4 h-4 text-gray-600 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                             {{ faq.question }}
                         </a>
                     </li>
@@ -27,44 +40,55 @@
             {% endif %}
         </div>
 
-        <!-- Form -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <form method="post" enctype="multipart/form-data">
+        <!-- Form Card -->
+        <div class="bg-[#1a1d23]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 md:p-10 shadow-2xl">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
                 {% csrf_token %}
 
-                <div class="mb-4">
-                    <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                <!-- Category -->
+                <div>
+                    <label for="{{ form.category.id_for_label }}" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
                         Категория *
                     </label>
                     {{ form.category }}
                 </div>
 
-                <div class="mb-4">
-                    <label for="{{ form.subject.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                <!-- Subject -->
+                <div>
+                    <label for="{{ form.subject.id_for_label }}" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
                         Тема *
                     </label>
                     {{ form.subject }}
                 </div>
 
-                <div class="mb-4">
-                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                <!-- Description -->
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
                         Описание проблемы *
                     </label>
                     {{ form.description }}
-                    <p class="text-sm text-gray-500 mt-1">Минимум 20 символов</p>
+                    <p class="text-xs text-gray-500 mt-2">Минимум 20 символов</p>
                 </div>
 
-                <div class="mb-6">
-                    <label for="{{ form.attachments.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        📎 Прикрепить файлы
+                <!-- Attachments -->
+                <div>
+                    <label for="{{ form.attachments.id_for_label }}" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+                        Прикрепить файлы
                     </label>
-                    {{ form.attachments }}
-                    <p class="text-sm text-gray-500 mt-1">До 5 файлов, максимум 10 МБ каждый</p>
+                    <div class="relative">
+                        <input type="file" name="{{ form.attachments.name }}" id="{{ form.attachments.id_for_label }}"
+                               multiple
+                               class="block w-full text-sm text-gray-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-wider file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30 file:transition-all cursor-pointer">
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">До 5 файлов, максимум 10 МБ каждый</p>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                    Отправить обращение
-                </button>
+                <!-- Submit -->
+                <div class="pt-6 border-t border-white/5">
+                    <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold text-sm uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5 active:translate-y-0">
+                        Отправить обращение
+                    </button>
+                </div>
             </form>
         </div>
     </div>

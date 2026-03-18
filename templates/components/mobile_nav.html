@@ -1,0 +1,155 @@
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-0 w-full z-[100] pb-safe" x-data="{ mobileMenuOpen: false }">
+    
+    <!-- Slide-up Menu Overlay -->
+    <div x-show="mobileMenuOpen" 
+         class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
+         style="display: none;"
+         @click="mobileMenuOpen = false"
+         x-transition.opacity></div>
+         
+    <!-- Slide-up Menu Content -->
+    <div x-show="mobileMenuOpen" 
+         class="fixed bottom-0 left-0 w-full bg-[#12151c] rounded-t-3xl border-t border-white/10 z-50 transform transition-transform duration-300 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] flex flex-col max-h-[85vh]"
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="translate-y-full"
+         x-transition:enter-end="translate-y-0"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="translate-y-0"
+         x-transition:leave-end="translate-y-full"
+         style="display: none; padding-bottom: calc(env(safe-area-inset-bottom) + 5rem);">
+         
+        <!-- Drag Handle -->
+        <div class="w-full pt-3 pb-2 flex justify-center items-center" @click="mobileMenuOpen = false">
+            <div class="w-12 h-1.5 bg-white/20 rounded-full"></div>
+        </div>
+        
+        <div class="p-4 overflow-y-auto w-full">
+            {% if user.is_authenticated %}
+                <div class="flex items-center space-x-4 mb-6 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-inner">
+                        {{ user.username|make_list|first|upper }}
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-white font-bold text-lg">{{ user.username }}</h3>
+                        <p class="text-xs text-[#00ff00] uppercase tracking-wider">{{ user.get_trust_level_display|default:"Новичок" }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="flex flex-col space-y-3 mb-6 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <button @click="mobileMenuOpen = false; authTab = 'login'; authModalOpen = true" class="w-full px-4 py-3 rounded-xl border border-white/10 text-white font-bold hover:bg-white/5 transition-colors">Вход</button>
+                    <button @click="mobileMenuOpen = false; authTab = 'register'; authModalOpen = true" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(59,130,246,0.4)] border-none">Регистрация</button>
+                </div>
+            {% endif %}
+
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <a href="/sports/" class="flex flex-col items-center justify-center p-4 bg-[#1a1d23] rounded-xl border border-white/5 hover:bg-white/5 transition-colors group">
+                    <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">⚽</span>
+                    <span class="text-sm font-bold text-white">Спорт</span>
+                </a>
+                <a href="/casino/" class="flex flex-col items-center justify-center p-4 bg-[#1a1d23] rounded-xl border border-white/5 hover:bg-white/5 transition-colors group">
+                    <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">🎰</span>
+                    <span class="text-sm font-bold text-white">Казино</span>
+                </a>
+                <a href="{% url 'predictions:index' %}" class="flex flex-col items-center justify-center p-4 bg-[#1a1d23] rounded-xl border border-white/5 hover:bg-white/5 transition-colors group">
+                    <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">📈</span>
+                    <span class="text-sm font-bold text-white">Прогнозы</span>
+                </a>
+                <a href="{% url 'predictions:portfolio' %}" class="flex flex-col items-center justify-center p-4 bg-[#1a1d23] rounded-xl border border-white/5 hover:bg-white/5 transition-colors group">
+                    <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">💼</span>
+                    <span class="text-sm font-bold text-white">Портфель</span>
+                </a>
+            </div>
+
+            <div class="space-y-1">
+                <h4 class="px-2 text-xs font-bold text-text-muted uppercase tracking-wider mb-3">Ваш аккаунт</h4>
+                <a href="{% url 'accounts:profile' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
+                    <span class="text-xl w-8 text-center mr-3 opacity-80">👤</span>
+                    <span class="font-medium text-[15px]">Профиль</span>
+                </a>
+                <a href="{% url 'wallet:deposit' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
+                    <span class="text-xl w-8 text-center mr-3 opacity-80">💰</span>
+                    <span class="font-medium text-[15px]">Пополнение</span>
+                </a>
+                <a href="{% url 'accounts:security_settings' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
+                    <span class="text-xl w-8 text-center mr-3 opacity-80">🛡️</span>
+                    <span class="font-medium text-[15px]">Безопасность</span>
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'referral:dashboard' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
+                    <span class="text-xl w-8 text-center mr-3 opacity-80">🤝</span>
+                    <span class="font-medium text-[15px]">Рефералы</span>
+                </a>
+                {% endif %}
+                <a href="#" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
+                    <span class="text-xl w-8 text-center mr-3 opacity-80">🎧</span>
+                    <span class="font-medium text-[15px]">Поддержка</span>
+                </a>
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full flex items-center px-4 py-3.5 rounded-xl hover:bg-red-500/10 text-red-500 transition-colors mt-4 border border-red-500/20">
+                        <span class="text-xl w-8 text-center mr-3">🚪</span>
+                        <span class="font-bold text-[15px]">Выйти</span>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Bar Original -->
+    <div class="flex justify-between items-center px-2 h-16 relative bg-[#0d1017]/90 backdrop-blur-md z-30 border-t border-dod-surface/80">
+        <!-- Sports -->
+        <a href="/sports/" class="flex flex-col items-center justify-center w-[20%] text-text-secondary hover:text-white transition-colors group">
+            <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-[10px] font-medium">Спорт</span>
+        </a>
+
+        <!-- Casino -->
+        <a href="/casino/" class="flex flex-col items-center justify-center w-[20%] text-text-secondary hover:text-white transition-colors group">
+            <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+            <span class="text-[10px] font-medium">Казино</span>
+        </a>
+
+        <!-- Coupon (Floating Center Button) -->
+        <div class="w-[20%] flex justify-center relative">
+            <a href="#" class="absolute -top-7 flex flex-col items-center justify-center w-14 h-14 bg-gradient-to-tr from-[#00ff00] to-green-500 rounded-full shadow-[0_0_15px_rgba(0,255,0,0.4)] border-4 border-[#1a1d23] text-[#0d1017] transform hover:scale-105 transition-all">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 9h-2V7h2v5zm0 4h-2v-2h2v2z"></path>
+                </svg>
+            </a>
+            <span class="text-[10px] font-medium text-text-secondary absolute bottom-1">Купон</span>
+        </div>
+
+        <!-- Predictions -->
+        <a href="{% url 'predictions:index' %}" class="flex flex-col items-center justify-center w-[20%] text-text-secondary hover:text-white transition-colors group">
+            <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+            <span class="text-[10px] font-medium">Прогнозы</span>
+        </a>
+
+        <!-- Menu Toggle Button -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="flex flex-col items-center justify-center w-[20%] text-text-secondary hover:text-white transition-colors group focus:outline-none">
+            <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+            <svg class="w-6 h-6 mb-1 text-white scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen" style="display: none;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            <span class="text-[10px] font-medium" :class="mobileMenuOpen ? 'text-white' : ''">Меню</span>
+        </button>
+    </div>
+</nav>
+
+<style>
+    .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+</style>

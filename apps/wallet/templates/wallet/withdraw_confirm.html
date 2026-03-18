@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load wallet_tags %}
+
+{% block title %}Подтверждение вывода — DOD{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-12">
+    <div class="bg-dod-surface/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-500/30">
+                <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-white mb-2">Подтверждение</h1>
+            <p class="text-text-secondary text-sm">
+                Для завершения операции вывода необходимо подтверждение безопасности.
+            </p>
+        </div>
+
+        <div class="bg-black/20 rounded-2xl p-4 mb-8 border border-white/5">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs text-text-secondary uppercase tracking-wider">Сумма к выводу</span>
+            </div>
+            <div class="text-xl font-bold text-white">
+                {% format_currency amount currency.code %}
+            </div>
+            <div class="text-xs text-text-muted mt-1">
+                Метод: 2FA ({% if two_fa_method == 'totp' %}Приложение{% else %}Email{% endif %})
+            </div>
+        </div>
+
+        {% if error %}
+            <div class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-3">
+                <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>{{ error }}</span>
+            </div>
+        {% endif %}
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="otp_code" class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                    Код подтверждения
+                </label>
+                <input 
+                    type="text" 
+                    name="otp_code" 
+                    id="otp_code" 
+                    required 
+                    autocomplete="one-time-code"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    maxlength="6"
+                    placeholder="000000"
+                    class="w-full bg-[#12151c] border border-white/10 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder:text-gray-700"
+                    autofocus
+                >
+            </div>
+
+            <button type="submit" class="w-full btn-premium py-4 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all flex items-center justify-center gap-2 group">
+                <span>Подтвердить вывод</span>
+                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+            </button>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-white/5 text-center">
+            <a href="{% url 'wallet:withdraw' %}" class="text-sm text-text-secondary hover:text-white transition-colors">
+                Вернуться к выбору метода
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
