@@ -18,9 +18,9 @@
         </div>
 
         <!-- Permissions Info -->
-        {% if user.partner_profile.tier.has_custom_links %}
+        {% if profile and profile.tier.has_custom_links %}
         <div class="bg-blue-900 border border-blue-700 rounded-lg p-4 mb-8">
-            <p class="text-blue-200"><strong>✅ Доступно:</strong> Можеыте создавать до {% if user.partner_profile.tier.slug == 'vip' %}неограниченного количества{% elif user.partner_profile.tier.slug == 'pro' %}50{% else %}10{% endif %} промо-ссылок</p>
+            <p class="text-blue-200"><strong>✅ Доступно:</strong> Можете создавать до {% if profile.tier.slug == 'vip' %}неограниченного количества{% elif profile.tier.slug == 'pro' %}50{% else %}10{% endif %} промо-ссылок</p>
         </div>
         {% endif %}
 

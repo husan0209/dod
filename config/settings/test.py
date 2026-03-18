@@ -1,3 +1,4 @@
+import os
 from .base import *
 
 DEBUG = False
@@ -6,10 +7,10 @@ SECRET_KEY = 'test-secret-key-not-for-production'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME', default='dod_test'),
-        'USER': env('DB_USER', default='dod_test'),
-        'PASSWORD': env('DB_PASSWORD', default='test'),
-        'HOST': env('DB_HOST', default='localhost'),
+        'NAME': os.getenv('DB_NAME', 'dod_test'),
+        'USER': os.getenv('DB_USER', 'dod_test'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'test'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': '5432',
         'TEST': {
             'NAME': 'dod_test_db',

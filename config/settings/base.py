@@ -1,10 +1,11 @@
 import os
 import sys
+import dotenv
 from pathlib import Path
 from datetime import timedelta
-from dotenv import load_dotenv
+from celery.schedules import crontab
 
-load_dotenv()
+dotenv.load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -190,9 +191,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-from celery.schedules import crontab
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ... existing code ...
 

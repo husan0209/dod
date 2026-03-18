@@ -131,7 +131,7 @@
                     {% for w in pending_withdrawals %}
                     <div class="bg-black/20 rounded-2xl p-4 border border-white/5">
                         <div class="flex justify-between items-start mb-2">
-                            <span class="text-sm font-bold text-white">{{ w.currency.code }} {{ w.amount|floatformat:isSelectedCrypto:8 }}</span>
+                            <span class="text-sm font-bold text-white">{{ w.currency.code }} {{ w.amount|floatformat:8 }}</span>
                             <span class="px-2 py-0.5 rounded-full bg-white/5 text-[9px] font-bold text-gray-400 uppercase">{{ w.get_status_display }}</span>
                         </div>
                         <p class="text-[10px] text-text-secondary truncate mb-3">ID: {{ w.request_id }}</p>

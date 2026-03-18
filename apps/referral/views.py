@@ -14,7 +14,10 @@ from .services.commission_service import CommissionService
 @login_required
 def dashboard(request):
     """Партнёрская панель - дашборд."""
-    profile = request.user.partner_profile
+    profile = getattr(request.user, 'partner_profile', None)
+    if not profile:
+        messages.error(request, 'У вас нет партнёрского аккаунта.')
+        return redirect('home')
 
     # Сводка
     total_balance = profile.balance
@@ -86,7 +89,10 @@ def dashboard(request):
 @login_required
 def referrals(request):
     """Список рефералов."""
-    profile = request.user.partner_profile
+    profile = getattr(request.user, 'partner_profile', None)
+    if not profile:
+        messages.error(request, 'У вас нет партнёрского аккаунта.')
+        return redirect('home')
 
     # Фильтры
     status_filter = request.GET.get('status', '')
@@ -146,6 +152,11 @@ def commissions(request):
 @login_required
 def payouts(request):
     """Выплаты партнёру."""
+    profile = getattr(request.user, 'partner_profile', None)
+    if not profile:
+        messages.error(request, 'У вас нет партнёрского аккаунта.')
+        return redirect('home')
+
     payouts_list = PartnerPayout.objects.filter(
         partner=request.user
     ).order_by('-created_at')
@@ -166,7 +177,7 @@ def payouts(request):
 
     context = {
         'payouts': payouts_list,
-        'profile': request.user.partner_profile,
+        'profile': profile,
     }
 
     return render(request, 'referral/payouts.html', context)
@@ -175,6 +186,11 @@ def payouts(request):
 @login_required
 def promo(request):
     """Промо-материалы."""
+    profile = getattr(request.user, 'partner_profile', None)
+    if not profile:
+        messages.error(request, 'У вас нет партнёрского аккаунта.')
+        return redirect('home')
+
     promo_links = PromoLink.objects.filter(
         partner=request.user
     ).order_by('-created_at')
@@ -199,6 +215,7 @@ def promo(request):
 
     context = {
         'promo_links': promo_links,
+        'profile': profile,
     }
 
     return render(request, 'referral/promo.html', context)
@@ -207,7 +224,10 @@ def promo(request):
 @login_required
 def stats(request):
     """Детальная статистика."""
-    profile = request.user.partner_profile
+    profile = getattr(request.user, 'partner_profile', None)
+    if not profile:
+        messages.error(request, 'У вас нет партнёрского аккаунта.')
+        return redirect('home')
 
     # Показатели
     total_earned = profile.total_earned
@@ -280,7 +300,10 @@ def referral_detail(request, referral_id):
 @login_required
 def settings(request):
     """Настройки партнёра."""
-    profile = request.user.partner_profile
+    profile = getattr(request.user, 'partner_profile', None)
+    if not profile:
+        messages.error(request, 'У вас нет партнёрского аккаунта.')
+        return redirect('home')
 
     if request.method == 'POST':
         bio = request.POST.get('bio')
