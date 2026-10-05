@@ -44,19 +44,19 @@
 
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <a href="/sports/" class="flex flex-col items-center justify-center p-4 bg-[#1a1d23] rounded-xl border border-white/5 hover:bg-white/5 transition-colors group">
-                    <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">⚽</span>
+                    <svg class="w-7 h-7 mb-2 text-emerald-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-width="1.8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m12 3 2.2 4.1 4.6.7-3.3 3.2.8 4.6-4.3-2.2-4.3 2.2.8-4.6-3.3-3.2 4.6-.7L12 3Z"/></svg>
                     <span class="text-sm font-bold text-white">Спорт</span>
                 </a>
                 <a href="/casino/" class="flex flex-col items-center justify-center p-4 bg-[#1a1d23] rounded-xl border border-white/5 hover:bg-white/5 transition-colors group">
-                    <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">🎰</span>
+                    <svg class="w-7 h-7 mb-2 text-purple-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M8 7h.01M12 7h.01M16 7h.01M8 11h.01M12 11h.01M16 11h.01M8 15h8M10 21v-3h4v3"/></svg>
                     <span class="text-sm font-bold text-white">Казино</span>
                 </a>
                 <a href="{% url 'predictions:index' %}" class="flex flex-col items-center justify-center p-4 bg-[#1a1d23] rounded-xl border border-white/5 hover:bg-white/5 transition-colors group">
-                    <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">📈</span>
+                    <svg class="w-7 h-7 mb-2 text-blue-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 17 9 11l4 4 8-9M15 6h6v6"/></svg>
                     <span class="text-sm font-bold text-white">Прогнозы</span>
                 </a>
                 <a href="{% url 'predictions:portfolio' %}" class="flex flex-col items-center justify-center p-4 bg-[#1a1d23] rounded-xl border border-white/5 hover:bg-white/5 transition-colors group">
-                    <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">💼</span>
+                    <svg class="w-7 h-7 mb-2 text-amber-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-13 5h18m-11 0v2h4v-2"/></svg>
                     <span class="text-sm font-bold text-white">Портфель</span>
                 </a>
             </div>
@@ -64,32 +64,32 @@
             <div class="space-y-1">
                 <h4 class="px-2 text-xs font-bold text-text-muted uppercase tracking-wider mb-3">Ваш аккаунт</h4>
                 <a href="{% url 'accounts:profile' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
-                    <span class="text-xl w-8 text-center mr-3 opacity-80">👤</span>
+                    <svg class="w-5 h-5 mr-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 21a8 8 0 0 0-16 0m8-10a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/></svg>
                     <span class="font-medium text-[15px]">Профиль</span>
                 </a>
                 <a href="{% url 'wallet:deposit' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
-                    <span class="text-xl w-8 text-center mr-3 opacity-80">💰</span>
+                    <svg class="w-5 h-5 mr-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7.5A2.5 2.5 0 0 1 5.5 5H20a1 1 0 0 1 1 1v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5Zm0 1.5h18m-5 5h2"/></svg>
                     <span class="font-medium text-[15px]">Пополнение</span>
                 </a>
                 <a href="{% url 'accounts:security_settings' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
-                    <span class="text-xl w-8 text-center mr-3 opacity-80">🛡️</span>
+                    <svg class="w-5 h-5 mr-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m9 12 2 2 4-4"/></svg>
                     <span class="font-medium text-[15px]">Безопасность</span>
                 </a>
                 {% if user.is_authenticated %}
                 <a href="{% url 'referral:dashboard' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
-                    <span class="text-xl w-8 text-center mr-3 opacity-80">🤝</span>
+                    <svg class="w-5 h-5 mr-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m8 12 2.5 2.5a2 2 0 0 0 2.8 0l4.2-4.2M7 7l3-3 3 2h4l4 4-4 4-2-2M7 7l-4 4 4 4 2-2"/></svg>
                     <span class="font-medium text-[15px]">Рефералы</span>
                 </a>
                 {% endif %}
                 <a href="#" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
-                    <span class="text-xl w-8 text-center mr-3 opacity-80">🎧</span>
+                    <svg class="w-5 h-5 mr-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 13v-2a9 9 0 0 1 18 0v2M5 13h2v6H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2Zm14 0h-2v6h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2Zm-7 8h2"/></svg>
                     <span class="font-medium text-[15px]">Поддержка</span>
                 </a>
                 {% if user.is_authenticated %}
                 <form method="post" action="{% url 'accounts:logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="w-full flex items-center px-4 py-3.5 rounded-xl hover:bg-red-500/10 text-red-500 transition-colors mt-4 border border-red-500/20">
-                        <span class="text-xl w-8 text-center mr-3">🚪</span>
+                        <svg class="w-5 h-5 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 17l5-5-5-5m5 5H3m9-9h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
                         <span class="font-bold text-[15px]">Выйти</span>
                     </button>
                 </form>

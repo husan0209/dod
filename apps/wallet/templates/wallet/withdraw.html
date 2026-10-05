@@ -27,11 +27,11 @@
                     {% for b in balances %}
                         {% if b.available > 0 %}
                         <button type="button" 
-                                @click="selectCurrency('{{ b.currency }}', {{ b.available|stringformat:'.8f' }}, '{{ b.currency_icon|default:b.currency }}')"
+                                @click="selectCurrency('{{ b.currency }}', {{ b.available|stringformat:'.8f' }})"
                                 :class="selectedCurrency === '{{ b.currency }}' ? 'border-orange-500 bg-orange-500/10 text-white' : 'border-white/5 bg-black/20 text-text-secondary hover:border-white/20'"
                                 class="flex items-center gap-4 p-4 rounded-2xl border transition-all duration-200 text-left">
-                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xl">
-                                {{ b.currency_icon|default:b.currency }}
+                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                                {% currency_logo b.currency "w-7 h-7 text-[10px]" %}
                             </div>
                             <div>
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{{ b.currency }}</p>
@@ -176,7 +176,7 @@ function withdrawPage() {
         amount: '',
         method: '',
         
-        selectCurrency(code, balance, icon) {
+        selectCurrency(code, balance) {
             this.selectedCurrency = code;
             this.availableBalance = balance;
             this.amount = '';

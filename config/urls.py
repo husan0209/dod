@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.db import connection
@@ -13,6 +14,10 @@ def home_view(request):
     """Главная страница - редирект на dashboard или login"""
     if request.user.is_authenticated:
         return redirect('dashboard:dashboard')
+    return redirect('accounts:login')
+
+def telegram_login_redirect(request):
+    """Stub for Telegram auth until the full flow is implemented."""
     return redirect('accounts:login')
 
 def health_check(request):
@@ -60,6 +65,7 @@ urlpatterns = [
     path('', home_view, name='index'),  # Alias for templates that reference 'index'
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls')),
+    path('auth/telegram-login/', telegram_login_redirect, name='telegram_login'),
     path('allauth/', include('allauth.urls')),
     path('admin-panel/', include('apps.dashboard.urls')),
     path('wallet/', include('apps.wallet.urls')),
@@ -93,3 +99,4 @@ if 'django_prometheus' in settings.INSTALLED_APPS:
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += staticfiles_urlpatterns()

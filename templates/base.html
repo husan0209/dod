@@ -207,7 +207,7 @@
                                     <a href="#" @click.prevent="setCurrency('BTC')" class="flex items-center justify-between px-4 py-2.5 hover:bg-white/5 transition-colors border-l-2 border-transparent">
                                         <div class="flex items-center gap-3">
                                             <div class="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center border border-orange-500/30">
-                                                <span class="text-sm font-bold tracking-tight">₿</span>
+                                                {% currency_logo "BTC" "w-5 h-5" %}
                                             </div>
                                             <div>
                                                 <div class="text-sm font-bold text-white">BTC</div>
@@ -237,7 +237,7 @@
                                     <a href="#" @click.prevent="setCurrency('USDT')" class="flex items-center justify-between px-4 py-2.5 hover:bg-white/5 transition-colors border-l-2 border-transparent">
                                         <div class="flex items-center gap-3">
                                             <div class="w-8 h-8 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center border border-teal-500/30">
-                                                <span class="text-sm font-bold">₮</span>
+                                                {% currency_logo "USDT" "w-5 h-5" %}
                                             </div>
                                             <div>
                                                 <div class="text-sm font-bold text-white">USDT</div>
@@ -429,32 +429,32 @@
                 <div class="space-y-1">
                     <h4 class="px-2 text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2 mt-2">Ваш аккаунт</h4>
                     <a href="{% url 'accounts:profile' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
-                        <span class="text-xl w-8 text-center mr-3 opacity-80">👤</span>
+                        <svg class="w-5 h-5 mr-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 21a8 8 0 0 0-16 0m8-10a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/></svg>
                         <span class="font-medium text-sm">Профиль</span>
                     </a>
                     <a href="{% url 'wallet:overview' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
-                        <span class="text-xl w-8 text-center mr-3 opacity-80">💰</span>
+                        <svg class="w-5 h-5 mr-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7.5A2.5 2.5 0 0 1 5.5 5H20a1 1 0 0 1 1 1v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5Zm0 1.5h18m-5 5h2"/></svg>
                         <span class="font-medium text-sm">Кошелёк</span>
                     </a>
                     <a href="{% url 'accounts:security_settings' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
-                        <span class="text-xl w-8 text-center mr-3 opacity-80">🛡️</span>
+                        <svg class="w-5 h-5 mr-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m9 12 2 2 4-4"/></svg>
                         <span class="font-medium text-sm">Безопасность</span>
                     </a>
                     {% if user.is_authenticated %}
                     <a href="{% url 'referral:dashboard' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
-                        <span class="text-xl w-8 text-center mr-3 opacity-80">🤝</span>
+                        <svg class="w-5 h-5 mr-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m8 12 2.5 2.5a2 2 0 0 0 2.8 0l4.2-4.2M7 7l3-3 3 2h4l4 4-4 4-2-2M7 7l-4 4 4 4 2-2"/></svg>
                         <span class="font-medium text-sm">Партнёрская программа</span>
                     </a>
                     {% endif %}
                     <a href="{% url 'support:home' %}" class="flex items-center px-4 py-3.5 rounded-xl hover:bg-white/5 text-text-secondary hover:text-white transition-colors">
-                        <span class="text-xl w-8 text-center mr-3 opacity-80">🎧</span>
+                        <svg class="w-5 h-5 mr-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 13v-2a9 9 0 0 1 18 0v2M5 13h2v6H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2Zm14 0h-2v6h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2Zm-7 8h2"/></svg>
                         <span class="font-medium text-sm">Поддержка</span>
                     </a>
                     {% if user.is_authenticated %}
                     <form method="post" action="{% url 'accounts:logout' %}" class="mt-4">
                         {% csrf_token %}
                         <button type="submit" class="w-full flex items-center px-4 py-3.5 rounded-xl hover:bg-red-500/10 text-red-500 transition-colors border border-red-500/20">
-                            <span class="text-xl w-8 text-center mr-3">🚪</span>
+                            <svg class="w-5 h-5 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 17l5-5-5-5m5 5H3m9-9h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
                             <span class="font-bold text-sm">Выйти</span>
                         </button>
                     </form>

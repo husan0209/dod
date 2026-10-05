@@ -26,10 +26,10 @@
                 <div class="grid grid-cols-3 sm:grid-cols-5 gap-3">
                     {% for cur in currencies %}
                         <button type="button" 
-                                @click="selectCurrency('{{ cur.code }}', '{{ cur.symbol }}', '{{ cur.min_deposit }}', '{{ cur.icon|default:cur.symbol }}')"
+                                @click="selectCurrency('{{ cur.code }}', '{% currency_symbol cur.code %}', '{{ cur.min_deposit }}')"
                                 :class="selectedCurrency === '{{ cur.code }}' ? 'border-blue-500 bg-blue-500/10 text-white' : 'border-white/5 bg-black/20 text-text-secondary hover:border-white/20'"
                                 class="flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-200">
-                            <span class="text-xl">{{ cur.icon|default:cur.symbol }}</span>
+                            {% currency_logo cur.code "w-7 h-7 text-[10px]" %}
                             <span class="text-xs font-bold">{{ cur.code }}</span>
                         </button>
                     {% endfor %}
@@ -90,8 +90,8 @@
                                             : 'border-white/5 bg-black/20 hover:border-emerald-500/20'"
                                          class="flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 cursor-pointer group relative overflow-hidden">
                                         
-                                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xl flex-shrink-0 group-hover:scale-110 transition-transform">
-                                            {{ m.icon|default:"🪙" }}
+                                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                                            {% payment_method_logo m.code m.currency "w-6 h-6" %}
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p class="text-xs font-bold text-white truncate">{{ m.name }}</p>
@@ -169,15 +169,15 @@
 function depositPage() {
     return {
         selectedCurrency: '{{ selected_currency.code }}',
-        currencyIcon: '{{ selected_currency.icon|default:selected_currency.symbol }}',
+        currencyIcon: '{% currency_symbol selected_currency.code %}',
         minDeposit: '{{ selected_currency.min_deposit }}',
         amount: '',
         selectedProvider: '',
         selectedMethod: '',
         
-        selectCurrency(code, symbol, min, icon) {
+        selectCurrency(code, symbol, min) {
             this.selectedCurrency = code;
-            this.currencyIcon = icon;
+            this.currencyIcon = symbol;
             this.minDeposit = min;
             // Optionally update URL or trigger HTMX if needed
             const url = new URL(window.location);

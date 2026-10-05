@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.cache import never_cache
 from django.contrib.auth.backends import ModelBackend
 
 from apps.accounts.models import User
@@ -97,6 +98,7 @@ def verify_email(request, token):
 
 @require_http_methods(["GET", "POST"])
 @csrf_protect
+@never_cache
 def login_view(request):
     """
     Страница входа.

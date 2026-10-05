@@ -74,7 +74,7 @@
                                             <button type="button" 
                                                     @click="$refs.currencyInput.value = '{{ b.currency }}'; open = false; document.getElementById('currency-form-mobile').dispatchEvent(new Event('submit', {cancelable: true})); setTimeout(() => window.location.reload(), 300);"
                                                     class="w-full text-left px-5 py-3 text-sm hover:bg-white/5 transition-colors flex items-center justify-between {% if b.currency == wallet.primary_currency_id %}bg-blue-500/10 text-blue-400 font-bold border-l-2 border-blue-500{% else %}text-white border-l-2 border-transparent{% endif %}">
-                                                <span>{{ b.currency }}</span>
+                                                <span class="flex items-center gap-3">{% currency_logo b.currency "w-6 h-6 text-[9px]" %}{{ b.currency }}</span>
                                                 <span class="text-xs text-gray-400">{% format_currency b.available b.currency %}</span>
                                             </button>
                                             {% endfor %}
