@@ -61,6 +61,7 @@
                         <a href="{% url 'predictions:index' %}" class="link-modern text-sm font-medium">Прогнозы</a>
                         <a href="/casino/" class="link-modern text-sm font-medium">Казино</a>
                         <a href="/sports/" class="link-modern text-sm font-medium">Спорт</a>
+                        <a href="{% url 'integrations:demo_hub' %}" class="link-modern text-sm font-medium">Тест API</a>
                     </nav>
                     
                     {% if user.is_authenticated %}

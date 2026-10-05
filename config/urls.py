@@ -73,6 +73,7 @@ urlpatterns = [
     path('casino/', include('apps.casino.urls')),
     path('sports/', include('apps.sports.urls')),
     path('predictions/', include('apps.predictions.urls')),
+    path('integrations/demo/', include('apps.integrations.urls')),
     path('partners/', include('apps.referral.urls')),
     path('support/', include('apps.support.urls')),
     path('telegram/', include('apps.telegram_bot.urls')),

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Тестовые интеграции | DOD{% endblock %}
+
+{% block content %}
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <header class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-[#12151c] p-7 md:p-10">
+        <p class="text-sm font-semibold uppercase tracking-widest text-blue-400">Sandbox · read-only feeds</p>
+        <h1 class="mt-3 text-3xl md:text-5xl font-bold text-white">Тестовый центр интеграций</h1>
+        <p class="mt-4 max-w-3xl text-gray-400">
+            Данные внешних источников показываются отдельно от кошелька и ставок DOD.
+            Коэффициенты и вероятности на этой странице нельзя использовать для размещения ставки.
+        </p>
+        <a href="?refresh=1" class="mt-6 inline-flex rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10">
+            Обновить источники
+        </a>
+    </header>
+
+    <section class="rounded-2xl border border-white/10 bg-[#12151c] p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <p class="text-xs uppercase tracking-widest text-gray-500">Спортивные события и коэффициенты</p>
+                <h2 class="mt-1 text-2xl font-bold text-white">{{ odds_feed.source }}</h2>
+            </div>
+            {% if odds_feed.mode == 'live' %}
+                <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">LIVE API · ТОЛЬКО ДАННЫЕ</span>
+            {% elif odds_feed.mode == 'demo' %}
+                <span class="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-300">ДЕМО-КОЭФФИЦИЕНТЫ</span>
+            {% else %}
+                <span class="rounded-full bg-red-500/10 px-3 py-1 text-xs font-bold text-red-300">API НЕДОСТУПЕН</span>
+            {% endif %}
+        </div>
+
+        {% if odds_feed.error %}
+            <p class="mt-5 rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-sm text-red-200">{{ odds_feed.error }}</p>
+        {% elif odds_feed.events %}
+            <div class="mt-5 grid gap-3 md:grid-cols-2">
+                {% for event in odds_feed.events %}
+                    <article class="rounded-xl border border-white/5 bg-white/[0.03] p-4">
+                        <p class="text-xs text-gray-500">{{ event.commence_time }}</p>
+                        <h3 class="mt-2 font-semibold text-white">{{ event.home_team|default:event.home }} <span class="text-gray-500">—</span> {{ event.away_team|default:event.away }}</h3>
+                        {% with bookmaker=event.bookmakers.0 market=event.bookmakers.0.markets.0 %}
+                            {% if market.outcomes %}
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    {% for outcome in market.outcomes %}
+                                        <span class="rounded-lg bg-blue-500/10 px-3 py-2 text-sm text-blue-100">
+                                            {{ outcome.name }} <strong class="ml-1">{{ outcome.price }}</strong>
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                                <p class="mt-2 text-xs text-gray-500">{{ bookmaker.title|default:bookmaker.name }}</p>
+                            {% else %}
+                                <p class="mt-3 text-sm text-gray-400">Коэффициенты для этого события ещё не опубликованы.</p>
+                            {% endif %}
+                        {% endwith %}
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="mt-5 text-sm text-gray-400">Поставщик не вернул доступных событий для выбранного вида спорта.</p>
+        {% endif %}
+        {% if odds_feed.mode == 'demo' %}
+            <p class="mt-4 text-sm text-gray-400">
+                Чтобы загрузить реальные коэффициенты для разработки, добавьте ключ The Odds API
+                в <code class="text-blue-300">THE_ODDS_API_KEY</code>. Бесплатность и квоту плана уточняйте у поставщика; ставки у букмекеров мы не размещаем.
+            </p>
+            <a class="mt-2 inline-block text-sm text-blue-400 hover:text-blue-300" href="https://the-odds-api.com/" target="_blank" rel="noopener noreferrer">Получить ключ и посмотреть документацию The Odds API ↗</a>
+            <a class="mt-2 ml-4 inline-block text-sm text-blue-400 hover:text-blue-300" href="https://the-odds-api.com/liveapi/guides/v4/" target="_blank" rel="noopener noreferrer">Документация API v4 ↗</a>
+        {% endif %}
+    </section>
+
+    <section class="rounded-2xl border border-white/10 bg-[#12151c] p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <p class="text-xs uppercase tracking-widest text-gray-500">Публичные рынки прогнозов</p>
+                <h2 class="mt-1 text-2xl font-bold text-white">{{ prediction_feed.source }}</h2>
+            </div>
+            {% if prediction_feed.mode == 'live' %}
+                <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">ПУБЛИЧНЫЙ API · ТОЛЬКО ДАННЫЕ</span>
+            {% else %}
+                <span class="rounded-full bg-red-500/10 px-3 py-1 text-xs font-bold text-red-300">API НЕДОСТУПЕН</span>
+            {% endif %}
+        </div>
+        {% if prediction_feed.error %}
+            <p class="mt-5 rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-sm text-red-200">{{ prediction_feed.error }}</p>
+        {% elif prediction_feed.markets %}
+            <div class="mt-5 grid gap-3 md:grid-cols-2">
+                {% for market in prediction_feed.markets %}
+                    <a href="{{ market.url }}" target="_blank" rel="noopener noreferrer" class="rounded-xl border border-white/5 bg-white/[0.03] p-4 hover:border-blue-500/30">
+                        <h3 class="font-semibold leading-snug text-white">{{ market.question }}</h3>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="text-sm text-gray-400">Вероятность YES</span>
+                            <strong class="text-lg text-emerald-400">{{ market.probability }}%</strong>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Объём за 24 ч: {{ market.volume|floatformat:0 }} · открыть первоисточник ↗</p>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="mt-5 text-sm text-gray-400">Нет доступных бинарных рынков для показа.</p>
+        {% endif %}
+        <p class="mt-4 text-xs text-gray-500">Manifold — внешний рынок с собственной валютой и правилами. Эти вероятности не синхронизируются с внутренними торгами DOD.</p>
+    </section>
+
+    <section class="rounded-2xl border border-white/10 bg-[#12151c] p-6">
+        <p class="text-xs uppercase tracking-widest text-gray-500">Игровые слоты</p>
+        <h2 class="mt-1 text-2xl font-bold text-white">Встроенная demo-игра</h2>
+        <p class="mt-3 max-w-3xl text-gray-400">
+            В проекте уже есть локальный provably-fair слот. Это не каталог внешнего агрегатора;
+            игровой раунд использует баланс тестового аккаунта, поэтому делайте только небольшие тестовые ставки.
+            Внешний провайдер предоставит интеграцию после выдачи sandbox-ключей и тестового игрового портала.
+        </p>
+        <a href="{% url 'casino:slots' %}" class="mt-5 inline-flex rounded-xl bg-purple-600 px-5 py-3 font-semibold text-white hover:bg-purple-500">Открыть локальный слот</a>
+        <a href="https://slotegrator.com/" target="_blank" rel="noopener noreferrer" class="ml-3 inline-flex rounded-xl border border-white/10 bg-white/5 px-5 py-3 font-semibold text-gray-200 hover:bg-white/10">Запросить sandbox у Slotegrator ↗</a>
+    </section>
+
+    <p class="text-xs leading-relaxed text-gray-500">
+        Эти подключения предназначены только для разработки. Внешние источники могут иметь лимиты, задержки,
+        региональные ограничения и собственные условия использования. Не применяйте demo-данные или тестовые
+        балансы для реальной игры.
+    </p>
+</main>
+{% endblock %}

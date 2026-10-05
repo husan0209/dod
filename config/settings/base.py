@@ -11,6 +11,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
 CASINO_API_SECRET = os.getenv('CASINO_API_SECRET', '')
+THE_ODDS_API_KEY = os.getenv('THE_ODDS_API_KEY', '')
+THE_ODDS_API_SPORT = os.getenv('THE_ODDS_API_SPORT', 'soccer_epl')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,localhost:9000,127.0.0.1:9000,0.0.0.0').split(',')
 
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
     'apps.sports',
     'apps.casino',
     'apps.predictions',
+    'apps.integrations',
     'apps.referral',
     'apps.support',
     'apps.dashboard',
