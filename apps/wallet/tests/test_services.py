@@ -87,6 +87,30 @@ class WalletServiceTests(TestCase):
         self.assertEqual(balance.available, Decimal("40"))
         self.assertEqual(balance.frozen, Decimal("0"))
 
+    def test_settle_bet_releases_stake_and_credits_cashout(self):
+        TransactionService.deposit(self.wallet, currency_code="USD", amount=Decimal("40"))
+        TransactionService.freeze_funds(
+            self.wallet,
+            currency_code="USD",
+            amount=Decimal("10"),
+            reference_type="bet",
+            reference_id="bet-cashout",
+        )
+
+        txn = TransactionService.settle_bet(
+            self.wallet,
+            currency_code="USD",
+            frozen_amount=Decimal("10"),
+            win_amount=Decimal("8"),
+            reference_type="bet_cashout",
+            reference_id="bet-cashout",
+        )
+
+        balance = self.wallet.balances.get(currency_id="USD")
+        self.assertEqual(balance.available, Decimal("38"))
+        self.assertEqual(balance.frozen, Decimal("0"))
+        self.assertEqual(txn.type, "win")
+
     def test_conversion_execute(self):
         TransactionService.deposit(self.wallet, currency_code="USD", amount=Decimal("100"))
         order = ConversionService.execute_conversion(self.wallet, "USD", "EUR", Decimal("50"))

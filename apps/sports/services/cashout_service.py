@@ -71,7 +71,19 @@ class CashoutService:
                 f"Сумма кэшаута слишком мала (минимум: ${BetSettings.get_settings().cashout_min_amount_usd})"
             )
 
-        # Выполнить кэшаут
+        if not bet.freeze_transaction:
+            raise CashoutError("Замороженные средства ставки не найдены")
+
+        # Settle the frozen stake and credit the cashout atomically.
+        TransactionService.settle_bet(
+            wallet=bet.wallet,
+            currency_code=bet.currency.code,
+            frozen_amount=bet.stake,
+            win_amount=cashout_amount,
+            reference_type='bet_cashout',
+            reference_id=bet.bet_id,
+        )
+
         bet.status = 'cashed_out'
         bet.cashout_amount = cashout_amount
         bet.cashout_used_at = timezone.now()
@@ -80,24 +92,6 @@ class CashoutService:
         bet.settled_at = timezone.now()
         bet.cashout_available = False
         bet.save()
-
-        # Обработать платёж
-        if bet.freeze_transaction:
-            TransactionService.unfreeze_funds(
-                transaction_id=bet.freeze_transaction.id,
-                reason="Кэшаут"
-            )
-
-        # Зачислить сумму кэшаута
-        TransactionService.create_transaction(
-            wallet=bet.wallet,
-            transaction_type='cashout',
-            currency_code=bet.currency.code,
-            amount=cashout_amount,
-            reference_type='bet',
-            reference_id=bet.bet_id,
-            description=f"Кэшаут ставки {bet.bet_id}"
-        )
 
         logger.info(
             f"Кэшаут выполнен: ставка {bet.bet_id}, "

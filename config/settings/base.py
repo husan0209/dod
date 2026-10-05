@@ -10,6 +10,7 @@ dotenv.load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
+CASINO_API_SECRET = os.getenv('CASINO_API_SECRET', '')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,localhost:9000,127.0.0.1:9000,0.0.0.0').split(',')
 

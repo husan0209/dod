@@ -90,6 +90,13 @@ class AdminAccessMiddleware:
         # Attach admin_profile to request
         request.admin_profile = admin_profile
 
+        # Every admin-panel request requires a completed second-factor challenge.
+        if not is_2fa_verification_path and (
+            not request.user.is_2fa_enabled
+            or not request.session.get('admin_2fa_verified')
+        ):
+            return redirect('dashboard:verify-2fa')
+
         return self.get_response(request)
 
 

@@ -107,6 +107,8 @@ def login_view(request):
         return redirect('dashboard:dashboard')
     
     if request.method == 'POST':
+        request.session.pop('2fa_user_id', None)
+        request.session.pop('admin_2fa_verified', None)
         form = EmailAuthenticationForm(request, data=request.POST)
         if form.is_valid():
             email = form.cleaned_data.get('username')
@@ -120,7 +122,10 @@ def login_view(request):
                 user, error = None, 'Неверный email или пароль'
             
             if user:
-                # Логируем пользователя без проверки 2FA
+                if user.is_2fa_enabled:
+                    request.session['2fa_user_id'] = str(user.id)
+                    return redirect('accounts:verify_2fa')
+
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 messages.success(request, 'Вы успешно вошли.')
                 return redirect('dashboard:dashboard')
@@ -146,6 +151,9 @@ def verify_2fa(request):
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
         return redirect('accounts:login')
+    if not user.is_active or not user.is_2fa_enabled:
+        request.session.pop('2fa_user_id', None)
+        return redirect('accounts:login')
     
     if request.method == 'POST':
         form = Verify2FAForm(request.POST)
@@ -167,6 +175,8 @@ def verify_2fa(request):
             if verified:
                 del request.session['2fa_user_id']
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                if user.is_staff:
+                    request.session['admin_2fa_verified'] = True
                 messages.success(request, 'Вы успешно вошли.')
                 return redirect('dashboard:dashboard')
             else:

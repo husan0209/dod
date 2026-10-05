@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 from django.utils import timezone
 from django.db import models
 from django.utils.text import slugify
@@ -8,6 +9,7 @@ from django.utils.text import slugify
 from apps.core.models import PlatformSettings, Banner, Promotion, StaticPage
 from apps.dashboard.models import AdminRole
 from apps.dashboard.decorators import require_permission
+from apps.accounts.models import AdminActionLog
 
 
 @login_required
@@ -17,6 +19,18 @@ def platform_settings(request):
     settings = PlatformSettings.get_settings()
     
     if request.method == 'POST':
+        if not request.admin_profile.has_permission('settings', 'edit'):
+            AdminActionLog.objects.create(
+                admin_user=request.user,
+                action_type='permission_denied',
+                module='settings',
+                action_category='permission',
+                description='Denied: settings.edit',
+                ip_address=request.META.get('REMOTE_ADDR'),
+                is_successful=False,
+            )
+            return HttpResponseForbidden('Insufficient rights: settings.edit')
+
         # Simple implementation for saving settings
         settings.site_name = request.POST.get('site_name', settings.site_name)
         settings.is_maintenance_mode = request.POST.get('is_maintenance_mode') == 'on'

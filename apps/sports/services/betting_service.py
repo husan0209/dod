@@ -221,16 +221,16 @@ class BettingService:
         BettingService._validate_user_event_limit(user, event)
 
         # 3. Заморозить средства
+        bet_id = BettingService._generate_bet_id()
         freeze_tx = TransactionService.freeze_funds(
             wallet=wallet,
             currency_code=currency_code,
             amount=stake_decimal,
             reference_type='bet',
-            description=f"Ставка на {event}"
+            reference_id=bet_id,
         )
 
         # 4. Создать ставку
-        bet_id = BettingService._generate_bet_id()
         bet = Bet.objects.create(
             bet_id=bet_id,
             user=user,
@@ -379,16 +379,16 @@ class BettingService:
         BettingService._validate_wallet(wallet, currency_code, stake_decimal)
 
         # 6. Заморозить средства
+        bet_id = BettingService._generate_bet_id()
         freeze_tx = TransactionService.freeze_funds(
             wallet=wallet,
             currency_code=currency_code,
             amount=stake_decimal,
             reference_type='bet',
-            description=f"Экспресс ставка ({len(items)} событий)"
+            reference_id=bet_id,
         )
 
         # 7. Создать ставку
-        bet_id = BettingService._generate_bet_id()
         bet = Bet.objects.create(
             bet_id=bet_id,
             user=user,
@@ -481,8 +481,11 @@ class BettingService:
         # Разморозить средства
         if bet.freeze_transaction:
             TransactionService.unfreeze_funds(
-                transaction_id=bet.freeze_transaction.id,
-                reason=f"Отмена ставки : {reason}"
+                wallet=bet.wallet,
+                currency_code=bet.currency.code,
+                amount=bet.stake,
+                reference_type='bet_cancel',
+                reference_id=bet.bet_id,
             )
 
         bet.save()

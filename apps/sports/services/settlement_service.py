@@ -472,8 +472,11 @@ class SettlementService:
             # Возврат: разморозить
             if bet.freeze_transaction:
                 TransactionService.unfreeze_funds(
-                    transaction_id=bet.freeze_transaction.id,
-                    reason="Ставка аннулирована"
+                    wallet=bet.wallet,
+                    currency_code=bet.currency.code,
+                    amount=bet.stake,
+                    reference_type='bet_void',
+                    reference_id=bet.bet_id,
                 )
 
     @staticmethod
@@ -549,8 +552,11 @@ class SettlementService:
             # Разморозить средства
             if bet.freeze_transaction:
                 TransactionService.unfreeze_funds(
-                    transaction_id=bet.freeze_transaction.id,
-                    reason=f"Событие отменено: {reason}"
+                    wallet=bet.wallet,
+                    currency_code=bet.currency.code,
+                    amount=bet.stake,
+                    reference_type='bet_void',
+                    reference_id=bet.bet_id,
                 )
 
             voided_count += 1
